@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   IconCode,
@@ -7,12 +7,107 @@ import {
   IconRocket,
 } from "@tabler/icons-react";
 
+interface ProfileData {
+  name: string;
+  email: string;
+  profileImage: string | null;
+  title?: string;
+  location?: string;
+  bio?: string;
+}
+
 const About: React.FC = () => {
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      console.log("Starting profile fetch...");
+      const token = localStorage.getItem("token");
+      console.log("Token available:", !!token);
+
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/settings/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("Profile response status:", response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Profile Data:", {
+            name: data.name,
+            email: data.email,
+            hasImage: !!data.profileImage,
+            imagePath: data.profileImage,
+          });
+          setProfileData(data);
+        } else {
+          const errorText = await response.text();
+          console.error("Failed to fetch profile:", {
+            status: response.status,
+            error: errorText,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+        console.log("Profile fetch completed");
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    console.error("Image load error:", {
+      src: e.currentTarget.src,
+      error: e,
+    });
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    console.log("Image loaded successfully");
+    setImageError(false);
+  };
+
+  const getProfileImageUrl = () => {
+    if (!profileData?.profileImage) {
+      console.log("No profile image available");
+      return null;
+    }
+
+    const imageUrl = `http://localhost:5000${profileData.profileImage}`;
+    console.log("Profile image URL:", imageUrl);
+    return imageUrl;
+  };
+
+  const getFallbackAvatarUrl = () => {
+    const name = profileData?.name || "User";
+    const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=random`;
+    console.log("Fallback avatar URL:", url);
+    return url;
+  };
+
   const personalInfo = {
-    name: "Your Name",
-    title: "Software Engineer",
-    location: "Your Location",
-    bio: `I am a passionate software engineer with expertise in building modern web applications. 
+    name: profileData?.name || "Your Name",
+    title: profileData?.title || "Software Engineer",
+    location: profileData?.location || "Your Location",
+    bio:
+      profileData?.bio ||
+      `I am a passionate software engineer with expertise in building modern web applications. 
     With a strong foundation in both frontend and backend development, I create efficient and 
     scalable solutions that solve real problems.`,
     interests: [
@@ -59,6 +154,27 @@ const About: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
+          <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-600 shadow-lg">
+            {loading ? (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : profileData?.profileImage && !imageError ? (
+              <img
+                src={getProfileImageUrl() || ""}
+                alt={profileData.name}
+                className="w-full h-full object-cover"
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+              />
+            ) : (
+              <img
+                src={getFallbackAvatarUrl()}
+                alt={profileData?.name || "User"}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             {personalInfo.name}
           </h1>

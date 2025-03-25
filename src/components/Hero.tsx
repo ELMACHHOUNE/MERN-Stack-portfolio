@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   IconBrandGithub,
@@ -12,7 +12,97 @@ interface SocialLink {
   label: string;
 }
 
+interface AdminProfile {
+  name: string;
+  email: string;
+  profileImage: string | null;
+}
+
 const Hero: React.FC = () => {
+  const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      console.log("Starting profile fetch...");
+      const token = localStorage.getItem("token");
+      console.log("Token available:", !!token);
+
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/settings/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("Profile response status:", response.status);
+
+        if (response.ok) {
+          const profileData = await response.json();
+          console.log("Profile Data:", {
+            name: profileData.name,
+            email: profileData.email,
+            hasImage: !!profileData.profileImage,
+            imagePath: profileData.profileImage,
+          });
+          setAdminProfile(profileData);
+        } else {
+          const errorText = await response.text();
+          console.error("Failed to fetch profile:", {
+            status: response.status,
+            error: errorText,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+        console.log("Profile fetch completed");
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    console.error("Image load error:", {
+      src: e.currentTarget.src,
+      error: e,
+    });
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    console.log("Image loaded successfully");
+    setImageError(false);
+  };
+
+  const getProfileImageUrl = () => {
+    if (!adminProfile?.profileImage) {
+      console.log("No profile image available");
+      return null;
+    }
+
+    const imageUrl = `http://localhost:5000/uploads/profiles/${adminProfile.profileImage}`;
+    console.log("Profile image URL:", imageUrl);
+    return imageUrl;
+  };
+
+  const getFallbackAvatarUrl = () => {
+    const name = adminProfile?.name || "User";
+    const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=random`;
+    console.log("Fallback avatar URL:", url);
+    return url;
+  };
+
   const socialLinks: SocialLink[] = [
     {
       href: "https://github.com/yourusername",
@@ -65,6 +155,31 @@ const Hero: React.FC = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <div className="relative w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-blue-400 shadow-lg">
+            {adminProfile?.profileImage ? (
+              <img
+                src={getProfileImageUrl() || ""}
+                alt={adminProfile.name}
+                className="w-full h-full object-cover"
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+              />
+            ) : (
+              <img
+                src={getFallbackAvatarUrl()}
+                alt={adminProfile?.name || "User"}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+        </motion.div>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,7 +188,7 @@ const Hero: React.FC = () => {
         >
           Hi, I'm{" "}
           <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Your Name
+            {adminProfile?.name || "Your Name"}
           </span>
         </motion.h1>
         <motion.h2

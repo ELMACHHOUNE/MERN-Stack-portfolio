@@ -5,33 +5,34 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Please provide a name"],
-      trim: true,
-      maxlength: [50, "Name cannot be more than 50 characters"],
+      required: [true, "Please add a name"],
     },
     email: {
       type: String,
-      required: [true, "Please provide an email"],
+      required: [true, "Please add an email"],
       unique: true,
-      trim: true,
-      lowercase: true,
       match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        "Please provide a valid email",
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please add a valid email",
       ],
     },
     password: {
       type: String,
-      required: [true, "Please provide a password"],
-      minlength: [6, "Password must be at least 6 characters"],
+      required: [true, "Please add a password"],
+      minlength: 6,
       select: false,
     },
     isAdmin: {
       type: Boolean,
       default: false,
     },
+    profileImage: {
+      type: String,
+      default: null,
+    },
     lastLogin: {
       type: Date,
+      default: Date.now,
     },
   },
   {
@@ -39,25 +40,26 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Encrypt password using bcrypt
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    return next();
+    next();
   }
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password method
+// Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Get public profile method
+// Get public profile (exclude password)
 userSchema.methods.getPublicProfile = function () {
-  const userObject = this.toObject();
-  delete userObject.password;
-  return userObject;
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
 };
 
 module.exports = mongoose.model("User", userSchema);
