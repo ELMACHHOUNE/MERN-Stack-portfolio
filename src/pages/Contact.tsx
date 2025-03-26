@@ -93,7 +93,7 @@ const Contact: React.FC = () => {
                     Email
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    your.email@example.com
+                    business.elmachhoune@gmail.com
                   </p>
                 </div>
               </div>
@@ -115,7 +115,7 @@ const Contact: React.FC = () => {
                     Location
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Your City, Country
+                    Kenitra, Morocco
                   </p>
                 </div>
               </div>

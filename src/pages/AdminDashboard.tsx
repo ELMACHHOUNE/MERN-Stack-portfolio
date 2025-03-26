@@ -1,23 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import SkillsManager from "../components/SkillsManager";
 import ProjectManager from "../components/ProjectManager";
 import SettingsManager from "../components/SettingsManager";
-import {
-  IconLogout,
-  IconSettings,
-  IconCode,
-  IconFolder,
-} from "@tabler/icons-react";
+import { IconSettings, IconCode, IconFolder } from "@tabler/icons-react";
 
 const AdminDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("skills");
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -26,13 +14,6 @@ const AdminDashboard: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Admin Dashboard
           </h1>
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900"
-          >
-            <IconLogout className="w-5 h-5 mr-2" />
-            Logout
-          </button>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">

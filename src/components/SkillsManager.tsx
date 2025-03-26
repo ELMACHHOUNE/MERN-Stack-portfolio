@@ -24,6 +24,8 @@ const SkillsManager: React.FC = () => {
   const [formData, setFormData] = useState({
     name: "",
     category: "frontend",
+    level: 50,
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
   });
 
   const fetchSkills = async () => {
@@ -63,22 +65,34 @@ const SkillsManager: React.FC = () => {
         : "http://localhost:5000/api/skills";
       const method = editingSkill ? "PATCH" : "POST";
 
+      // Prepare the skill data
+      const skillData = {
+        name: formData.name,
+        category: formData.category,
+        level: formData.level,
+        icon: formData.icon,
+        order: skills.length, // Set order to the end of the list
+        isActive: true,
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(skillData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save skill");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save skill");
       }
 
       await fetchSkills();
       handleCloseForm();
     } catch (err) {
+      console.error("Error saving skill:", err);
       setError(err instanceof Error ? err.message : "Failed to save skill");
     }
   };
@@ -110,13 +124,20 @@ const SkillsManager: React.FC = () => {
     setFormData({
       name: skill.name,
       category: skill.category,
+      level: 50,
+      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
     });
     setShowForm(true);
   };
 
   const handleCloseForm = () => {
     setEditingSkill(null);
-    setFormData({ name: "", category: "frontend" });
+    setFormData({
+      name: "",
+      category: "frontend",
+      level: 50,
+      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+    });
     setShowForm(false);
   };
 
@@ -221,8 +242,47 @@ const SkillsManager: React.FC = () => {
                   <option value="frontend">Frontend</option>
                   <option value="backend">Backend</option>
                   <option value="database">Database</option>
-                  <option value="other">Other</option>
+                  <option value="devops">DevOps</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Level (0-100)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.level}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      level: parseInt(e.target.value),
+                    })
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Icon URL
+                </label>
+                <input
+                  type="text"
+                  value={formData.icon}
+                  onChange={(e) =>
+                    setFormData({ ...formData, icon: e.target.value })
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  required
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  You can use Devicon URLs (e.g.,
+                  https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg)
+                </p>
               </div>
 
               <div className="flex justify-end space-x-3">
