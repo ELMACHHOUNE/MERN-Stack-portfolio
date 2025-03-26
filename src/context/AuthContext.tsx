@@ -37,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
+      console.log("Attempting login...");
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
@@ -49,10 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Login failed");
+        console.error("Login response error:", error);
+        throw new Error(
+          error.message ||
+            `Login failed: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
+      console.log("Login successful:", data);
+
       setToken(data.token);
       setUser(data.user);
       localStorage.setItem("token", data.token);

@@ -50,9 +50,20 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     exposedHeaders: ["Content-Disposition"],
+    optionsSuccessStatus: 200,
     preflightContinue: false,
   })
 );
+
+// Add CORS headers middleware
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+});
 
 // Body parser
 app.use(express.json({ limit: "10kb" }));

@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   IconBrandGithub,
   IconExternalLink,
@@ -29,6 +31,8 @@ interface Project {
 }
 
 const Projects: React.FC = () => {
+  const navigate = useNavigate();
+  const { token, logout } = useAuth();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
@@ -50,7 +54,27 @@ const Projects: React.FC = () => {
     const fetchProjects = async () => {
       try {
         console.log("Fetching all projects...");
-        const response = await fetch("http://localhost:5000/api/projects");
+
+        if (!token) {
+          console.log("No token found, redirecting to login...");
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/projects", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (response.status === 401) {
+          console.log("Token expired or invalid, logging out...");
+          logout();
+          navigate("/login");
+          return;
+        }
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -71,13 +95,18 @@ const Projects: React.FC = () => {
         setError(
           err instanceof Error ? err.message : "Failed to fetch projects"
         );
+
+        if (err instanceof Error && err.message.includes("401")) {
+          logout();
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchProjects();
-  }, []);
+  }, [token, logout, navigate]);
 
   // Apply filters whenever filter criteria change
   useEffect(() => {
