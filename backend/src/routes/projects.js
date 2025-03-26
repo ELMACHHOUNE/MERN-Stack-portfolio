@@ -6,7 +6,21 @@ const Project = require("../models/Project");
 // Get all projects (public route)
 router.get("/", async (req, res) => {
   try {
-    const projects = await Project.find({ isActive: true }).sort({ order: 1 });
+    const { category, technologies } = req.query;
+    let query = { isActive: true };
+
+    // Add category filter if provided
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    // Add technologies filter if provided
+    if (technologies) {
+      const techArray = technologies.split(",");
+      query.technologies = { $in: techArray };
+    }
+
+    const projects = await Project.find(query).sort({ order: 1 });
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -16,9 +30,24 @@ router.get("/", async (req, res) => {
 // Get all projects (admin only)
 router.get("/admin", protect, admin, async (req, res) => {
   try {
-    const projects = await Project.find().sort({ order: 1 });
+    const { category, technologies } = req.query;
+    let query = {};
+
+    // Add category filter if provided
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    // Add technologies filter if provided
+    if (technologies) {
+      const techArray = technologies.split(",");
+      query.technologies = { $in: techArray };
+    }
+
+    const projects = await Project.find(query).sort({ order: 1 });
     res.json(projects);
   } catch (error) {
+    console.error("Get projects error:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -56,14 +85,13 @@ router.patch("/:id", protect, admin, async (req, res) => {
 // Delete project (admin only)
 router.delete("/:id", protect, admin, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findByIdAndDelete(req.params.id);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
-    await project.remove();
     res.json({ message: "Project deleted successfully" });
   } catch (error) {
+    console.error("Delete project error:", error);
     res.status(500).json({ message: error.message });
   }
 });

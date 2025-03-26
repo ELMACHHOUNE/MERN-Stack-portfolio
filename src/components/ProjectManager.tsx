@@ -97,16 +97,27 @@ const ProjectManager: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      // Prepare project data
       const projectData = {
         ...formData,
         technologies: formData.technologies.split(",").map((t) => t.trim()),
         features: formData.features.split(",").map((f) => f.trim()),
+        order: projects.length, // Set order to the end of the list
+        isActive: true,
+        startDate: new Date(formData.startDate),
+        endDate: new Date(formData.endDate),
       };
 
       const url = editingProject
         ? `http://localhost:5000/api/projects/${editingProject._id}`
         : "http://localhost:5000/api/projects";
       const method = editingProject ? "PATCH" : "POST";
+
+      console.log("Sending project data:", projectData);
 
       const response = await fetch(url, {
         method,
@@ -118,10 +129,12 @@ const ProjectManager: React.FC = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(
-          `Failed to ${editingProject ? "update" : "create"} project: ${
-            response.status
-          } ${response.statusText}`
+          errorData.message ||
+            `Failed to ${editingProject ? "update" : "create"} project: ${
+              response.status
+            } ${response.statusText}`
         );
       }
 
@@ -129,11 +142,7 @@ const ProjectManager: React.FC = () => {
       handleCloseForm();
     } catch (err) {
       console.error("Error saving project:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An unexpected error occurred while saving the project"
-      );
+      setError(err instanceof Error ? err.message : "Failed to save project");
     }
   };
 

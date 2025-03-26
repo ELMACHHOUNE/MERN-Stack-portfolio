@@ -1,74 +1,182 @@
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
+import React, { useRef, useEffect, useState } from "react";
+import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  IconBrandGithub,
+  IconExternalLink,
+  IconSearch,
+  IconFilter,
+  IconX,
+} from "@tabler/icons-react";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 interface Project {
-  id: number;
+  _id: string;
   title: string;
   description: string;
   image: string;
   technologies: string[];
-  githubLink: string;
-  liveLink: string;
+  features: string[];
+  githubUrl?: string;
+  liveUrl?: string;
+  category: string;
+  startDate: string;
+  endDate: string;
+  order: number;
+  isActive: boolean;
 }
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: "Project One",
-    description:
-      "A modern web application built with React and TypeScript. Features include responsive design, dark mode, and real-time updates.",
-    image: "https://via.placeholder.com/600x400",
-    technologies: ["React", "TypeScript", "Tailwind CSS", "Node.js"],
-    githubLink: "https://github.com/yourusername/project1",
-    liveLink: "https://project1.com",
-  },
-  {
-    id: 2,
-    title: "Project Two",
-    description:
-      "Full-stack application with authentication, database integration, and RESTful API endpoints.",
-    image: "https://via.placeholder.com/600x400",
-    technologies: ["Next.js", "MongoDB", "Express", "JWT"],
-    githubLink: "https://github.com/yourusername/project2",
-    liveLink: "https://project2.com",
-  },
-  {
-    id: 3,
-    title: "Project Three",
-    description:
-      "Mobile-first responsive website with modern UI/UX design principles and smooth animations.",
-    image: "https://via.placeholder.com/600x400",
-    technologies: ["React", "Framer Motion", "SASS", "Firebase"],
-    githubLink: "https://github.com/yourusername/project3",
-    liveLink: "https://project3.com",
-  },
-];
 
 const Projects: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(
+    []
+  );
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
+  const [categories, setCategories] = useState<string[]>(["All"]);
 
+  // Fetch all projects
   useEffect(() => {
-    // Ensure elements are mounted before animating
-    if (!titleRef.current || !cardsRef.current.length) {
-      console.log("Elements not ready yet");
-      return;
+    const fetchProjects = async () => {
+      try {
+        console.log("Fetching all projects...");
+        const response = await fetch("http://localhost:5000/api/projects");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Fetched projects:", data);
+        setProjects(data);
+
+        // Extract unique categories
+        const uniqueCategories = [
+          "All",
+          ...new Set(data.map((p: Project) => p.category)),
+        ] as string[];
+        setCategories(uniqueCategories);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch projects"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Apply filters whenever filter criteria change
+  useEffect(() => {
+    console.log("Applying filters:", {
+      selectedCategory,
+      selectedTechnologies,
+      searchTerm,
+      sortBy,
+    });
+
+    let filtered = [...projects];
+
+    // Category filter
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(
+        (project) =>
+          project.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
     }
 
-    console.log("Initializing GSAP animations");
+    // Technologies filter
+    if (selectedTechnologies.length > 0) {
+      filtered = filtered.filter((project) =>
+        selectedTechnologies.every((tech) =>
+          project.technologies.some(
+            (projectTech) => projectTech.toLowerCase() === tech.toLowerCase()
+          )
+        )
+      );
+    }
 
-    // Animate section title
+    // Search term filter
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(
+        (project) =>
+          project.title.toLowerCase().includes(search) ||
+          project.description.toLowerCase().includes(search) ||
+          project.technologies.some((tech) =>
+            tech.toLowerCase().includes(search)
+          )
+      );
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "newest":
+          return (
+            new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+          );
+        case "oldest":
+          return (
+            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          );
+        case "name":
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
+
+    console.log("Filtered projects:", filtered);
+    setFilteredProjects(filtered);
+  }, [projects, selectedCategory, selectedTechnologies, searchTerm, sortBy]);
+
+  // Get unique technologies from all projects
+  const allTechnologies = Array.from(
+    new Set(projects.flatMap((project) => project.technologies))
+  ).sort();
+
+  const toggleTechnology = (tech: string) => {
+    setSelectedTechnologies((prev) =>
+      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech]
+    );
+  };
+
+  const handleCategoryChange = (category: string) => {
+    console.log("Changing category to:", category);
+    setSelectedCategory(category);
+    setShowFilters(false);
+  };
+
+  const resetFilters = () => {
+    console.log("Resetting all filters");
+    setSelectedCategory("All");
+    setSelectedTechnologies([]);
+    setSortBy("newest");
+    setSearchTerm("");
+    setShowFilters(false);
+  };
+
+  // Animation effects
+  useEffect(() => {
+    if (!titleRef.current || !cardsRef.current.length) return;
+
     gsap.fromTo(
       titleRef.current,
-      {
-        y: 50,
-        opacity: 0,
-      },
+      { y: 50, opacity: 0 },
       {
         y: 0,
         opacity: 1,
@@ -82,16 +190,11 @@ const Projects: React.FC = () => {
       }
     );
 
-    // Animate project cards
     cardsRef.current.forEach((card, index) => {
       if (!card) return;
-
       gsap.fromTo(
         card,
-        {
-          y: 100,
-          opacity: 0,
-        },
+        { y: 100, opacity: 0 },
         {
           y: 0,
           opacity: 1,
@@ -105,67 +208,32 @@ const Projects: React.FC = () => {
           },
         }
       );
-
-      // Hover animations for cards
-      const image = card.querySelector("img");
-      const overlay = card.querySelector(".overlay");
-      const content = card.querySelector(".content");
-
-      if (!image || !overlay || !content) return;
-
-      const handleMouseEnter = () => {
-        gsap.to(image, {
-          scale: 1.1,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-        gsap.to(overlay, {
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-        gsap.to(content, {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-      };
-
-      const handleMouseLeave = () => {
-        gsap.to(image, {
-          scale: 1,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-        gsap.to(overlay, {
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-        gsap.to(content, {
-          y: 20,
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-      };
-
-      card.addEventListener("mouseenter", handleMouseEnter);
-      card.addEventListener("mouseleave", handleMouseLeave);
-
-      // Cleanup event listeners
-      return () => {
-        card.removeEventListener("mouseenter", handleMouseEnter);
-        card.removeEventListener("mouseleave", handleMouseLeave);
-      };
     });
 
     return () => {
-      // Cleanup ScrollTrigger
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [filteredProjects]);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="text-center text-red-500">
+          <p>Error loading projects: {error}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -181,66 +249,219 @@ const Projects: React.FC = () => {
           My Projects
           <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              ref={(el) => {
-                if (el) {
-                  cardsRef.current[project.id - 1] = el;
-                }
-              }}
-              className="group bg-gray-800 rounded-xl overflow-hidden shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="overlay absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0"></div>
-                <div className="content absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 opacity-0">
-                  <div className="flex space-x-4">
-                    <a
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-white hover:text-purple-500 transition-colors duration-300"
-                    >
-                      <i className="fab fa-github mr-2"></i>
-                      GitHub
-                    </a>
-                    <a
-                      href={project.liveLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-white hover:text-purple-500 transition-colors duration-300"
-                    >
-                      <i className="fas fa-external-link-alt mr-2"></i>
-                      Live Demo
-                    </a>
-                  </div>
-                </div>
+
+        {/* Search and Filters */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center justify-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+          >
+            <IconFilter className="w-5 h-5 mr-2" />
+            Filters
+          </button>
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="bg-gray-800 rounded-lg p-4 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Filters</h3>
+              <button
+                onClick={resetFilters}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Categories */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-400 mb-2">
+                Category
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => handleCategoryChange(category)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === category
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
+            </div>
+
+            {/* Technologies */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-400 mb-2">
+                Technologies
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {allTechnologies.map((tech) => (
+                  <button
+                    key={tech}
+                    onClick={() => toggleTechnology(tech)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedTechnologies.includes(tech)
+                        ? "bg-purple-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {tech}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sort Options */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-400 mb-2">
+                Sort By
+              </h4>
+              <div className="flex gap-2">
+                {[
+                  { value: "newest", label: "Newest First" },
+                  { value: "oldest", label: "Oldest First" },
+                  { value: "name", label: "Name" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() =>
+                      setSortBy(option.value as "newest" | "oldest" | "name")
+                    }
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      sortBy === option.value
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Active Filters */}
+        {(selectedCategory !== "All" ||
+          selectedTechnologies.length > 0 ||
+          searchTerm) && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {selectedCategory !== "All" && (
+              <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm flex items-center">
+                {selectedCategory}
+                <button
+                  onClick={() => handleCategoryChange("All")}
+                  className="ml-2 hover:text-gray-200"
+                >
+                  <IconX className="w-4 h-4" />
+                </button>
+              </span>
+            )}
+            {selectedTechnologies.map((tech) => (
+              <span
+                key={tech}
+                className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm flex items-center"
+              >
+                {tech}
+                <button
+                  onClick={() => toggleTechnology(tech)}
+                  className="ml-2 hover:text-gray-200"
+                >
+                  <IconX className="w-4 h-4" />
+                </button>
+              </span>
+            ))}
+            {searchTerm && (
+              <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm flex items-center">
+                Search: {searchTerm}
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="ml-2 hover:text-gray-200"
+                >
+                  <IconX className="w-4 h-4" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Projects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project, index) => (
+            <div
+              key={project._id}
+              ref={(el) => (cardsRef.current[index] = el as HTMLDivElement)}
+              className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300"
+            >
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-48 object-cover"
+              />
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-white mb-2">
                   {project.title}
                 </h3>
-                <p className="text-gray-300 mb-4">{project.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((tech, index) => (
+                <p className="text-gray-400 mb-4">{project.description}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.technologies.map((tech) => (
                     <span
-                      key={index}
-                      className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm"
+                      key={tech}
+                      className="px-2 py-1 bg-gray-700 text-gray-300 rounded-full text-sm"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
+                <div className="flex justify-between">
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-400"
+                    >
+                      GitHub
+                    </a>
+                  )}
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-500 hover:text-green-400"
+                    >
+                      Live Demo
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {filteredProjects.length === 0 && (
+          <div className="text-center text-gray-400 mt-8">
+            No projects found matching your criteria.
+          </div>
+        )}
       </div>
     </section>
   );
