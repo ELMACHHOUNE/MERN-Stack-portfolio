@@ -42,19 +42,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
+          "Accept": "application/json",
+          "Origin": "http://localhost:3000"
         },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("Login response error:", error);
-        throw new Error(
-          error.message ||
-            `Login failed: ${response.status} ${response.statusText}`
-        );
+        const errorData = await response.json().catch(() => ({
+          message: "Failed to parse error response"
+        }));
+        console.error("Login response error:", errorData);
+        throw new Error(errorData.message || `Login failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
