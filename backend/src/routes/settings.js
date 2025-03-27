@@ -33,6 +33,21 @@ const upload = multer({
   },
 });
 
+// Get public admin profile
+router.get("/admin-profile", async (req, res) => {
+  try {
+    const adminUser = await User.findOne({ isAdmin: true }).select(
+      "-password -email"
+    );
+    if (!adminUser) {
+      return res.status(404).json({ message: "Admin profile not found" });
+    }
+    res.json(adminUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get admin profile
 router.get("/profile", protect, admin, async (req, res) => {
   try {

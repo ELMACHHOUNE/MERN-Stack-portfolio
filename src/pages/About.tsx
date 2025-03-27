@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 import {
   IconCode,
   IconBrain,
@@ -16,32 +17,38 @@ interface ProfileData {
   bio?: string;
 }
 
+// Default profile data for fallback
+const defaultProfileData: ProfileData = {
+  name: "Your Name",
+  email: "",
+  profileImage: null,
+  title: "Software Engineer",
+  location: "Your Location",
+  bio: `I am a passionate software engineer with expertise in building modern web applications. 
+  With a strong foundation in both frontend and backend development, I create efficient and 
+  scalable solutions that solve real problems.`,
+};
+
 const About: React.FC = () => {
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const { token } = useAuth();
+  const [profileData, setProfileData] =
+    useState<ProfileData>(defaultProfileData);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       console.log("Starting profile fetch...");
-      const token = localStorage.getItem("token");
-      console.log("Token available:", !!token);
 
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/settings/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        // First try to fetch the public admin profile
+        const publicResponse = await fetch(
+          "http://localhost:5000/api/settings/admin-profile"
         );
 
-        console.log("Profile response status:", response.status);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Profile Data:", {
+        if (publicResponse.ok) {
+          const data = await publicResponse.json();
+          console.log("Admin Profile Data:", {
             name: data.name,
             email: data.email,
             hasImage: !!data.profileImage,
@@ -49,14 +56,32 @@ const About: React.FC = () => {
           });
           setProfileData(data);
         } else {
-          const errorText = await response.text();
-          console.error("Failed to fetch profile:", {
-            status: response.status,
-            error: errorText,
-          });
+          // If public profile fails and we have a token, try authenticated fetch
+          if (token) {
+            const authResponse = await fetch(
+              "http://localhost:5000/api/settings/profile",
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (authResponse.ok) {
+              const data = await authResponse.json();
+              setProfileData(data);
+            } else {
+              console.error("Failed to fetch authenticated profile");
+              setProfileData(defaultProfileData);
+            }
+          } else {
+            console.log("Using default profile");
+            setProfileData(defaultProfileData);
+          }
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
+        setProfileData(defaultProfileData);
       } finally {
         setLoading(false);
         console.log("Profile fetch completed");
@@ -64,7 +89,7 @@ const About: React.FC = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [token]);
 
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
@@ -93,23 +118,19 @@ const About: React.FC = () => {
   };
 
   const getFallbackAvatarUrl = () => {
-    const name = profileData?.name || "User";
+    const name = profileData.name || "User";
     const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       name
-    )}&background=random`;
+    )}&background=random&size=128`;
     console.log("Fallback avatar URL:", url);
     return url;
   };
 
   const personalInfo = {
-    name: profileData?.name || "Your Name",
-    title: profileData?.title || "Software Engineer",
-    location: profileData?.location || "Your Location",
-    bio:
-      profileData?.bio ||
-      `I am a passionate software engineer with expertise in building modern web applications. 
-    With a strong foundation in both frontend and backend development, I create efficient and 
-    scalable solutions that solve real problems.`,
+    name: profileData.name,
+    title: profileData.title,
+    location: profileData.location,
+    bio: profileData.bio,
     interests: [
       "Web Development",
       "Cloud Computing",

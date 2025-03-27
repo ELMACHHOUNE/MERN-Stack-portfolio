@@ -61,34 +61,6 @@ app.use(
   })
 );
 
-// Add CORS headers for all responses
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (
-    [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-    ].includes(origin)
-  ) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-  next();
-});
-
 // Body parser
 app.use(express.json({ limit: "10kb" }));
 
@@ -96,7 +68,17 @@ app.use(express.json({ limit: "10kb" }));
 app.use(
   "/uploads",
   (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    const origin = req.headers.origin;
+    if (
+      [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+      ].includes(origin)
+    ) {
+      res.header("Access-Control-Allow-Origin", origin);
+    }
+    res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "GET");
     res.header("Cross-Origin-Resource-Policy", "cross-origin");
     next();

@@ -42,23 +42,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Origin": "http://localhost:3000"
+          Accept: "application/json",
         },
         credentials: "include",
+        mode: "cors",
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to parse error response"
-        }));
-        console.error("Login response error:", errorData);
-        throw new Error(errorData.message || `Login failed: ${response.status} ${response.statusText}`);
+        let errorMessage = "Login failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error("Failed to parse error response:", e);
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
-      console.log("Login successful:", data);
+      console.log("Login successful:", {
+        userId: data.user._id,
+        name: data.user.name,
+      });
 
       setToken(data.token);
       setUser(data.user);
@@ -79,15 +85,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           Accept: "application/json",
         },
         credentials: "include",
+        mode: "cors",
         body: JSON.stringify({ name, email, password }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
+        let errorMessage = "Registration failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error("Failed to parse error response:", e);
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log("Registration successful:", {
+        userId: data.user._id,
+        name: data.user.name,
+      });
+
       setToken(data.token);
       setUser(data.user);
       localStorage.setItem("token", data.token);
