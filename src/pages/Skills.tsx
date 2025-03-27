@@ -64,7 +64,6 @@ const Skills: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Fetching skills from backend...");
       const response = await fetch("http://localhost:5000/api/skills", {
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +79,6 @@ const Skills: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Received skills data:", data);
 
       if (!Array.isArray(data)) {
         throw new Error("Invalid response format: expected an array of skills");
@@ -114,11 +112,6 @@ const Skills: React.FC = () => {
   const handleRetry = () => {
     setRetryCount((prev) => prev + 1);
   };
-
-  // Debug render
-  console.log("Current skills state:", skills);
-  console.log("Loading state:", loading);
-  console.log("Error state:", error);
 
   if (loading) {
     return (

@@ -78,7 +78,6 @@ const ProjectManager: React.FC = () => {
       const data = await response.json();
       setProjects(data);
     } catch (err) {
-      console.error("Error fetching projects:", err);
       setError(
         err instanceof Error
           ? err.message
@@ -117,8 +116,6 @@ const ProjectManager: React.FC = () => {
         : "http://localhost:5000/api/projects";
       const method = editingProject ? "PATCH" : "POST";
 
-      console.log("Sending project data:", projectData);
-
       const response = await fetch(url, {
         method,
         headers: {
@@ -141,7 +138,6 @@ const ProjectManager: React.FC = () => {
       await fetchProjects();
       handleCloseForm();
     } catch (err) {
-      console.error("Error saving project:", err);
       setError(err instanceof Error ? err.message : "Failed to save project");
     }
   };
@@ -168,7 +164,6 @@ const ProjectManager: React.FC = () => {
 
       await fetchProjects();
     } catch (err) {
-      console.error("Error deleting project:", err);
       setError(
         err instanceof Error
           ? err.message
@@ -245,7 +240,6 @@ const ProjectManager: React.FC = () => {
         );
       }
     } catch (err) {
-      console.error("Error reordering projects:", err);
       setError(
         err instanceof Error
           ? err.message

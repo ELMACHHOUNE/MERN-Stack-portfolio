@@ -38,53 +38,21 @@ const About: React.FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      console.log("Starting profile fetch...");
-
       try {
-        // First try to fetch the public admin profile
-        const publicResponse = await fetch(
+        const response = await fetch(
           "http://localhost:5000/api/settings/admin-profile"
         );
 
-        if (publicResponse.ok) {
-          const data = await publicResponse.json();
-          console.log("Admin Profile Data:", {
-            name: data.name,
-            email: data.email,
-            hasImage: !!data.profileImage,
-            imagePath: data.profileImage,
-          });
+        if (response.ok) {
+          const data = await response.json();
           setProfileData(data);
         } else {
-          // If public profile fails and we have a token, try authenticated fetch
-          if (token) {
-            const authResponse = await fetch(
-              "http://localhost:5000/api/settings/profile",
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-
-            if (authResponse.ok) {
-              const data = await authResponse.json();
-              setProfileData(data);
-            } else {
-              console.error("Failed to fetch authenticated profile");
-              setProfileData(defaultProfileData);
-            }
-          } else {
-            console.log("Using default profile");
-            setProfileData(defaultProfileData);
-          }
+          setProfileData(defaultProfileData);
         }
       } catch (error) {
-        console.error("Error fetching profile:", error);
         setProfileData(defaultProfileData);
       } finally {
         setLoading(false);
-        console.log("Profile fetch completed");
       }
     };
 
@@ -102,18 +70,16 @@ const About: React.FC = () => {
   };
 
   const handleImageLoad = () => {
-    console.log("Image loaded successfully");
     setImageError(false);
   };
 
   const getProfileImageUrl = () => {
     if (!profileData?.profileImage) {
-      console.log("No profile image available");
       return null;
     }
 
     const imageUrl = `http://localhost:5000${profileData.profileImage}`;
-    console.log("Profile image URL:", imageUrl);
+
     return imageUrl;
   };
 
@@ -122,7 +88,7 @@ const About: React.FC = () => {
     const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       name
     )}&background=random&size=128`;
-    console.log("Fallback avatar URL:", url);
+
     return url;
   };
 

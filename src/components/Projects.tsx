@@ -35,108 +35,70 @@ const Projects: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(
-    []
-  );
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
-  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [filters, setFilters] = useState({
+    selectedCategory: "All",
+    selectedTechnologies: [] as string[],
+    searchTerm: "",
+    sortBy: "newest",
+    showFilters: false,
+  });
 
-  // Fetch all projects
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        console.log("Fetching all projects...");
-        setLoading(true);
-
-        const response = await fetch("http://localhost:5000/api/projects", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          mode: "cors",
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched projects:", data);
-        setProjects(data);
-
-        // Extract unique categories
-        const uniqueCategories = [
-          "All",
-          ...new Set(data.map((p: Project) => p.category)),
-        ] as string[];
-        setCategories(uniqueCategories);
-      } catch (err) {
-        console.error("Error fetching projects:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch projects"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProjects();
   }, []);
 
-  // Apply filters whenever filter criteria change
-  useEffect(() => {
-    console.log("Applying filters:", {
-      selectedCategory,
-      selectedTechnologies,
-      searchTerm,
-      sortBy,
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch("http://localhost:5000/api/projects");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setProjects(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch projects");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterProjects = (projects: Project[]) => {
+    const filtered = projects.filter((project) => {
+      const matchesCategory =
+        filters.selectedCategory === "All" ||
+        project.category === filters.selectedCategory;
+
+      const matchesTechnologies =
+        filters.selectedTechnologies.length === 0 ||
+        filters.selectedTechnologies.every((tech) =>
+          project.technologies.includes(tech)
+        );
+
+      const matchesSearch =
+        !filters.searchTerm ||
+        project.title
+          .toLowerCase()
+          .includes(filters.searchTerm.toLowerCase()) ||
+        project.description
+          .toLowerCase()
+          .includes(filters.searchTerm.toLowerCase());
+
+      return matchesCategory && matchesTechnologies && matchesSearch;
     });
 
-    let filtered = [...projects];
+    return filtered;
+  };
 
-    // Category filter
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter(
-        (project) =>
-          project.category.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
-
-    // Technologies filter
-    if (selectedTechnologies.length > 0) {
-      filtered = filtered.filter((project) =>
-        selectedTechnologies.every((tech) =>
-          project.technologies.some(
-            (projectTech) => projectTech.toLowerCase() === tech.toLowerCase()
-          )
-        )
-      );
-    }
-
-    // Search term filter
-    if (searchTerm.trim()) {
-      const search = searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(
-        (project) =>
-          project.title.toLowerCase().includes(search) ||
-          project.description.toLowerCase().includes(search) ||
-          project.technologies.some((tech) =>
-            tech.toLowerCase().includes(search)
-          )
-      );
-    }
-
-    // Sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
+  const sortProjects = (projects: Project[]) => {
+    return [...projects].sort((a, b) => {
+      switch (filters.sortBy) {
         case "newest":
           return (
             new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
@@ -145,16 +107,13 @@ const Projects: React.FC = () => {
           return (
             new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
           );
-        case "name":
-          return a.title.localeCompare(b.title);
         default:
           return 0;
       }
     });
+  };
 
-    console.log("Filtered projects:", filtered);
-    setFilteredProjects(filtered);
-  }, [projects, selectedCategory, selectedTechnologies, searchTerm, sortBy]);
+  const filteredProjects = sortProjects(filterProjects(projects));
 
   // Get unique technologies from all projects
   const allTechnologies = Array.from(
@@ -162,24 +121,29 @@ const Projects: React.FC = () => {
   ).sort();
 
   const toggleTechnology = (tech: string) => {
-    setSelectedTechnologies((prev) =>
-      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech]
-    );
+    setFilters((prev) => ({
+      ...prev,
+      selectedTechnologies: prev.selectedTechnologies.includes(tech)
+        ? prev.selectedTechnologies.filter((t) => t !== tech)
+        : [...prev.selectedTechnologies, tech],
+    }));
   };
 
   const handleCategoryChange = (category: string) => {
-    console.log("Changing category to:", category);
-    setSelectedCategory(category);
-    setShowFilters(false);
+    setFilters((prev) => ({
+      ...prev,
+      selectedCategory: category,
+    }));
   };
 
   const resetFilters = () => {
-    console.log("Resetting all filters");
-    setSelectedCategory("All");
-    setSelectedTechnologies([]);
-    setSortBy("newest");
-    setSearchTerm("");
-    setShowFilters(false);
+    setFilters({
+      selectedCategory: "All",
+      selectedTechnologies: [],
+      searchTerm: "",
+      sortBy: "newest",
+      showFilters: false,
+    });
   };
 
   // Animation effects
@@ -275,8 +239,10 @@ const Projects: React.FC = () => {
             <input
               type="text"
               placeholder="Search projects..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={filters.searchTerm}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
+              }
               className={`w-full pl-10 pr-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 isDarkMode
                   ? "bg-gray-800 border-gray-700 text-white"
@@ -285,7 +251,12 @@ const Projects: React.FC = () => {
             />
           </div>
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() =>
+              setFilters((prev) => ({
+                ...prev,
+                showFilters: !prev.showFilters,
+              }))
+            }
             className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors ${
               isDarkMode
                 ? "bg-gray-800 text-white hover:bg-gray-700"
@@ -298,7 +269,7 @@ const Projects: React.FC = () => {
         </div>
 
         {/* Filter Panel */}
-        {showFilters && (
+        {filters.showFilters && (
           <div
             className={`rounded-lg p-4 mb-6 ${
               isDarkMode ? "bg-gray-800" : "bg-white border border-gray-200"
@@ -334,21 +305,23 @@ const Projects: React.FC = () => {
                 Category
               </h4>
               <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === category
-                        ? "bg-blue-600 text-white"
-                        : isDarkMode
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+                {["All", ...new Set(projects.map((p) => p.category))].map(
+                  (category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryChange(category)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        filters.selectedCategory === category
+                          ? "bg-blue-600 text-white"
+                          : isDarkMode
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
@@ -367,7 +340,7 @@ const Projects: React.FC = () => {
                     key={tech}
                     onClick={() => toggleTechnology(tech)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedTechnologies.includes(tech)
+                      filters.selectedTechnologies.includes(tech)
                         ? "bg-purple-600 text-white"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -393,15 +366,17 @@ const Projects: React.FC = () => {
                 {[
                   { value: "newest", label: "Newest First" },
                   { value: "oldest", label: "Oldest First" },
-                  { value: "name", label: "Name" },
                 ].map((option) => (
                   <button
                     key={option.value}
                     onClick={() =>
-                      setSortBy(option.value as "newest" | "oldest" | "name")
+                      setFilters((prev) => ({
+                        ...prev,
+                        sortBy: option.value as "newest" | "oldest" | "name",
+                      }))
                     }
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      sortBy === option.value
+                      filters.sortBy === option.value
                         ? "bg-green-600 text-white"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -417,13 +392,13 @@ const Projects: React.FC = () => {
         )}
 
         {/* Active Filters */}
-        {(selectedCategory !== "All" ||
-          selectedTechnologies.length > 0 ||
-          searchTerm) && (
+        {(filters.selectedCategory !== "All" ||
+          filters.selectedTechnologies.length > 0 ||
+          filters.searchTerm) && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {selectedCategory !== "All" && (
+            {filters.selectedCategory !== "All" && (
               <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm flex items-center">
-                {selectedCategory}
+                {filters.selectedCategory}
                 <button
                   onClick={() => handleCategoryChange("All")}
                   className="ml-2 hover:text-gray-200"
@@ -432,7 +407,7 @@ const Projects: React.FC = () => {
                 </button>
               </span>
             )}
-            {selectedTechnologies.map((tech) => (
+            {filters.selectedTechnologies.map((tech) => (
               <span
                 key={tech}
                 className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm flex items-center"
@@ -446,11 +421,13 @@ const Projects: React.FC = () => {
                 </button>
               </span>
             ))}
-            {searchTerm && (
+            {filters.searchTerm && (
               <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm flex items-center">
-                Search: {searchTerm}
+                Search: {filters.searchTerm}
                 <button
-                  onClick={() => setSearchTerm("")}
+                  onClick={() =>
+                    setFilters((prev) => ({ ...prev, searchTerm: "" }))
+                  }
                   className="ml-2 hover:text-gray-200"
                 >
                   <IconX className="w-4 h-4" />

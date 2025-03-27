@@ -92,7 +92,6 @@ const SkillsManager: React.FC = () => {
       await fetchSkills();
       handleCloseForm();
     } catch (err) {
-      console.error("Error saving skill:", err);
       setError(err instanceof Error ? err.message : "Failed to save skill");
     }
   };

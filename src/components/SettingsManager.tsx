@@ -60,9 +60,7 @@ const SettingsManager: React.FC = () => {
           profileImage: data.profileImage,
         });
       }
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    }
+    } catch (error) {}
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {

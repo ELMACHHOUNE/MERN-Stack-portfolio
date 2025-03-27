@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { CardSpotlight } from "./ui/card-spotlight";
 
 interface Skill {
@@ -8,28 +8,47 @@ interface Skill {
 }
 
 const Skills: React.FC = () => {
-  const skills: Skill[] = [
-    // Frontend
-    { name: "HTML5", level: 90, category: "Frontend" },
-    { name: "CSS3", level: 85, category: "Frontend" },
-    { name: "JavaScript", level: 80, category: "Frontend" },
-    { name: "React", level: 85, category: "Frontend" },
-    { name: "TypeScript", level: 75, category: "Frontend" },
-    { name: "Tailwind CSS", level: 85, category: "Frontend" },
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    // Backend
-    { name: "Node.js", level: 80, category: "Backend" },
-    { name: "Express", level: 75, category: "Backend" },
-    { name: "MongoDB", level: 70, category: "Backend" },
-    { name: "SQL", level: 78, category: "Backend" },
-    { name: "REST APIs", level: 85, category: "Backend" },
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/skills");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch skills: ${response.status}`);
+        }
+        const data = await response.json();
 
-    // Tools & Others
-    { name: "Git", level: 85, category: "Tools & Others" },
-    { name: "Docker", level: 65, category: "Tools & Others" },
-    { name: "AWS", level: 60, category: "Tools & Others" },
-    { name: "CI/CD", level: 75, category: "Tools & Others" },
-  ];
+        setSkills(data);
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch skills"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
+  const getSkillsByCategory = (category: string) => {
+    const categorySkills = skills.filter(
+      (skill) => skill.category.toLowerCase() === category.toLowerCase()
+    );
+
+    return categorySkills;
+  };
+
+  if (loading) {
+    return <div>Loading skills...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   const categories = ["Frontend", "Backend", "Tools & Others"] as const;
 
@@ -44,22 +63,20 @@ const Skills: React.FC = () => {
             <CardSpotlight key={category} className="h-full">
               <h3 className="text-xl font-bold text-white mb-4">{category}</h3>
               <div className="space-y-4">
-                {skills
-                  .filter((skill) => skill.category === category)
-                  .map((skill) => (
-                    <div key={skill.name}>
-                      <div className="flex justify-between text-sm text-gray-300 mb-1">
-                        <span>{skill.name}</span>
-                        <span>{skill.level}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-800 rounded-full">
-                        <div
-                          className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
+                {getSkillsByCategory(category).map((skill) => (
+                  <div key={skill.name}>
+                    <div className="flex justify-between text-sm text-gray-300 mb-1">
+                      <span>{skill.name}</span>
+                      <span>{skill.level}%</span>
                     </div>
-                  ))}
+                    <div className="h-2 bg-gray-800 rounded-full">
+                      <div
+                        className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                        style={{ width: `${skill.level}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardSpotlight>
           ))}
