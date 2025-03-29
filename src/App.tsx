@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { AdminProfileProvider } from "./context/AdminProfileContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar";
 import Loading from "./components/Loading";
 import NotFound from "./pages/NotFound";
@@ -17,14 +19,15 @@ const Experience = React.lazy(() => import("./pages/Experience"));
 const Login = React.lazy(() => import("./pages/Login"));
 const Register = React.lazy(() => import("./pages/Register"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
+const UserDashboard = React.lazy(() => import("./pages/UserDashboard"));
 const PrivateRoute = React.lazy(() => import("./components/PrivateRoute"));
 
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AdminProfileProvider>
-          <Router>
+      <Router>
+        <AuthProvider>
+          <AdminProfileProvider>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
               <Navbar />
               <Suspense fallback={<Loading />}>
@@ -45,13 +48,33 @@ const App: React.FC = () => {
                       </PrivateRoute>
                     }
                   />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <PrivateRoute>
+                        <UserDashboard />
+                      </PrivateRoute>
+                    }
+                  />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
             </div>
-          </Router>
-        </AdminProfileProvider>
-      </AuthProvider>
+          </AdminProfileProvider>
+        </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 };

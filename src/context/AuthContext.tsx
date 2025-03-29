@@ -1,17 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 interface User {
   _id: string;
   name: string;
   email: string;
   isAdmin: boolean;
-  lastLogin?: string;
+  profileImage: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ user: User; token: string } | null>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -24,20 +28,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     // Check for stored auth data on mount
+    console.log("AuthProvider: Checking stored auth data");
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
+
     if (storedToken && storedUser) {
+      console.log("AuthProvider: Found stored auth data");
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    } else {
+      console.log("AuthProvider: No stored auth data found");
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const register = async (name: string, email: string, password: string) => {
+    console.log("AuthProvider: Attempting registration", { name, email });
     try {
-      console.log("Attempting login...");
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      console.log("AuthProvider: Registration response", data);
+
+      if (!response.ok) {
+        console.error("AuthProvider: Registration failed", data);
+        throw new Error(data.message || "Registration failed");
+      }
+
+      toast.success("Registration successful! Please login.");
+    } catch (error: any) {
+      console.error("AuthProvider: Registration error", error);
+      toast.error(error.message || "Registration failed");
+      throw error;
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    console.log("AuthProvider: Attempting login", { email });
+    try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
@@ -46,90 +84,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+      console.log("AuthProvider: Login response", data);
+
       if (!response.ok) {
-        let errorMessage = "Login failed";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-        throw new Error(errorMessage);
+        console.error("AuthProvider: Login failed", data);
+        throw new Error(data.message || "Login failed");
       }
 
-      const data = await response.json();
-      console.log("Login successful:", {
-        userId: data.user._id,
-        name: data.user.name,
-      });
+      // Store auth data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       setToken(data.token);
       setUser(data.user);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    }
-  };
+      setIsAuthenticated(true);
+      console.log("AuthProvider: Login successful", data.user);
 
-  const register = async (name: string, email: string, password: string) => {
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-        mode: "cors",
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      if (!response.ok) {
-        let errorMessage = "Registration failed";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      console.log("Registration successful:", {
-        userId: data.user._id,
-        name: data.user.name,
-      });
-
-      setToken(data.token);
-      setUser(data.user);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-    } catch (error) {
-      console.error("Registration error:", error);
+      return { user: data.user, token: data.token };
+    } catch (error: any) {
+      console.error("AuthProvider: Login error", error);
+      toast.error(error.message || "Login failed");
       throw error;
     }
   };
 
   const logout = () => {
-    setToken(null);
-    setUser(null);
+    console.log("AuthProvider: Logging out");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
+    toast.success("Logged out successfully");
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        token,
-        login,
-        register,
-        logout,
-        isAuthenticated: !!token,
-      }}
+      value={{ user, token, login, register, logout, isAuthenticated }}
     >
       {children}
     </AuthContext.Provider>
@@ -143,3 +135,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthContext;

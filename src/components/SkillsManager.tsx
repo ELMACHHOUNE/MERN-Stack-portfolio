@@ -6,6 +6,8 @@ import {
   IconTrash,
   IconAlertCircle,
 } from "@tabler/icons-react";
+import { toast } from "react-toastify";
+import { api } from "../utils/api";
 
 interface Skill {
   _id: string;
@@ -30,31 +32,33 @@ const SkillsManager: React.FC = () => {
 
   const fetchSkills = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/skills/admin", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch skills");
+      const { data, error } = await api.get<Skill[]>("/skills/admin");
+      if (error) {
+        setError(error);
+        return;
       }
-
-      const data = await response.json();
-      setSkills(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch skills");
+      setSkills(data || []);
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSkills();
-  }, []);
+  const updateSkillOrder = async (reorderedSkills: Skill[]) => {
+    try {
+      const { error } = await api.put("/skills/admin/reorder", {
+        skills: reorderedSkills,
+      });
+      if (error) {
+        toast.error(error);
+        return;
+      }
+      toast.success("Skills order updated successfully");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,39 +144,26 @@ const SkillsManager: React.FC = () => {
     setShowForm(false);
   };
 
-  const handleDragEnd = async (result: any) => {
+  const handleDragEnd = (result: any) => {
     if (!result.destination) return;
 
     const items = Array.from(skills);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    setSkills(items);
+    // Update the order property for each skill
+    const updatedSkills = items.map((skill, index) => ({
+      ...skill,
+      order: index,
+    }));
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/skills/reorder", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          skills: items.map((item, index) => ({
-            _id: item._id,
-            order: index,
-          })),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to reorder skills");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reorder skills");
-      await fetchSkills();
-    }
+    setSkills(updatedSkills);
+    updateSkillOrder(updatedSkills);
   };
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
 
   if (loading) {
     return (
@@ -180,6 +171,10 @@ const SkillsManager: React.FC = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (

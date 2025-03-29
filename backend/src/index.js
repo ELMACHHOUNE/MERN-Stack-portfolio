@@ -6,6 +6,7 @@ const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
+const morgan = require("morgan");
 const contactRouter = require("./routes/contact");
 const authRouter = require("./routes/auth");
 const skillsRouter = require("./routes/skills");
@@ -18,6 +19,9 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+// Logging middleware
+app.use(morgan("dev"));
 
 // Security middleware
 app.use(
@@ -44,6 +48,10 @@ app.use(
   })
 );
 
+// Body parser
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -58,31 +66,22 @@ const devLimiter = rateLimit({
   message: "Too many requests from this IP, please try again later.",
 });
 
-// Apply rate limiting to specific routes
-app.use("/api/contact", limiter); // Stricter limit for contact form
-app.use("/api/auth", limiter); // Stricter limit for auth routes
-app.use("/api/", devLimiter); // More lenient limit for other routes
+// Apply rate limiting based on environment
+if (process.env.NODE_ENV === "production") {
+  app.use("/api/contact", limiter);
+  app.use("/api/auth", limiter);
+} else {
+  app.use("/api", devLimiter);
+}
 
 // Enable compression
 app.use(compression());
 
-// Body parser
-app.use(express.json({ limit: "10kb" }));
-
-// Serve static files with CORS enabled
+// Serve static files
 app.use(
   "/uploads",
   (req, res, next) => {
-    const origin = req.headers.origin;
-    if (
-      [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-      ].includes(origin)
-    ) {
-      res.header("Access-Control-Allow-Origin", origin);
-    }
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "GET");
     res.header("Cross-Origin-Resource-Policy", "cross-origin");
@@ -93,12 +92,9 @@ app.use(
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI || "", {
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/portfolio", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
   })
   .then(() => {
     console.log("Connected to MongoDB");

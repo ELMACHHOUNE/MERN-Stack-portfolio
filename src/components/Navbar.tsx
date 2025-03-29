@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -23,6 +23,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
@@ -47,13 +48,9 @@ const Navbar: React.FC = () => {
     { path: "/contact", label: "Contact", icon: IconMail },
   ];
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setIsOpen(false);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   const isActive = (path: string) => location.pathname === path;
