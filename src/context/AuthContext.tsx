@@ -42,10 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
-        credentials: "include",
-        mode: "cors",
         body: JSON.stringify({ email, password }),
       });
 

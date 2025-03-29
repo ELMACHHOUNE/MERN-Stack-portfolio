@@ -6,11 +6,8 @@ interface Experience {
   _id: string;
   title: string;
   company: string;
-  location: string;
-  startDate: string;
-  endDate: string | null;
+  period: string;
   description: string;
-  technologies: string[];
   order: number;
   isActive: boolean;
 }
@@ -87,7 +84,7 @@ const Experience: React.FC = () => {
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
 
           {/* Experience Items */}
-          <div className="space-y-12">
+          <div className="space-y-8">
             {experiences
               .filter((exp) => exp.isActive)
               .sort((a, b) => b.order - a.order)
@@ -118,28 +115,11 @@ const Experience: React.FC = () => {
                       </p>
                       <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
                         <IconCalendar className="h-5 w-5 mr-2" />
-                        <span>
-                          {experience.startDate} -{" "}
-                          {experience.endDate || "Present"}
-                        </span>
+                        <span>{experience.period}</span>
                       </div>
-                      <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-                        <IconMapPin className="h-5 w-5 mr-2" />
-                        <span>{experience.location}</span>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      <p className="text-gray-600 dark:text-gray-300">
                         {experience.description}
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {experience.technologies.map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </motion.div>

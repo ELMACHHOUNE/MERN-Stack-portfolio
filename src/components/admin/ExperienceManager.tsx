@@ -348,6 +348,22 @@ const ExperienceManager: React.FC = () => {
                       rows={3}
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={() => setEditingExperience(null)}
+                        className="px-4 py-2 text-gray-700 hover:text-gray-900"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleUpdateExperience(editingExperience)
+                        }
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -361,32 +377,17 @@ const ExperienceManager: React.FC = () => {
                 )}
               </div>
               <div className="flex items-center space-x-2">
-                {editingExperience?._id === experience._id ? (
-                  <>
-                    <button
-                      onClick={() => handleUpdateExperience(editingExperience)}
-                      className="p-2 text-green-600 hover:text-green-700"
-                    >
-                      <IconCheck className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => setEditingExperience(null)}
-                      className="p-2 text-red-600 hover:text-red-700"
-                    >
-                      <IconX className="w-5 h-5" />
-                    </button>
-                  </>
-                ) : (
+                {editingExperience?._id !== experience._id && (
                   <>
                     <button
                       onClick={() => setEditingExperience(experience)}
-                      className="p-2 text-blue-600 hover:text-blue-700"
+                      className="p-2 text-gray-600 hover:text-blue-600"
                     >
                       <IconEdit className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleDeleteExperience(experience._id)}
-                      className="p-2 text-red-600 hover:text-red-700"
+                      className="p-2 text-gray-600 hover:text-red-600"
                     >
                       <IconTrash className="w-5 h-5" />
                     </button>
