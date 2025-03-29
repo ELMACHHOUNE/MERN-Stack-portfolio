@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useAdminProfile } from "../context/AdminProfileContext";
 import {
   IconCode,
   IconBrain,
@@ -37,30 +38,15 @@ const defaultProfile = {
 
 const Home: React.FC = () => {
   const { user } = useAuth();
+  const { profile: adminProfile, loading, error } = useAdminProfile();
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
   const [isVisible, setIsVisible] = useState(false);
-  const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
-    fetchAdminProfile();
   }, []);
-
-  const fetchAdminProfile = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/settings/admin-profile");
-      if (response.ok) {
-        const data = await response.json();
-        setAdminProfile(data);
-      } else {
-        console.error("Failed to fetch admin profile");
-      }
-    } catch (error) {
-      console.error("Error fetching admin profile:", error);
-    }
-  };
 
   const technologies = [
     {

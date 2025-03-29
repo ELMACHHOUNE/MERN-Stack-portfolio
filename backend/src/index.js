@@ -50,7 +50,18 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   message: "Too many requests from this IP, please try again later.",
 });
-app.use("/api/", limiter);
+
+// More lenient limiter for development
+const devLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // much higher limit for development
+  message: "Too many requests from this IP, please try again later.",
+});
+
+// Apply rate limiting to specific routes
+app.use("/api/contact", limiter); // Stricter limit for contact form
+app.use("/api/auth", limiter); // Stricter limit for auth routes
+app.use("/api/", devLimiter); // More lenient limit for other routes
 
 // Enable compression
 app.use(compression());
