@@ -21,11 +21,14 @@
     "express-rate-limit": "^6.11.2",
     "express-validator": "^7.2.1",
     "helmet": "^7.2.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.8.6",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.2",
-    "nodemailer": "^6.9.1"
+    "nodemailer": "^6.9.1",
+    "react-hot-toast": "^2.5.2",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

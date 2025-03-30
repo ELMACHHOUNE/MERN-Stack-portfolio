@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { IconBriefcase, IconCalendar, IconMapPin } from "@tabler/icons-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Briefcase, Calendar, MapPin } from "lucide-react";
+import { API_URL } from "../config";
 
 interface Experience {
   _id: string;
-  title: string;
   company: string;
-  period: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
   description: string;
+  technologies: string[];
   order: number;
   isActive: boolean;
 }
@@ -20,7 +24,7 @@ const Experience: React.FC = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/experience");
+        const response = await fetch(`${API_URL}/api/experience`);
         if (!response.ok) {
           throw new Error("Failed to fetch experiences");
         }
@@ -105,21 +109,37 @@ const Experience: React.FC = () => {
                   <div className={`w-1/2 ${index % 2 === 0 ? "pr-8" : "pl-8"}`}>
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                       <div className="flex items-center mb-4">
-                        <IconBriefcase className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-2" />
+                        <Briefcase className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                          {experience.title}
+                          {experience.position}
                         </h3>
                       </div>
                       <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">
                         {experience.company}
                       </p>
                       <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-                        <IconCalendar className="h-5 w-5 mr-2" />
-                        <span>{experience.period}</span>
+                        <Calendar className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                        <span>
+                          {new Date(experience.startDate).toLocaleDateString()}{" "}
+                          -{" "}
+                          {experience.current
+                            ? "Present"
+                            : new Date(experience.endDate).toLocaleDateString()}
+                        </span>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-300">
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
                         {experience.description}
                       </p>
+                      <div className="flex flex-wrap gap-2">
+                        {experience.technologies?.map((tech) => (
+                          <span
+                            key={tech}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

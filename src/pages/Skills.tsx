@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconCode,
-  IconServer,
-  IconDatabase,
-  IconTools,
-  IconRefresh,
-  IconAlertCircle,
-} from "@tabler/icons-react";
+  Code,
+  Server,
+  Database,
+  Wrench,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
+import { API_URL } from "../config";
 
 interface Skill {
   _id: string;
@@ -28,27 +29,27 @@ interface Category {
 
 const categories: Category[] = [
   {
-    id: "frontend",
+    id: "Frontend",
     name: "Frontend Development",
-    icon: IconCode,
+    icon: Code,
     description: "Building responsive and interactive user interfaces",
   },
   {
-    id: "backend",
+    id: "Backend",
     name: "Backend Development",
-    icon: IconServer,
+    icon: Server,
     description: "Creating robust server-side applications",
   },
   {
-    id: "database",
+    id: "Database",
     name: "Database Management",
-    icon: IconDatabase,
+    icon: Database,
     description: "Designing and optimizing database systems",
   },
   {
-    id: "devops",
+    id: "DevOps",
     name: "DevOps & Cloud",
-    icon: IconTools,
+    icon: Wrench,
     description: "Implementing CI/CD and cloud infrastructure",
   },
 ];
@@ -64,7 +65,7 @@ const Skills: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:5000/api/skills", {
+      const response = await fetch(`${API_URL}/api/skills`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -148,14 +149,14 @@ const Skills: React.FC = () => {
               className="mt-4 flex items-center justify-center space-x-4"
             >
               <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md flex items-center">
-                <IconAlertCircle className="h-5 w-5 mr-2" />
+                <AlertCircle className="h-5 w-5 mr-2" />
                 <span>{error}</span>
               </div>
               <button
                 onClick={handleRetry}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
               >
-                <IconRefresh className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Retry
               </button>
             </motion.div>
@@ -199,23 +200,36 @@ const Skills: React.FC = () => {
                             transition={{ duration: 0.3 }}
                           >
                             <div className="flex justify-between mb-1">
-                              <span className="text-gray-700 dark:text-gray-300 font-medium">
-                                {skill.name}
-                              </span>
+                              <div className="flex items-center space-x-2">
+                                {skill.icon && (
+                                  <img
+                                    src={skill.icon}
+                                    alt={skill.name}
+                                    className="h-5 w-5"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                )}
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                                  {skill.name}
+                                </span>
+                              </div>
                               <span className="text-gray-500 dark:text-gray-400">
-                                {skill.level}%
+                                {skill.level * 10}%
                               </span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${skill.level}%` }}
+                                animate={{ width: `${skill.level * 10}%` }}
                                 transition={{
                                   duration: 1,
                                   delay: 0.2,
                                   ease: "easeOut",
                                 }}
                                 className="bg-blue-500 dark:bg-blue-400 h-full rounded-full"
+                                style={{ width: `${skill.level * 10}%` }}
                               />
                             </div>
                           </motion.div>

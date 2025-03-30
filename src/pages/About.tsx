@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "../context/AuthContext";
-import {
-  IconCode,
-  IconBrain,
-  IconHeart,
-  IconRocket,
-} from "@tabler/icons-react";
+import { useAdminProfile } from "../context/AdminProfileContext";
+import { API_URL } from "../config";
+import { User, Code, Server, Database, Wrench } from "lucide-react";
 
 interface ProfileData {
   name: string;
@@ -30,34 +26,8 @@ const defaultProfileData: ProfileData = {
 };
 
 const About: React.FC = () => {
-  const { token } = useAuth();
-  const [profileData, setProfileData] =
-    useState<ProfileData>(defaultProfileData);
-  const [loading, setLoading] = useState(true);
+  const { adminProfile, loading } = useAdminProfile();
   const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/settings/admin-profile"
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setProfileData(data);
-        } else {
-          setProfileData(defaultProfileData);
-        }
-      } catch (error) {
-        setProfileData(defaultProfileData);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [token]);
 
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
@@ -74,29 +44,27 @@ const About: React.FC = () => {
   };
 
   const getProfileImageUrl = () => {
-    if (!profileData?.profileImage) {
+    if (!adminProfile?.profileImage) {
       return null;
     }
 
-    const imageUrl = `http://localhost:5000${profileData.profileImage}`;
-
+    const imageUrl = `${API_URL}${adminProfile.profileImage}`;
     return imageUrl;
   };
 
   const getFallbackAvatarUrl = () => {
-    const name = profileData.name || "User";
+    const name = adminProfile?.name || "User";
     const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       name
     )}&background=random&size=128`;
-
     return url;
   };
 
   const personalInfo = {
-    name: profileData.name,
-    title: profileData.title,
-    location: profileData.location,
-    bio: profileData.bio,
+    name: adminProfile?.name || defaultProfileData.name,
+    title: adminProfile?.title || defaultProfileData.title,
+    location: adminProfile?.location || defaultProfileData.location,
+    bio: adminProfile?.bio || defaultProfileData.bio,
     interests: [
       "Web Development",
       "Cloud Computing",
@@ -105,25 +73,25 @@ const About: React.FC = () => {
     ],
     values: [
       {
-        icon: IconCode,
+        icon: User,
         title: "Clean Code",
         description:
           "Writing maintainable and efficient code that follows best practices.",
       },
       {
-        icon: IconBrain,
+        icon: Code,
         title: "Problem Solving",
         description:
           "Finding innovative solutions to complex technical challenges.",
       },
       {
-        icon: IconHeart,
+        icon: Server,
         title: "User Experience",
         description:
           "Creating intuitive and accessible applications that users love.",
       },
       {
-        icon: IconRocket,
+        icon: Database,
         title: "Continuous Learning",
         description:
           "Staying updated with the latest technologies and industry trends.",
@@ -146,10 +114,10 @@ const About: React.FC = () => {
               <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
               </div>
-            ) : profileData?.profileImage && !imageError ? (
+            ) : adminProfile?.profileImage && !imageError ? (
               <img
                 src={getProfileImageUrl() || ""}
-                alt={profileData.name}
+                alt={adminProfile.name}
                 className="w-full h-full object-cover"
                 onError={handleImageError}
                 onLoad={handleImageLoad}
@@ -157,7 +125,7 @@ const About: React.FC = () => {
             ) : (
               <img
                 src={getFallbackAvatarUrl()}
-                alt={profileData?.name || "User"}
+                alt={adminProfile?.name || "User"}
                 className="w-full h-full object-cover"
               />
             )}

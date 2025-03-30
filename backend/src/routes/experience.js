@@ -58,14 +58,13 @@ router.put("/:id", protect, admin, async (req, res) => {
 // Delete experience (admin only)
 router.delete("/:id", protect, admin, async (req, res) => {
   try {
-    const experience = await Experience.findById(req.params.id);
+    const experience = await Experience.findByIdAndDelete(req.params.id);
     if (!experience) {
       return res.status(404).json({ message: "Experience not found" });
     }
-
-    await experience.remove();
-    res.json({ message: "Experience deleted" });
+    res.json({ message: "Experience deleted successfully" });
   } catch (error) {
+    console.error("Delete experience error:", error);
     res.status(500).json({ message: error.message });
   }
 });

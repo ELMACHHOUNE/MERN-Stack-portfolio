@@ -4,20 +4,20 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import {
-  IconCode,
-  IconBrain,
-  IconHeart,
-  IconRocket,
-  IconArrowRight,
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconBrandTwitter,
-  IconChevronDown,
-  IconTerminal2,
-  IconDeviceLaptop,
-  IconCloud,
-  IconDatabase,
-} from "@tabler/icons-react";
+  Code,
+  Brain,
+  Heart,
+  Rocket,
+  ChevronDown,
+  Terminal,
+  Laptop,
+  Cloud,
+  Database,
+  Github,
+  Linkedin,
+  Mail,
+} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface AdminProfile {
   name: string;
@@ -38,7 +38,7 @@ const defaultProfile = {
 
 const Home: React.FC = () => {
   const { user } = useAuth();
-  const { profile: adminProfile, loading, error } = useAdminProfile();
+  const { adminProfile, loading, error } = useAdminProfile();
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
@@ -51,18 +51,18 @@ const Home: React.FC = () => {
   const technologies = [
     {
       name: "Frontend",
-      icon: IconDeviceLaptop,
+      icon: Laptop,
       items: ["React", "TypeScript", "Tailwind CSS"],
     },
     {
       name: "Backend",
-      icon: IconTerminal2,
+      icon: Terminal,
       items: ["Node.js", "Express", "MongoDB"],
     },
-    { name: "Cloud", icon: IconCloud, items: ["AWS", "Docker", "CI/CD"] },
+    { name: "Cloud", icon: Cloud, items: ["AWS", "Docker", "CI/CD"] },
     {
       name: "Database",
-      icon: IconDatabase,
+      icon: Database,
       items: ["MongoDB", "PostgreSQL", "Redis"],
     },
   ];
@@ -74,25 +74,25 @@ const Home: React.FC = () => {
     bio: adminProfile?.bio || defaultProfile.bio,
     values: [
       {
-        icon: IconCode,
+        icon: Code,
         title: "Clean Code",
         description:
           "Writing maintainable and efficient code that follows best practices.",
       },
       {
-        icon: IconBrain,
+        icon: Brain,
         title: "Problem Solving",
         description:
           "Finding innovative solutions to complex technical challenges.",
       },
       {
-        icon: IconHeart,
+        icon: Heart,
         title: "User Experience",
         description:
           "Creating intuitive and accessible applications that users love.",
       },
       {
-        icon: IconRocket,
+        icon: Rocket,
         title: "Innovation",
         description:
           "Pushing boundaries with cutting-edge technologies and approaches.",
@@ -100,17 +100,17 @@ const Home: React.FC = () => {
     ],
     socialLinks: [
       {
-        icon: IconBrandGithub,
+        icon: Github,
         url: "https://github.com/yourusername",
         label: "GitHub",
       },
       {
-        icon: IconBrandLinkedin,
+        icon: Linkedin,
         url: "https://linkedin.com/in/yourusername",
         label: "LinkedIn",
       },
       {
-        icon: IconBrandTwitter,
+        icon: Mail,
         url: "https://twitter.com/yourusername",
         label: "Twitter",
       },
@@ -146,7 +146,7 @@ const Home: React.FC = () => {
               className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transform hover:scale-105 transition-all"
             >
               View My Work
-              <IconArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
             <Link
               to="/contact"
@@ -166,7 +166,7 @@ const Home: React.FC = () => {
                 className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 aria-label={link.label}
               >
-                <link.icon className="h-8 w-8" />
+                <link.icon className="h-6 w-6" />
               </motion.a>
             ))}
           </div>
@@ -177,7 +177,7 @@ const Home: React.FC = () => {
           transition={{ delay: 1.5, duration: 1 }}
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
-          <IconChevronDown className="h-8 w-8 text-gray-400 dark:text-gray-500 animate-bounce" />
+          <ChevronDown className="h-8 w-8 text-gray-400 dark:text-gray-500 animate-bounce" />
         </motion.div>
       </section>
 
@@ -291,7 +291,7 @@ const Home: React.FC = () => {
               className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-blue-600 dark:text-blue-500 bg-white dark:bg-gray-100 hover:bg-blue-50 dark:hover:bg-gray-200 transform hover:scale-105 transition-all"
             >
               Let's Talk
-              <IconArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
           </motion.div>
         </div>

@@ -11,14 +11,14 @@ const skillSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Category is required"],
-      enum: ["frontend", "backend", "database", "devops"],
-      default: "frontend",
+      enum: ["Frontend", "Backend", "Database", "DevOps", "Other"],
+      default: "Frontend",
     },
     level: {
       type: Number,
       required: [true, "Skill level is required"],
-      min: [0, "Skill level cannot be less than 0"],
-      max: [100, "Skill level cannot be more than 100"],
+      min: [1, "Skill level cannot be less than 1"],
+      max: [10, "Skill level cannot be more than 10"],
     },
     icon: {
       type: String,

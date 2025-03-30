@@ -4,102 +4,108 @@ const { protect, admin } = require("../middleware/auth");
 const User = require("../models/User");
 const multer = require("multer");
 const path = require("path");
+const bcrypt = require("bcryptjs");
+const fs = require("fs");
 
 // Configure multer for image upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/profiles");
+    const uploadDir = path.join(__dirname, "../../uploads/profile-images");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error("Invalid file type. Only JPEG, JPG, PNG, and GIF are allowed."),
+      false
+    );
+  }
+};
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimetype = filetypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
-    }
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
   },
 });
 
-// Get public admin profile
-router.get("/admin-profile", async (req, res) => {
-  try {
-    const adminUser = await User.findOne({ isAdmin: true }).select(
-      "-password -email"
-    );
-    if (!adminUser) {
-      return res.status(404).json({ message: "Admin profile not found" });
+// Error handling middleware for multer
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res
+        .status(400)
+        .json({ message: "File size too large. Maximum size is 5MB." });
     }
-    res.json(adminUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } else if (err) {
+    return res.status(400).json({ message: err.message });
   }
-});
+  next();
+};
 
-// Get admin profile
-router.get("/profile", protect, admin, async (req, res) => {
+// Get current user's profile
+router.get("/profile", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Update admin profile
-router.patch("/profile", protect, admin, async (req, res) => {
+// Update current user's profile
+router.put("/profile", protect, async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const user = await User.findById(req.user._id);
+    const { name, email, currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id).select("+password");
 
-    if (name) user.name = name;
-    if (email) {
-      // Check if email is already taken by another user
-      const emailExists = await User.findOne({ email, _id: { $ne: user._id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if email is already taken by another user
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
       if (emailExists) {
         return res.status(400).json({ message: "Email already in use" });
       }
-      user.email = email;
     }
 
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Update admin password
-router.patch("/password", protect, admin, async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    const user = await User.findById(req.user._id);
-
-    // Verify current password
-    const isMatch = await user.matchPassword(currentPassword);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Current password is incorrect" });
+    // Update password if provided
+    if (currentPassword && newPassword) {
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res
+          .status(400)
+          .json({ message: "Current password is incorrect" });
+      }
+      user.password = newPassword;
     }
 
-    // Update password
-    user.password = newPassword;
-    await user.save();
+    // Update other fields
+    if (name) user.name = name;
+    if (email) user.email = email;
 
-    res.json({ message: "Password updated successfully" });
+    await user.save();
+    res.json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Profile update error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -107,8 +113,8 @@ router.patch("/password", protect, admin, async (req, res) => {
 router.post(
   "/profile-image",
   protect,
-  admin,
   upload.single("image"),
+  handleMulterError,
   async (req, res) => {
     try {
       if (!req.file) {
@@ -116,14 +122,77 @@ router.post(
       }
 
       const user = await User.findById(req.user._id);
-      user.profileImage = `/uploads/profiles/${req.file.filename}`;
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Delete old profile image if it exists
+      if (user.profileImage) {
+        const oldImagePath = path.join(__dirname, "../../", user.profileImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      // Update user's profile image path
+      user.profileImage = `/uploads/profile-images/${req.file.filename}`;
       await user.save();
 
-      res.json(user);
+      res.json({
+        message: "Profile image updated successfully",
+        profileImage: user.profileImage,
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error("Profile image upload error:", error);
+      res.status(500).json({ message: "Failed to upload profile image" });
     }
   }
 );
+
+// Get admin profile
+router.get("/admin-profile", protect, admin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Update admin profile
+router.put("/admin-profile", protect, admin, async (req, res) => {
+  try {
+    const { name, email, title, location, bio } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if email is already taken by another user
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
+    // Update fields if provided
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (title) user.title = title;
+    if (location) user.location = location;
+    if (bio) user.bio = bio;
+
+    await user.save();
+    res.json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error("Admin profile update error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;

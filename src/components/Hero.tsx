@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconBrandTwitter,
-} from "@tabler/icons-react";
+import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
 
 interface SocialLink {
   href: string;
@@ -106,17 +102,17 @@ const Hero: React.FC = () => {
   const socialLinks: SocialLink[] = [
     {
       href: "https://github.com/yourusername",
-      icon: <IconBrandGithub className="w-6 h-6" />,
+      icon: <Github className="h-6 w-6" />,
       label: "GitHub",
     },
     {
       href: "https://linkedin.com/in/yourusername",
-      icon: <IconBrandLinkedin className="w-6 h-6" />,
+      icon: <Linkedin className="h-6 w-6" />,
       label: "LinkedIn",
     },
     {
       href: "https://twitter.com/yourusername",
-      icon: <IconBrandTwitter className="w-6 h-6" />,
+      icon: <Mail className="h-6 w-6" />,
       label: "Twitter",
     },
   ];
@@ -252,19 +248,7 @@ const Hero: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-              </svg>
+              <ArrowRight className="h-5 w-5" />
             </motion.div>
           </motion.a>
         </motion.div>

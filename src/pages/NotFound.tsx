@@ -1,6 +1,6 @@
 import React from "react";
+import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
-import { IconHome } from "@tabler/icons-react";
 
 const NotFound: React.FC = () => {
   return (
@@ -19,7 +19,7 @@ const NotFound: React.FC = () => {
           to="/"
           className="inline-flex items-center px-6 py-3 mt-8 text-base font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
         >
-          <IconHome className="w-5 h-5 mr-2" />
+          <Home className="h-5 w-5 mr-2" />
           Back to Home
         </Link>
       </div>

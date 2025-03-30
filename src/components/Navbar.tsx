@@ -3,19 +3,21 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { API_URL } from "../config";
 import {
-  IconMenu2,
-  IconX,
-  IconHome,
-  IconUser,
-  IconBriefcase,
-  IconCode,
-  IconMail,
-  IconDashboard,
-  IconLogout,
-  IconSun,
-  IconMoon,
-} from "@tabler/icons-react";
+  Menu,
+  X,
+  Home,
+  User,
+  Briefcase,
+  Code,
+  Mail,
+  LayoutDashboard,
+  LogOut,
+  Sun,
+  Moon,
+  Settings,
+} from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,7 @@ const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // Handle scroll effect
   useEffect(() => {
@@ -40,12 +43,12 @@ const Navbar: React.FC = () => {
   }, [location]);
 
   const navItems = [
-    { path: "/", label: "Home", icon: IconHome },
-    { path: "/about", label: "About", icon: IconUser },
-    { path: "/projects", label: "Projects", icon: IconBriefcase },
-    { path: "/experience", label: "Experience", icon: IconBriefcase },
-    { path: "/skills", label: "Skills", icon: IconCode },
-    { path: "/contact", label: "Contact", icon: IconMail },
+    { path: "/", label: "Home", icon: Home },
+    { path: "/about", label: "About", icon: User },
+    { path: "/projects", label: "Projects", icon: Briefcase },
+    { path: "/experience", label: "Experience", icon: Briefcase },
+    { path: "/skills", label: "Skills", icon: Code },
+    { path: "/contact", label: "Contact", icon: Mail },
   ];
 
   const handleLogout = () => {
@@ -96,7 +99,7 @@ const Navbar: React.FC = () => {
                 to="/admin"
                 className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
               >
-                <IconDashboard className="h-5 w-5 mr-1" />
+                <LayoutDashboard className="h-5 w-5 mr-1" />
                 Dashboard
               </Link>
             )}
@@ -105,18 +108,61 @@ const Navbar: React.FC = () => {
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {isDarkMode ? (
-                <IconSun className="h-5 w-5 text-gray-300" />
+                <Sun className="h-5 w-5 text-gray-300" />
               ) : (
-                <IconMoon className="h-5 w-5 text-gray-700" />
+                <Moon className="h-5 w-5 text-gray-700" />
               )}
             </button>
             {user ? (
-              <button
-                onClick={handleLogout}
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
-              >
-                Logout
-              </button>
+              <div className="flex items-center">
+                <div className="ml-3 relative">
+                  <div>
+                    <button
+                      onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                      className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      <span className="sr-only">Open user menu</span>
+                      {user.profileImage ? (
+                        <img
+                          className="h-8 w-8 rounded-full object-cover"
+                          src={`${API_URL}${user.profileImage}`}
+                          alt={user.name}
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                          <User className="h-5 w-5 text-indigo-600" />
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                  {isProfileMenuOpen && (
+                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-gray-500 text-xs">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Profile Settings
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -134,9 +180,9 @@ const Navbar: React.FC = () => {
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-2"
             >
               {isDarkMode ? (
-                <IconSun className="h-5 w-5 text-gray-300" />
+                <Sun className="h-5 w-5 text-gray-300" />
               ) : (
-                <IconMoon className="h-5 w-5 text-gray-700" />
+                <Moon className="h-5 w-5 text-gray-700" />
               )}
             </button>
             <button
@@ -144,9 +190,9 @@ const Navbar: React.FC = () => {
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {isOpen ? (
-                <IconX className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               ) : (
-                <IconMenu2 className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                <Menu className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               )}
             </button>
           </div>
@@ -188,18 +234,60 @@ const Navbar: React.FC = () => {
                   className="flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
                   onClick={() => setIsOpen(false)}
                 >
-                  <IconDashboard className="w-5 h-5 mr-2" />
+                  <LayoutDashboard className="w-5 h-5 mr-2" />
                   Dashboard
                 </Link>
               )}
               {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-red-400"
-                >
-                  <IconLogout className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
+                <div className="flex items-center">
+                  <div className="ml-3 relative">
+                    <div>
+                      <button
+                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                        className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        <span className="sr-only">Open user menu</span>
+                        {user.profileImage ? (
+                          <img
+                            className="h-8 w-8 rounded-full object-cover"
+                            src={`${API_URL}${user.profileImage}`}
+                            alt={user.name}
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <User className="h-5 w-5 text-indigo-600" />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                    {isProfileMenuOpen && (
+                      <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-gray-500 text-xs">{user.email}</p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Profile Settings
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign out
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ) : (
                 <Link
                   to="/login"

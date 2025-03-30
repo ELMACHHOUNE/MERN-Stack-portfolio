@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { IconMail, IconPhone, IconMapPin, IconSend } from "@tabler/icons-react";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { API_URL } from "../config";
 
 interface ContactForm {
   name: string;
@@ -87,7 +88,7 @@ const Contact: React.FC = () => {
             </h2>
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <IconMail className="h-6 w-6 text-blue-500 dark:text-blue-400 mt-1" />
+                <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Email
@@ -98,7 +99,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-start space-x-4">
-                <IconPhone className="h-6 w-6 text-blue-500 dark:text-blue-400 mt-1" />
+                <Phone className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Phone
@@ -109,7 +110,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-start space-x-4">
-                <IconMapPin className="h-6 w-6 text-blue-500 dark:text-blue-400 mt-1" />
+                <MapPin className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Location

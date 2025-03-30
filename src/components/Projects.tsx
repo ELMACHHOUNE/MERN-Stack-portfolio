@@ -2,13 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTheme } from "../context/ThemeContext";
-import {
-  IconBrandGithub,
-  IconExternalLink,
-  IconSearch,
-  IconFilter,
-  IconX,
-} from "@tabler/icons-react";
+import { Github, Link, ExternalLink } from "lucide-react";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -235,7 +229,7 @@ const Projects: React.FC = () => {
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search projects..."
@@ -263,7 +257,7 @@ const Projects: React.FC = () => {
                 : "bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             }`}
           >
-            <IconFilter className="w-5 h-5 mr-2" />
+            <Github className="w-5 h-5 mr-2" />
             Filters
           </button>
         </div>
@@ -291,7 +285,7 @@ const Projects: React.FC = () => {
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                <IconX className="w-5 h-5" />
+                <Github className="w-5 h-5" />
               </button>
             </div>
 
@@ -403,7 +397,7 @@ const Projects: React.FC = () => {
                   onClick={() => handleCategoryChange("All")}
                   className="ml-2 hover:text-gray-200"
                 >
-                  <IconX className="w-4 h-4" />
+                  <Github className="w-4 h-4" />
                 </button>
               </span>
             )}
@@ -417,7 +411,7 @@ const Projects: React.FC = () => {
                   onClick={() => toggleTechnology(tech)}
                   className="ml-2 hover:text-gray-200"
                 >
-                  <IconX className="w-4 h-4" />
+                  <Github className="w-4 h-4" />
                 </button>
               </span>
             ))}
@@ -430,7 +424,7 @@ const Projects: React.FC = () => {
                   }
                   className="ml-2 hover:text-gray-200"
                 >
-                  <IconX className="w-4 h-4" />
+                  <Github className="w-4 h-4" />
                 </button>
               </span>
             )}
@@ -489,7 +483,7 @@ const Projects: React.FC = () => {
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:text-blue-400"
                     >
-                      GitHub
+                      <Github className="h-5 w-5" />
                     </a>
                   )}
                   {project.liveUrl && (
@@ -499,7 +493,7 @@ const Projects: React.FC = () => {
                       rel="noopener noreferrer"
                       className="text-green-500 hover:text-green-400"
                     >
-                      Live Demo
+                      <Link className="h-5 w-5" />
                     </a>
                   )}
                 </div>

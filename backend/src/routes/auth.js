@@ -29,116 +29,83 @@ const loginValidation = [
 
 // Register route
 router.post("/register", async (req, res) => {
-  console.log("Register route: Received request", {
-    ...req.body,
-    password: "[FILTERED]",
-  });
   try {
     const { name, email, password } = req.body;
 
-    // Validate input
-    if (!name || !email || !password) {
-      console.log("Register route: Missing required fields");
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      console.log("Register route: User already exists");
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create new user
-    user = new User({
+    // Create user
+    const user = await User.create({
       name,
       email,
       password,
-      isAdmin: false,
-      profileImage: null,
-      lastLogin: new Date(),
     });
 
-    await user.save();
-    console.log("Register route: User created successfully");
-
-    res.status(201).json({
-      message: "Registration successful",
-      user: {
+    if (user) {
+      res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
-        profileImage: user.profileImage,
-      },
-    });
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: "Invalid user data" });
+    }
   } catch (error) {
-    console.error("Register route error:", error);
+    console.error("Register error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
 // Login route
 router.post("/login", async (req, res) => {
-  console.log("Login route: Received request", { email: req.body.email });
   try {
     const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      console.log("Login route: Missing required fields");
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Check if user exists and include password for comparison
+    // Check for user email
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      console.log("Login route: User not found");
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     // Check password
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      console.log("Login route: Invalid password");
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     // Update last login
     user.lastLogin = new Date();
     await user.save();
 
-    // Create JWT token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "24h" }
-    );
-
-    console.log("Login route: Login successful");
     res.json({
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        profileImage: user.profileImage,
-      },
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      profileImage: user.profileImage,
+      token: generateToken(user._id),
     });
   } catch (error) {
-    console.error("Login route error:", error);
+    console.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Get current user route
+// Get current user profile
 router.get("/me", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     res.json(user);
   } catch (error) {
-    console.error("Get current user error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -172,7 +139,7 @@ router.get("/admin/users", protect, admin, async (req, res) => {
 router.put("/update-profile", protect, async (req, res) => {
   try {
     const { name, email } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     // Check if email is already taken by another user
     const existingUser = await User.findOne({ email, _id: { $ne: userId } });
@@ -185,17 +152,18 @@ router.put("/update-profile", protect, async (req, res) => {
       userId,
       { name, email },
       { new: true }
-    );
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     res.json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      message: "Profile updated successfully",
+      user,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Profile update error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -204,31 +172,36 @@ router.put("/update-profile", protect, async (req, res) => {
 router.put("/update-password", protect, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     // Get user
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("+password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Verify current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    const isMatch = await user.matchPassword(currentPassword);
     if (!isMatch) {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-
+    // Update password
+    user.password = newPassword;
     await user.save();
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Password update error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 
 module.exports = router;

@@ -2,26 +2,44 @@ const mongoose = require("mongoose");
 
 const experienceSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: [true, "Please provide a job title"],
-      trim: true,
-    },
     company: {
       type: String,
       required: [true, "Please provide a company name"],
       trim: true,
     },
-    period: {
+    position: {
       type: String,
-      required: [true, "Please provide the period"],
+      required: [true, "Please provide a position"],
       trim: true,
+    },
+    startDate: {
+      type: Date,
+      required: [true, "Please provide a start date"],
+    },
+    endDate: {
+      type: Date,
+      required: [
+        function () {
+          return !this.current;
+        },
+        "Please provide an end date for past experiences",
+      ],
+    },
+    current: {
+      type: Boolean,
+      default: false,
     },
     description: {
       type: String,
       required: [true, "Please provide a description"],
       trim: true,
     },
+    technologies: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     order: {
       type: Number,
       default: 0,

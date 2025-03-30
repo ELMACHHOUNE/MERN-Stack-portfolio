@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import {
-  IconUser,
-  IconMail,
-  IconLock,
-  IconUpload,
-  IconPhoto,
-} from "@tabler/icons-react";
+import { Save, RefreshCw, AlertCircle } from "lucide-react";
 
 interface ProfileData {
   name: string;
@@ -242,14 +236,14 @@ const SettingsManager: React.FC = () => {
                     />
                   ) : (
                     <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      <IconPhoto className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                      <Save className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                     </div>
                   )}
                   <label
                     htmlFor="profile-image"
                     className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors"
                   >
-                    <IconUpload className="w-4 h-4" />
+                    <Save className="h-4 w-4" />
                   </label>
                   <input
                     type="file"
@@ -278,7 +272,7 @@ const SettingsManager: React.FC = () => {
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IconUser className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <Save className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
                   <input
                     type="text"
@@ -305,7 +299,7 @@ const SettingsManager: React.FC = () => {
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IconMail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <Save className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
                   <input
                     type="email"
@@ -353,7 +347,7 @@ const SettingsManager: React.FC = () => {
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IconLock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <Save className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
                   <input
                     type="password"
@@ -380,7 +374,7 @@ const SettingsManager: React.FC = () => {
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IconLock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <Save className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
                   <input
                     type="password"
@@ -407,7 +401,7 @@ const SettingsManager: React.FC = () => {
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IconLock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <Save className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
                   <input
                     type="password"

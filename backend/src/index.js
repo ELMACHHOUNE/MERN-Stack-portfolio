@@ -13,6 +13,10 @@ const skillsRouter = require("./routes/skills");
 const experienceRouter = require("./routes/experience");
 const projectsRouter = require("./routes/projects");
 const settingsRouter = require("./routes/settings");
+const xss = require("xss-clean");
+const hpp = require("hpp");
+const connectDB = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 // Load environment variables
 dotenv.config();
@@ -31,20 +35,19 @@ app.use(
   })
 );
 
+// Prevent XSS attacks
+app.use(xss());
+
+// Prevent http param pollution
+app.use(hpp());
+
 // CORS configuration
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-    ],
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-    exposedHeaders: ["Content-Range", "X-Content-Range"],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -54,9 +57,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 10 * 60 * 1000, // 10 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
 });
 
 // More lenient limiter for development
@@ -68,8 +70,7 @@ const devLimiter = rateLimit({
 
 // Apply rate limiting based on environment
 if (process.env.NODE_ENV === "production") {
-  app.use("/api/contact", limiter);
-  app.use("/api/auth", limiter);
+  app.use("/api/", limiter);
 } else {
   app.use("/api", devLimiter);
 }
@@ -77,18 +78,8 @@ if (process.env.NODE_ENV === "production") {
 // Enable compression
 app.use(compression());
 
-// Serve static files
-app.use(
-  "/uploads",
-  (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", req.headers.origin);
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Methods", "GET");
-    res.header("Cross-Origin-Resource-Policy", "cross-origin");
-    next();
-  },
-  express.static(path.join(__dirname, "../uploads"))
-);
+// Serve static files from uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Connect to MongoDB
 mongoose
@@ -125,13 +116,7 @@ app.get("/health", (req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: "Something went wrong!",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
+app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {

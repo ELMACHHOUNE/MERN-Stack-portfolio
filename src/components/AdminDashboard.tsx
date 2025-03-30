@@ -3,15 +3,15 @@ import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
-  IconUsers,
-  IconMail,
-  IconSettings,
-  IconLogout,
-  IconDashboard,
-  IconChartBar,
-  IconTools,
-  IconBriefcase,
-} from "@tabler/icons-react";
+  Users,
+  Mail,
+  Settings,
+  LogOut,
+  LayoutDashboard,
+  BarChart3,
+  Wrench,
+  Briefcase,
+} from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
 
@@ -92,7 +92,7 @@ const AdminDashboard: React.FC = () => {
               activeTab === "overview" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconDashboard className="w-5 h-5 mr-3" />
+            <LayoutDashboard className="w-5 h-5 mr-3" />
             Overview
           </button>
           <button
@@ -101,7 +101,7 @@ const AdminDashboard: React.FC = () => {
               activeTab === "users" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconUsers className="w-5 h-5 mr-3" />
+            <Users className="w-5 h-5 mr-3" />
             Users
           </button>
           <button
@@ -110,7 +110,7 @@ const AdminDashboard: React.FC = () => {
               activeTab === "skills" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconTools className="w-5 h-5 mr-3" />
+            <Wrench className="w-5 h-5 mr-3" />
             Skills
           </button>
           <button
@@ -121,7 +121,7 @@ const AdminDashboard: React.FC = () => {
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            <IconBriefcase className="w-5 h-5" />
+            <Briefcase className="w-5 h-5" />
             <span>Experience</span>
           </button>
           <button
@@ -130,7 +130,7 @@ const AdminDashboard: React.FC = () => {
               activeTab === "analytics" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconChartBar className="w-5 h-5 mr-3" />
+            <BarChart3 className="w-5 h-5 mr-3" />
             Analytics
           </button>
           <button
@@ -139,7 +139,7 @@ const AdminDashboard: React.FC = () => {
               activeTab === "messages" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconMail className="w-5 h-5 mr-3" />
+            <Mail className="w-5 h-5 mr-3" />
             Messages
           </button>
           <button
@@ -148,14 +148,14 @@ const AdminDashboard: React.FC = () => {
               activeTab === "settings" ? "bg-blue-50 text-blue-600" : ""
             }`}
           >
-            <IconSettings className="w-5 h-5 mr-3" />
+            <Settings className="w-5 h-5 mr-3" />
             Settings
           </button>
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-6 py-3 text-red-600 hover:bg-red-50 mt-4"
           >
-            <IconLogout className="w-5 h-5 mr-3" />
+            <LogOut className="w-5 h-5 mr-3" />
             Logout
           </button>
         </nav>

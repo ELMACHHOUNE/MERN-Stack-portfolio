@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import {
-  IconPlus,
-  IconEdit,
-  IconTrash,
-  IconAlertCircle,
-} from "@tabler/icons-react";
+import { Plus, Edit, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { api } from "../utils/api";
 
@@ -187,14 +182,14 @@ const SkillsManager: React.FC = () => {
           onClick={() => setShowForm(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          <IconPlus className="h-5 w-5 mr-2" />
+          <Plus className="h-5 w-5 mr-2" />
           Add Skill
         </button>
       </div>
 
       {error && (
         <div className="mb-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md flex items-center">
-          <IconAlertCircle className="h-5 w-5 mr-2" />
+          <AlertCircle className="h-5 w-5 mr-2" />
           <span>{error}</span>
         </div>
       )}
@@ -333,13 +328,13 @@ const SkillsManager: React.FC = () => {
                           onClick={() => handleEdit(skill)}
                           className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                         >
-                          <IconEdit className="h-5 w-5" />
+                          <Edit className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => handleDelete(skill._id)}
                           className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
-                          <IconTrash className="h-5 w-5" />
+                          <Trash2 className="h-5 w-5" />
                         </button>
                       </div>
                     </div>
