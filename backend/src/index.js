@@ -22,24 +22,29 @@ const errorHandler = require("./middleware/error");
 // Load environment variables
 dotenv.config();
 
+// Create Express app
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Logging middleware
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Security middleware
+// Configure Helmet with necessary adjustments for image loading
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "blob:", "*"],
+        connectSrc: ["'self'", "*"],
+      },
+    },
   })
 );
 
-// Prevent XSS attacks
 app.use(xss());
-
-// Prevent http param pollution
 app.use(hpp());
 
 // CORS configuration
@@ -52,12 +57,9 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// Body parser
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -83,32 +85,16 @@ if (process.env.NODE_ENV === "production") {
 app.use(compression());
 
 // Serve static files from uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-
-// Connect to MongoDB and load models
-mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/portfolio", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(async () => {
-    console.log("Connected to MongoDB");
-
-    // Load models
-    await loadModels();
-    console.log("Models loaded successfully");
-
-    // Create uploads directory if it doesn't exist
-    const fs = require("fs");
-    const uploadsDir = path.join(__dirname, "../uploads/profiles");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-  });
+const uploadsPath = path.join(__dirname, "../uploads");
+// Create uploads directory if it doesn't exist
+const fs = require("fs");
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+if (!fs.existsSync(path.join(uploadsPath, "profile-images"))) {
+  fs.mkdirSync(path.join(uploadsPath, "profile-images"), { recursive: true });
+}
+app.use("/uploads", express.static(uploadsPath));
 
 // Routes
 app.use("/api/contact", contactRouter);
@@ -119,32 +105,41 @@ app.use("/api/experience", experienceRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);
 
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
-
 // Error handling middleware
 app.use(errorHandler);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
+// Connect to MongoDB
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/portfolio",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
 
-// Start server
-const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-});
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Promise Rejection:", err);
-  // Close server & exit process
-  server.close(() => process.exit(1));
-});
+    // Load models after successful connection
+    await loadModels();
+
+    // Start server only after successful database connection
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    console.error(
+      "Please make sure MongoDB is installed and running on your system."
+    );
+    console.error(
+      "You can download MongoDB from: https://www.mongodb.com/try/download/community"
+    );
+    process.exit(1);
+  }
+};
+
+// Start the application
+connectDB();

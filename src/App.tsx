@@ -105,6 +105,14 @@ const App: React.FC = () => {
                     }
                   />
                   <Route
+                    path="/admin/messages"
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
                     path="/admin/about"
                     element={
                       <AdminRoute>

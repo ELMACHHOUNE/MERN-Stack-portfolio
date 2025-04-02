@@ -2,6 +2,8 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const { sendEmail } = require("../services/email");
 const nodemailer = require("nodemailer");
+const Contact = require("../models/Contact");
+const { protect, admin } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -37,16 +39,15 @@ router.post("/", contactValidation, async (req, res) => {
 
     const { name, email, subject, message } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
+    // Create contact message in database
+    const contact = await Contact.create({
+      name,
+      email,
+      subject,
+      message,
+      isRead: false,
+      isActive: true,
+    });
 
     // Email content
     const mailOptions = {
@@ -85,6 +86,50 @@ router.post("/", contactValidation, async (req, res) => {
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ message: "Failed to send message" });
+  }
+});
+
+// Admin routes
+// Get all contact messages (admin only)
+router.get("/admin", protect, admin, async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch contact messages" });
+  }
+});
+
+// Mark contact message as read (admin only)
+router.put("/admin/:id/read", protect, admin, async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      return res.status(404).json({ message: "Contact message not found" });
+    }
+
+    contact.isRead = true;
+    await contact.save();
+
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to mark message as read" });
+  }
+});
+
+// Delete contact message (admin only)
+router.delete("/admin/:id", protect, admin, async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      return res.status(404).json({ message: "Contact message not found" });
+    }
+
+    await contact.deleteOne();
+    res.json({ message: "Contact message deleted successfully" });
+  } catch (error) {
+    console.error("Delete contact error:", error);
+    res.status(500).json({ message: "Failed to delete contact message" });
   }
 });
 

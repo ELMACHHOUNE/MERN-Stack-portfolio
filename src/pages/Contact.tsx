@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { API_URL } from "../config";
+import { toast } from "react-hot-toast";
 
 interface ContactForm {
   name: string;
   email: string;
   subject: string;
+  message: string;
+}
+
+interface ValidationError {
+  field: string;
   message: string;
 }
 
@@ -18,17 +23,52 @@ const Contact: React.FC = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [errors, setErrors] = useState<ValidationError[]>([]);
+
+  const validateForm = () => {
+    const newErrors: ValidationError[] = [];
+
+    if (!formData.name.trim()) {
+      newErrors.push({ field: "name", message: "Name is required" });
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.push({ field: "email", message: "Email is required" });
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.push({
+        field: "email",
+        message: "Please provide a valid email",
+      });
+    }
+
+    if (!formData.subject.trim()) {
+      newErrors.push({ field: "subject", message: "Subject is required" });
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.push({ field: "message", message: "Message is required" });
+    } else if (formData.message.trim().length < 10) {
+      newErrors.push({
+        field: "message",
+        message: "Message must be at least 10 characters long",
+      });
+    }
+
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
-    setSubmitStatus("idle");
+    setErrors([]);
 
     try {
-      // Replace with your actual API endpoint
       const response = await fetch("http://localhost:5000/api/contact", {
         method: "POST",
         headers: {
@@ -37,15 +77,27 @@ const Contact: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setSubmitStatus("success");
-        setFormData({ name: "", email: "", subject: "", message: "" });
-      } else {
-        setSubmitStatus("error");
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 400 && data.errors) {
+          const validationErrors = data.errors.map((err: any) => ({
+            field: err.param,
+            message: err.msg,
+          }));
+          setErrors(validationErrors);
+          toast.error("Please fix the form errors");
+          return;
+        }
+        throw new Error(data.message || "Failed to send message");
       }
+
+      toast.success("Message sent successfully! I'll get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      setSubmitStatus("error");
-      console.error("Error submitting form:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to send message"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -56,6 +108,12 @@ const Contact: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error for the field being edited
+    setErrors((prev) => prev.filter((error) => error.field !== name));
+  };
+
+  const getFieldError = (fieldName: string) => {
+    return errors.find((error) => error.field === fieldName)?.message;
   };
 
   return (
@@ -147,9 +205,18 @@ const Contact: React.FC = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    getFieldError("name")
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   required
                 />
+                {getFieldError("name") && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {getFieldError("name")}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -164,9 +231,18 @@ const Contact: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    getFieldError("email")
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   required
                 />
+                {getFieldError("email") && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {getFieldError("email")}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -181,9 +257,18 @@ const Contact: React.FC = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    getFieldError("subject")
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   required
                 />
+                {getFieldError("subject") && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {getFieldError("subject")}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -198,15 +283,37 @@ const Contact: React.FC = () => {
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    getFieldError("message")
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   required
                 />
+                {getFieldError("message") && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {getFieldError("message")}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+                disabled={isSubmitting}
+                className={`w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors flex items-center justify-center ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-5 w-5 mr-2" />
+                    Send Message
+                  </>
+                )}
               </button>
             </form>
           </motion.div>

@@ -18,6 +18,7 @@ import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
 import CategoryManager from "../components/admin/CategoryManager";
 import ProjectManager from "../components/admin/ProjectManager";
+import ContactManager from "../components/admin/ContactManager";
 import { useTheme } from "../context/ThemeContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
 
@@ -43,6 +44,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/categories")) return "categories";
     if (path.includes("/projects")) return "projects";
     if (path.includes("/experience")) return "experience";
+    if (path.includes("/messages")) return "messages";
     return "skills";
   });
 
@@ -343,13 +345,10 @@ const AdminDashboard: React.FC = () => {
           )}
 
           {activeTab === "messages" && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Messages
-              </h2>
-              <p className="text-gray-600">
-                Message management features coming soon...
-              </p>
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <ContactManager />
+              </div>
             </div>
           )}
 
