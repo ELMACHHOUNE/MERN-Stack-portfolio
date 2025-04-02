@@ -163,6 +163,7 @@
       "icon": "Icon URL",
       "order": "Display Order",
       "iconPlaceholder": "Enter icon URL (e.g., {example})",
+      "updateSuccess": "Skill updated successfully",
       "actions": {
         "addSuccess": "Skill added successfully",
         "updateSuccess": "Skill updated successfully",

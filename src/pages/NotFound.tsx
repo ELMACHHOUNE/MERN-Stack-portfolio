@@ -1,6 +1,6 @@
 import React from "react";
 import { Home } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 
 const NotFound: React.FC = () => {

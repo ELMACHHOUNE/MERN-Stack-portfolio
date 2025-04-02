@@ -23,8 +23,6 @@ import ExperienceManager from "./admin/ExperienceManager";
 import CategoryManager from "../components/admin/CategoryManager";
 import ProjectManager from "../components/admin/ProjectManager";
 import ContactManager from "../components/admin/ContactManager";
-import { useTheme } from "../context/ThemeContext";
-import { useAdminProfile } from "../context/AdminProfileContext";
 
 interface User {
   _id: string;
@@ -38,8 +36,6 @@ const AdminDashboard: React.FC = () => {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDarkMode } = useTheme();
-  const { adminProfile } = useAdminProfile();
   const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);

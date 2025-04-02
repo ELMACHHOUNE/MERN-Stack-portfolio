@@ -3,14 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-hot-toast";
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +12,6 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
   const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {

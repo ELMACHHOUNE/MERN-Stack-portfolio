@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { Save, RefreshCw, AlertCircle } from "lucide-react";
+import { Save } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 interface ProfileData {
@@ -18,7 +18,7 @@ interface PasswordData {
 
 const SettingsManager: React.FC = () => {
   const { t } = useLanguage();
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     email: "",

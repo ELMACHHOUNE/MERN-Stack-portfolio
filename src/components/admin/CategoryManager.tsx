@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Folder } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useLanguage } from "../../context/LanguageContext";
 
 interface Category {
@@ -128,41 +127,6 @@ const CategoryManager: React.FC = () => {
     });
     setCurrentCategory(null);
     setIsEditing(false);
-  };
-
-  const handleDragEnd = async (result: any) => {
-    if (!result.destination) return;
-
-    const items = Array.from(categories);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    // Update the order property for each category
-    const updatedCategories = items.map((category, index) => ({
-      ...category,
-      order: index,
-    }));
-
-    setCategories(updatedCategories);
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/categories/admin/reorder`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ categories: updatedCategories }),
-      });
-
-      if (!response.ok)
-        throw new Error(t("categories.management.errors.reorderFailed"));
-      toast.success(t("categories.management.actions.reorderSuccess"));
-    } catch (error) {
-      toast.error(t("categories.management.errors.reorderFailed"));
-      fetchCategories(); // Revert to original order
-    }
   };
 
   if (loading) {

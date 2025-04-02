@@ -196,7 +196,7 @@ const Navbar: React.FC = () => {
                         </div>
                         <Link
                           to="/profile"
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] flex items-center transition-colors duration-200"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] transition-colors duration-200"
                           onClick={() => setIsProfileMenuOpen(false)}
                         >
                           <Settings className="h-4 w-4 mr-2" />
@@ -207,7 +207,7 @@ const Navbar: React.FC = () => {
                             setIsProfileMenuOpen(false);
                             handleLogout();
                           }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] flex items-center transition-colors duration-200"
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] transition-colors duration-200"
                         >
                           <LogOut className="h-4 w-4 mr-2" />
                           {t("navbar.profile.signOut")}

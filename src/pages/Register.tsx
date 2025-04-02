@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
 
@@ -17,7 +16,6 @@ interface RegisterFormData {
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const { isDarkMode } = useTheme();
   const { t } = useLanguage();
   const [formData, setFormData] = useState<RegisterFormData>({
     name: "",

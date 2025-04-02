@@ -207,6 +207,7 @@
       "icon": "URL de l'icône",
       "order": "Ordre d'affichage",
       "iconPlaceholder": "Entrez l'URL de l'icône (ex., {example})",
+      "updateSuccess": "Compétence mise à jour avec succès",
       "actions": {
         "addSuccess": "Compétence ajoutée avec succès",
         "updateSuccess": "Compétence mise à jour avec succès",

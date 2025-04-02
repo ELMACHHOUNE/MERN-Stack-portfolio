@@ -18,8 +18,6 @@ interface AdminProfile {
 const Hero: React.FC = () => {
   const { t } = useLanguage();
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,29 +55,11 @@ const Hero: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
-      } finally {
-        setLoading(false);
-        console.log("Profile fetch completed");
       }
     };
 
     fetchProfile();
   }, []);
-
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    console.error("Image load error:", {
-      src: e.currentTarget.src,
-      error: e,
-    });
-    setImageError(true);
-  };
-
-  const handleImageLoad = () => {
-    console.log("Image loaded successfully");
-    setImageError(false);
-  };
 
   const getProfileImageUrl = () => {
     if (!adminProfile?.profileImage) {
@@ -165,8 +145,6 @@ const Hero: React.FC = () => {
                 src={getProfileImageUrl() || ""}
                 alt={adminProfile.name}
                 className="w-full h-full object-cover"
-                onError={handleImageError}
-                onLoad={handleImageLoad}
               />
             ) : (
               <img

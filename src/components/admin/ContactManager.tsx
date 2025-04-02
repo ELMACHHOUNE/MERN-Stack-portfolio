@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Mail, Trash2, CheckCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "../../context/LanguageContext";
@@ -20,7 +20,6 @@ const ContactManager: React.FC = () => {
   const { t } = useLanguage();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -44,11 +43,6 @@ const ContactManager: React.FC = () => {
       const data = await response.json();
       setContacts(data);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("contact.management.messages.error")
-      );
       toast.error(t("contact.management.messages.error"));
     } finally {
       setLoading(false);
@@ -80,11 +74,6 @@ const ContactManager: React.FC = () => {
       );
       toast.success(t("contact.management.messages.markReadSuccess"));
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("contact.management.messages.markReadError")
-      );
       toast.error(t("contact.management.messages.markReadError"));
     }
   };
@@ -112,11 +101,6 @@ const ContactManager: React.FC = () => {
       setContacts(contacts.filter((contact) => contact._id !== id));
       toast.success(t("contact.management.messages.deleteSuccess"));
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("contact.management.messages.deleteError")
-      );
       toast.error(t("contact.management.messages.deleteError"));
     }
   };

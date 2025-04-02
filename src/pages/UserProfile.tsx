@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
 import { API_URL } from "../config";
-import {
-  User,
-  Mail,
-  Lock,
-  Save,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Camera,
-} from "lucide-react";
+import { User, Mail, Lock, Save, Eye, EyeOff, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ProfileFormData {
@@ -27,7 +17,6 @@ interface ProfileFormData {
 const UserProfile: React.FC = () => {
   const { t } = useLanguage();
   const { user, token, setUser } = useAuth();
-  const { isDarkMode } = useTheme();
   const [profileImage, setProfileImage] = useState<string | null>(
     user?.profileImage ? `${API_URL}${user.profileImage}` : null
   );
