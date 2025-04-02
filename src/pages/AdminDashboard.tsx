@@ -8,6 +8,7 @@ import SkillsManager from "../components/admin/SkillsManager";
 import ProjectManager from "../components/admin/ProjectManager";
 import ExperienceManager from "../components/admin/ExperienceManager";
 import CategoryManager from "../components/admin/CategoryManager";
+import AboutSettings from "./AboutSettings";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/projects")) return "projects";
     if (path.includes("/experience")) return "experience";
     if (path.includes("/categories")) return "categories";
+    if (path.includes("/about")) return "about";
     return "skills";
   });
 
@@ -81,6 +83,16 @@ const AdminDashboard: React.FC = () => {
             >
               Categories
             </button>
+            <button
+              onClick={() => setActiveTab("about")}
+              className={`${
+                activeTab === "about"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              About
+            </button>
           </nav>
         </div>
 
@@ -90,6 +102,7 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "projects" && <ProjectManager />}
           {activeTab === "experience" && <ExperienceManager />}
           {activeTab === "categories" && <CategoryManager />}
+          {activeTab === "about" && <AboutSettings />}
         </div>
       </main>
     </div>

@@ -14,8 +14,10 @@ import UserProfile from "./pages/UserProfile";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SkillsManager from "./components/admin/SkillsManager";
+import ProjectManager from "./components/admin/ProjectManager";
 import ExperienceManager from "./components/admin/ExperienceManager";
 import CategoryManager from "./components/admin/CategoryManager";
+import AboutSettings from "./pages/AboutSettings";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -73,7 +75,15 @@ const App: React.FC = () => {
                     path="/admin/skills"
                     element={
                       <AdminRoute>
-                        <SkillsManager />
+                        <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/projects"
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
                       </AdminRoute>
                     }
                   />
@@ -81,7 +91,7 @@ const App: React.FC = () => {
                     path="/admin/experience"
                     element={
                       <AdminRoute>
-                        <ExperienceManager />
+                        <AdminDashboard />
                       </AdminRoute>
                     }
                   />
@@ -89,13 +99,21 @@ const App: React.FC = () => {
                     path="/admin/categories"
                     element={
                       <AdminRoute>
-                        <CategoryManager />
+                        <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/about"
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
                       </AdminRoute>
                     }
                   />
                 </Routes>
               </main>
-              <Toaster position="top-right" />
+              <Toaster position="bottom-right" />
             </div>
           </Router>
         </AdminProfileProvider>

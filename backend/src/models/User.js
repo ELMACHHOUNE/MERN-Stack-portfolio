@@ -42,6 +42,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    interests: {
+      type: [String],
+      default: [],
+    },
+    values: {
+      type: [
+        {
+          icon: String,
+          title: String,
+          description: String,
+        },
+      ],
+      default: [],
+    },
     lastLogin: {
       type: Date,
       default: Date.now,
