@@ -56,23 +56,28 @@ const Navbar: React.FC = () => {
     navigate("/login");
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md shadow-lg"
+          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-lg"
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
-              Portfolio
-            </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <Link
+            to="/"
+            className="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-white"
+          >
+            <span className="text-blue-600 dark:text-blue-400">Portfolio</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -83,14 +88,25 @@ const Navbar: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 text-sm font-medium transition-all duration-200 ${
+                  className={`relative px-3 py-2 text-sm font-medium transition-colors ${
                     isActive(item.path)
                       ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span>{item.label}</span>
+                  {isActive(item.path) && (
+                    <motion.div
+                      layoutId="activeNav"
+                      className="absolute inset-0 -z-10 bg-blue-50 dark:bg-blue-900/20 rounded-md"
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    />
+                  )}
                 </Link>
               );
             })}
@@ -105,7 +121,8 @@ const Navbar: React.FC = () => {
             )}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -183,11 +200,12 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center space-x-4">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200 mr-2"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -197,7 +215,8 @@ const Navbar: React.FC = () => {
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200"
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle menu"
             >
               {isOpen ? (
                 <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
@@ -217,27 +236,23 @@ const Navbar: React.FC = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-white dark:bg-[#0B1120] border-t border-gray-200 dark:border-gray-800"
+            className="md:hidden bg-white dark:bg-gray-900 shadow-lg"
           >
-            <div className="container mx-auto px-4 py-4 space-y-2">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive(item.path)
-                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-[#1B2333] dark:hover:text-blue-400"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    isActive(item.path)
+                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
               {user?.isAdmin && (
                 <Link
                   to="/admin"
