@@ -1,39 +1,46 @@
-# Modern Portfolio Website
+# MERN Stack Portfolio
 
-A full-stack portfolio website built with React, TypeScript, Node.js, and MongoDB. Features a beautiful, responsive design with dark mode support and an admin dashboard for content management.
+A modern, responsive portfolio website built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring a dark mode, admin dashboard, and dynamic content management.
 
-## 🌟 Features
+## Features
+
+- 🌙 Dark/Light Mode Toggle
+- 📱 Fully Responsive Design
+- 🔐 Secure Authentication System
+- 👨‍💼 Admin Dashboard
+- 📊 Dynamic Content Management
+- 🎨 Modern UI with Tailwind CSS
+- ⚡ Fast Performance
+- 🔒 Protected Admin Routes
+- 📝 Contact Form
+- 🎯 Skills Management
+- 📁 Project Management
+- 📚 Experience Management
+- 📋 Category Management
+
+## Tech Stack
 
 ### Frontend
 
-- Modern, responsive design with dark mode support
-- Smooth animations using Framer Motion
-- TypeScript for type safety
-- Tailwind CSS for styling
-- React Router for navigation
-- Context API for state management
-- Beautiful UI components with Tabler Icons
+- React.js
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- React Router
+- Context API
+- Axios
 
 ### Backend
 
-- Node.js with Express
-- MongoDB with Mongoose
-- JWT authentication
-- Role-based access control (Admin/User)
-- RESTful API architecture
-- Input validation and error handling
-- Rate limiting and security middleware
+- Node.js
+- Express.js
+- MongoDB
+- JWT Authentication
+- Mongoose
+- CORS
+- Express Validator
 
-### Admin Dashboard
-
-- Protected admin routes
-- Skills management (CRUD operations)
-- Projects management (CRUD operations)
-- Drag-and-drop reordering
-- Image upload support
-- Real-time updates
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -43,157 +50,110 @@ A full-stack portfolio website built with React, TypeScript, Node.js, and MongoD
 
 ### Installation
 
-1. Clone the repository:
+1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd portfolio
+git clone https://github.com/yourusername/MERN-Stack-portfolio.git
+cd MERN-Stack-portfolio
 ```
 
-2. Install frontend dependencies:
+2. Install dependencies
 
 ```bash
+# Install frontend dependencies
 cd frontend
 npm install
-```
 
-3. Install backend dependencies:
-
-```bash
+# Install backend dependencies
 cd ../backend
 npm install
 ```
 
-4. Create a `.env` file in the backend directory:
+3. Set up environment variables
 
-```env
+```bash
+# Frontend (.env)
+VITE_API_URL=http://localhost:5000
+
+# Backend (.env)
+PORT=5000
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
-JWT_EXPIRE=30d
-PORT=5000
 ```
 
-5. Create a `.env` file in the frontend directory:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-### Running the Application
-
-1. Start the backend server:
+4. Start the development servers
 
 ```bash
+# Start backend server
 cd backend
 npm run dev
-```
 
-2. Start the frontend development server:
-
-```bash
+# Start frontend server
 cd frontend
 npm run dev
 ```
 
-3. Create an admin user:
-
-```bash
-cd backend
-node src/scripts/createAdmin.js
-```
-
-4. Access the application:
-
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
-- Admin Dashboard: http://localhost:5173/admin
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-portfolio/
+MERN-Stack-portfolio/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
 │   │   ├── context/
 │   │   ├── pages/
 │   │   ├── types/
-│   │   └── App.tsx
+│   │   └── utils/
 │   ├── public/
 │   └── package.json
-│
-└── backend/
-    ├── src/
-    │   ├── models/
-    │   ├── routes/
-    │   ├── middleware/
-    │   ├── scripts/
-    │   └── index.js
-    └── package.json
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   └── utils/
+│   └── package.json
+└── README.md
 ```
 
-## 🔒 Authentication
+## API Endpoints
 
-The application uses JWT-based authentication with the following endpoints:
+### Authentication
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/admin/check` - Check admin status
-- `GET /api/auth/admin/users` - Get all users (admin only)
+- POST /api/auth/register - Register a new user
+- POST /api/auth/login - Login user
+- GET /api/auth/me - Get current user
+- POST /api/auth/logout - Logout user
 
-## 📝 API Endpoints
+### Admin
+
+- GET /api/auth/admin/users - Get all users
+- PUT /api/auth/admin/users/:id - Update user
+- DELETE /api/auth/admin/users/:id - Delete user
 
 ### Skills
 
-- `GET /api/skills` - Get all active skills
-- `GET /api/skills/admin` - Get all skills (admin only)
-- `POST /api/skills` - Create new skill (admin only)
-- `PATCH /api/skills/:id` - Update skill (admin only)
-- `DELETE /api/skills/:id` - Delete skill (admin only)
+- GET /api/skills - Get all skills
+- POST /api/skills - Create new skill
+- PUT /api/skills/:id - Update skill
+- DELETE /api/skills/:id - Delete skill
 
 ### Projects
 
-- `GET /api/projects` - Get all active projects
-- `GET /api/projects/admin` - Get all projects (admin only)
-- `POST /api/projects` - Create new project (admin only)
-- `PATCH /api/projects/:id` - Update project (admin only)
-- `DELETE /api/projects/:id` - Delete project (admin only)
-- `PATCH /api/projects/reorder` - Reorder projects (admin only)
+- GET /api/projects - Get all projects
+- POST /api/projects - Create new project
+- PUT /api/projects/:id - Update project
+- DELETE /api/projects/:id - Delete project
 
-## 🛠️ Technologies Used
+### Categories
 
-### Frontend
+- GET /api/categories - Get all categories
+- POST /api/categories - Create new category
+- PUT /api/categories/:id - Update category
+- DELETE /api/categories/:id - Delete category
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Framer Motion
-- React Router
-- Tabler Icons
-
-### Backend
-
-- Node.js
-- Express
-- MongoDB
-- Mongoose
-- JWT
-- Express Validator
-- CORS
-- Rate Limiter
-
-## 🔒 Security Features
-
-- JWT authentication
-- Password hashing
-- Rate limiting
-- CORS protection
-- Input validation
-- XSS protection
-- Secure headers
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -201,18 +161,20 @@ The application uses JWT-based authentication with the following endpoints:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
-
-- Your Name - Initial work
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [Tabler Icons](https://tabler-icons.io/)
 - [MongoDB](https://www.mongodb.com/)
+- [Express.js](https://expressjs.com/)
+- [Node.js](https://nodejs.org/)
+
+## Contact
+
+Mohamed EL MACHHOUNE - [@ELMACHHOUNE](https://github.com/ELMACHHOUNE) - mohamed.elmachhoune@gmail.com
+
+Project Link: [https://github.com/ELMACHHOUNE/MERN-Stack-portfolio](https://github.com/ELMACHHOUNE/MERN-Stack-portfolio)
