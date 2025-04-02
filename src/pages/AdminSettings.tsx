@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { API_URL } from "../config";
 import {
   User,
@@ -40,6 +41,7 @@ interface SocialLinks {
 }
 
 const AdminSettings: React.FC = () => {
+  const { t } = useLanguage();
   const { adminProfile, updateAdminProfile } = useAdminProfile();
   const { token } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -109,17 +111,17 @@ const AdminSettings: React.FC = () => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to upload image");
+        throw new Error(error.message || t("settings.image.error"));
       }
 
       const data = await response.json();
       setProfileImage(data.profileImage);
       await updateAdminProfile({ profileImage: data.profileImage });
-      toast.success("Profile image updated successfully");
+      toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to upload image"
+        error instanceof Error ? error.message : t("settings.image.error")
       );
     } finally {
       setIsUploading(false);
@@ -188,11 +190,11 @@ const AdminSettings: React.FC = () => {
 
     try {
       await updateAdminProfile(data);
-      toast.success("Profile updated successfully");
+      toast.success(t("settings.profile.success"));
     } catch (error) {
       console.error("Profile update error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to update profile"
+        error instanceof Error ? error.message : t("settings.profile.error")
       );
     }
   };
@@ -203,14 +205,14 @@ const AdminSettings: React.FC = () => {
         <div className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
-              Admin Profile Settings
+              {t("settings.profile.title")}
             </h2>
           </div>
 
           <form onSubmit={handleProfileUpdate} className="space-y-8">
             <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                Basic Profile
+                {t("settings.profile.title")}
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="flex flex-col items-center space-y-4">
@@ -219,7 +221,7 @@ const AdminSettings: React.FC = () => {
                       {profileImage ? (
                         <img
                           src={`${API_URL}${profileImage}`}
-                          alt="Profile"
+                          alt={t("settings.profile.imageAlt")}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -244,7 +246,7 @@ const AdminSettings: React.FC = () => {
                     />
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Click the camera icon to update your profile picture
+                    {t("settings.profile.description")}
                   </p>
                 </div>
 
@@ -253,30 +255,30 @@ const AdminSettings: React.FC = () => {
                     {[
                       {
                         id: "name",
-                        label: "Name",
+                        label: t("settings.profile.fullName"),
                         type: "text",
-                        placeholder: "Your full name",
+                        placeholder: t("settings.profile.namePlaceholder"),
                         value: adminProfile?.name || "",
                       },
                       {
                         id: "email",
-                        label: "Email",
+                        label: t("settings.profile.email"),
                         type: "email",
-                        placeholder: "your.email@example.com",
+                        placeholder: t("settings.profile.emailPlaceholder"),
                         value: adminProfile?.email || "",
                       },
                       {
                         id: "title",
-                        label: "Title",
+                        label: t("about.subtitle"),
                         type: "text",
-                        placeholder: "e.g. Full Stack Developer",
+                        placeholder: t("home.defaultProfile.title"),
                         value: adminProfile?.title || "",
                       },
                       {
                         id: "location",
-                        label: "Location",
+                        label: t("about.location"),
                         type: "text",
-                        placeholder: "e.g. New York, USA",
+                        placeholder: t("home.defaultProfile.location"),
                         value: adminProfile?.location || "",
                       },
                     ].map((field) => (
@@ -304,7 +306,7 @@ const AdminSettings: React.FC = () => {
                       htmlFor="bio"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Bio
+                      {t("about.bio")}
                     </label>
                     <textarea
                       id="bio"
@@ -312,7 +314,7 @@ const AdminSettings: React.FC = () => {
                       rows={4}
                       defaultValue={adminProfile?.bio}
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                      placeholder="Write a brief description about yourself..."
+                      placeholder={t("home.defaultProfile.bio")}
                     />
                   </div>
                 </div>
@@ -321,18 +323,50 @@ const AdminSettings: React.FC = () => {
 
             <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                Social Media Links
+                {t("about.socialLinks.title")}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
-                  { id: "gmail", icon: Mail, label: "Gmail" },
-                  { id: "whatsapp", icon: MessageCircle, label: "WhatsApp" },
-                  { id: "github", icon: Github, label: "GitHub" },
-                  { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
-                  { id: "twitter", icon: Twitter, label: "Twitter" },
-                  { id: "facebook", icon: Facebook, label: "Facebook" },
-                  { id: "instagram", icon: Instagram, label: "Instagram" },
-                  { id: "youtube", icon: Youtube, label: "YouTube" },
+                  {
+                    id: "gmail",
+                    icon: Mail,
+                    label: t("about.socialLinks.gmail"),
+                  },
+                  {
+                    id: "whatsapp",
+                    icon: MessageCircle,
+                    label: t("about.socialLinks.whatsapp"),
+                  },
+                  {
+                    id: "github",
+                    icon: Github,
+                    label: t("about.socialLinks.github"),
+                  },
+                  {
+                    id: "linkedin",
+                    icon: Linkedin,
+                    label: t("about.socialLinks.linkedin"),
+                  },
+                  {
+                    id: "twitter",
+                    icon: Twitter,
+                    label: t("about.socialLinks.twitter"),
+                  },
+                  {
+                    id: "facebook",
+                    icon: Facebook,
+                    label: t("about.socialLinks.facebook"),
+                  },
+                  {
+                    id: "instagram",
+                    icon: Instagram,
+                    label: t("about.socialLinks.instagram"),
+                  },
+                  {
+                    id: "youtube",
+                    icon: Youtube,
+                    label: t("about.socialLinks.youtube"),
+                  },
                   {
                     id: "behance",
                     icon: (props: any) => (
@@ -340,7 +374,7 @@ const AdminSettings: React.FC = () => {
                         <path d="M22 7h-7V2H9v5H2v15h20V7zM9 13.47c0 .43-.15.77-.46 1.03-.31.25-.75.38-1.32.38H5.94V12h1.31c.54 0 .96.12 1.27.37.3.25.46.58.46.99l.02.11zm6.31.03c0 .42-.14.76-.41 1.05-.28.28-.65.42-1.12.42-.48 0-.87-.15-1.16-.45-.29-.31-.44-.7-.44-1.18 0-.47.15-.85.46-1.15.31-.31.71-.46 1.21-.46.46 0 .83.14 1.09.42.27.28.4.63.4 1.06l-.03.29zm-6.31-3.93c0 .42-.15.75-.45 1-.3.25-.72.37-1.27.37H5.94V8.43h1.31c.54 0 .97.13 1.28.38.31.25.46.59.46 1l.02.11zm6.31-.08c0 .36-.11.66-.34.89-.23.23-.55.34-.96.34-.42 0-.75-.12-1-.37-.25-.25-.38-.57-.38-.97 0-.41.13-.74.4-1 .27-.26.62-.39 1.05-.39.41 0 .74.12.99.36.24.24.36.55.36.92l-.12.22z" />
                       </svg>
                     ),
-                    label: "Behance",
+                    label: t("about.socialLinks.behance"),
                   },
                 ].map((platform) => (
                   <div key={platform.id}>
@@ -377,10 +411,10 @@ const AdminSettings: React.FC = () => {
               <div className="flex justify-between items-center mb-8">
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-                    Core Values
+                    {t("about.coreValues")}
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Define the principles that guide your work
+                    {t("about.coreValues")}
                   </p>
                 </div>
                 <button
@@ -389,7 +423,7 @@ const AdminSettings: React.FC = () => {
                   className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
                 >
                   <Plus className="w-5 h-5" />
-                  Add Value
+                  {t("common.add")}
                 </button>
               </div>
 
@@ -428,15 +462,15 @@ const AdminSettings: React.FC = () => {
                         {[
                           {
                             id: "title",
-                            label: "Title",
+                            label: t("about.coreValues"),
                             type: "text",
-                            placeholder: "Enter value title",
+                            placeholder: t("about.coreValues"),
                           },
                           {
                             id: "icon",
-                            label: "Icon URL",
+                            label: t("skills.management.icon"),
                             type: "url",
-                            placeholder: "Enter icon URL",
+                            placeholder: t("skills.management.icon"),
                           },
                         ].map((field) => (
                           <div key={field.id}>
@@ -461,7 +495,7 @@ const AdminSettings: React.FC = () => {
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Description
+                            {t("about.bio")}
                           </label>
                           <textarea
                             value={value.description}
@@ -474,7 +508,7 @@ const AdminSettings: React.FC = () => {
                             }
                             rows={2}
                             className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#242E42] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm resize-none hover:border-blue-500/50"
-                            placeholder="Enter value description"
+                            placeholder={t("about.bio")}
                           />
                         </div>
                       </div>
@@ -488,10 +522,10 @@ const AdminSettings: React.FC = () => {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-                    Interests
+                    {t("about.interests")}
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Share your passions and areas of expertise
+                    {t("about.interests")}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -499,7 +533,7 @@ const AdminSettings: React.FC = () => {
                     type="text"
                     value={newInterest}
                     onChange={(e) => setNewInterest(e.target.value)}
-                    placeholder="Add new interest"
+                    placeholder={t("about.interests")}
                     className="w-full sm:w-64 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
                   />
                   <button
@@ -508,7 +542,7 @@ const AdminSettings: React.FC = () => {
                     className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 hover:scale-105 transform"
                   >
                     <Plus className="w-5 h-5" />
-                    Add Interest
+                    {t("common.add")}
                   </button>
                 </div>
               </div>
@@ -541,7 +575,7 @@ const AdminSettings: React.FC = () => {
                     <Plus className="w-8 h-8 text-blue-500 dark:text-blue-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
-                    No interests added yet. Add your first interest above!
+                    {t("about.interests")}
                   </p>
                 </div>
               )}
@@ -552,7 +586,7 @@ const AdminSettings: React.FC = () => {
                 type="submit"
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                Save Changes
+                {t("settings.profile.saveChanges")}
                 <svg
                   className="w-5 h-5"
                   fill="none"

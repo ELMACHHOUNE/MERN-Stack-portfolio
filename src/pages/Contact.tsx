@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send, MessageCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
+import { useLanguage } from "../context/LanguageContext";
 
 interface ContactForm {
   name: string;
@@ -17,6 +18,7 @@ interface ValidationError {
 }
 
 const Contact: React.FC = () => {
+  const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
@@ -31,28 +33,40 @@ const Contact: React.FC = () => {
     const newErrors: ValidationError[] = [];
 
     if (!formData.name.trim()) {
-      newErrors.push({ field: "name", message: "Name is required" });
+      newErrors.push({
+        field: "name",
+        message: t("contact.validation.nameRequired"),
+      });
     }
 
     if (!formData.email.trim()) {
-      newErrors.push({ field: "email", message: "Email is required" });
+      newErrors.push({
+        field: "email",
+        message: t("contact.validation.emailRequired"),
+      });
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.push({
         field: "email",
-        message: "Please provide a valid email",
+        message: t("contact.validation.emailInvalid"),
       });
     }
 
     if (!formData.subject.trim()) {
-      newErrors.push({ field: "subject", message: "Subject is required" });
+      newErrors.push({
+        field: "subject",
+        message: t("contact.validation.subjectRequired"),
+      });
     }
 
     if (!formData.message.trim()) {
-      newErrors.push({ field: "message", message: "Message is required" });
+      newErrors.push({
+        field: "message",
+        message: t("contact.validation.messageRequired"),
+      });
     } else if (formData.message.trim().length < 10) {
       newErrors.push({
         field: "message",
-        message: "Message must be at least 10 characters long",
+        message: t("contact.validation.messageTooShort"),
       });
     }
 
@@ -88,17 +102,17 @@ const Contact: React.FC = () => {
             message: err.msg,
           }));
           setErrors(validationErrors);
-          toast.error("Please fix the form errors");
+          toast.error(t("contact.error.formErrors"));
           return;
         }
-        throw new Error(data.message || "Failed to send message");
+        throw new Error(data.message || t("contact.error.sendFailed"));
       }
 
-      toast.success("Message sent successfully! I'll get back to you soon.");
+      toast.success(t("contact.success"));
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to send message"
+        error instanceof Error ? error.message : t("contact.error.sendFailed")
       );
     } finally {
       setIsSubmitting(false);
@@ -128,10 +142,10 @@ const Contact: React.FC = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Get in Touch
+            {t("contact.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Have a question or want to work together? Feel free to reach out!
+            {t("contact.description")}
           </p>
         </motion.div>
 
@@ -144,7 +158,7 @@ const Contact: React.FC = () => {
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
           >
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Contact Information
+              {t("contact.info.title")}
             </h2>
             <div className="space-y-6">
               {/* Gmail */}
@@ -153,7 +167,7 @@ const Contact: React.FC = () => {
                   <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Email
+                      {t("contact.info.email")}
                     </h3>
                     <a
                       href={adminProfile.socialLinks.gmail}
@@ -171,7 +185,7 @@ const Contact: React.FC = () => {
                   <MessageCircle className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      WhatsApp
+                      {t("contact.info.whatsapp")}
                     </h3>
                     <a
                       href={adminProfile.socialLinks.whatsapp}
@@ -193,7 +207,7 @@ const Contact: React.FC = () => {
                   <MapPin className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Location
+                      {t("contact.info.location")}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300">
                       {adminProfile.location}
@@ -207,7 +221,7 @@ const Contact: React.FC = () => {
             {adminProfile?.socialLinks && (
               <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Connect With Me
+                  {t("contact.info.connect")}
                 </h3>
                 <div className="flex flex-wrap gap-4">
                   {Object.entries(adminProfile.socialLinks)
@@ -223,7 +237,9 @@ const Contact: React.FC = () => {
                         rel="noopener noreferrer"
                         className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                       >
-                        <span className="capitalize">{platform}</span>
+                        <span className="capitalize">
+                          {t(`about.socialLinks.${platform}`)}
+                        </span>
                       </a>
                     ))}
                 </div>
@@ -239,7 +255,7 @@ const Contact: React.FC = () => {
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
           >
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Send a Message
+              {t("contact.form.title")}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -247,7 +263,7 @@ const Contact: React.FC = () => {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Name
+                  {t("contact.name")}
                 </label>
                 <input
                   type="text"
@@ -255,25 +271,26 @@ const Contact: React.FC = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                  placeholder={t("contact.namePlaceholder")}
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
                     getFieldError("name")
-                      ? "border-red-500 dark:border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  required
                 />
                 {getFieldError("name") && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("name")}
                   </p>
                 )}
               </div>
+
               <div>
                 <label
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Email
+                  {t("contact.email")}
                 </label>
                 <input
                   type="email"
@@ -281,25 +298,26 @@ const Contact: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                  placeholder={t("contact.emailPlaceholder")}
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
                     getFieldError("email")
-                      ? "border-red-500 dark:border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  required
                 />
                 {getFieldError("email") && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("email")}
                   </p>
                 )}
               </div>
+
               <div>
                 <label
                   htmlFor="subject"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Subject
+                  {t("contact.subject")}
                 </label>
                 <input
                   type="text"
@@ -307,61 +325,63 @@ const Contact: React.FC = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                  placeholder={t("contact.subjectPlaceholder")}
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
                     getFieldError("subject")
-                      ? "border-red-500 dark:border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  required
                 />
                 {getFieldError("subject") && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("subject")}
                   </p>
                 )}
               </div>
+
               <div>
                 <label
                   htmlFor="message"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Message
+                  {t("contact.message")}
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
+                  placeholder={t("contact.messagePlaceholder")}
                   rows={4}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
                     getFieldError("message")
-                      ? "border-red-500 dark:border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  required
                 />
                 {getFieldError("message") && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("message")}
                   </p>
                 )}
               </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors flex items-center justify-center ${
+                className={`w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Sending...
+                    <Send className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                    {t("contact.sending")}
                   </>
                 ) : (
                   <>
-                    <Send className="h-5 w-5 mr-2" />
-                    Send Message
+                    <Send className="-ml-1 mr-3 h-5 w-5" />
+                    {t("contact.send")}
                   </>
                 )}
               </button>

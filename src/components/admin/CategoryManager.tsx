@@ -3,6 +3,7 @@ import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Folder } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Category {
   _id: string;
@@ -14,6 +15,7 @@ interface Category {
 }
 
 const CategoryManager: React.FC = () => {
+  const { t } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -36,11 +38,12 @@ const CategoryManager: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Failed to fetch categories");
+      if (!response.ok)
+        throw new Error(t("categories.management.errors.fetchFailed"));
       const data = await response.json();
       setCategories(data);
     } catch (error) {
-      toast.error("Failed to fetch categories");
+      toast.error(t("categories.management.errors.fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -69,22 +72,23 @@ const CategoryManager: React.FC = () => {
         body: JSON.stringify(categoryData),
       });
 
-      if (!response.ok) throw new Error("Failed to save category");
+      if (!response.ok)
+        throw new Error(t("categories.management.errors.saveFailed"));
 
       toast.success(
         isEditing
-          ? "Category updated successfully"
-          : "Category added successfully"
+          ? t("categories.management.actions.updateSuccess")
+          : t("categories.management.actions.addSuccess")
       );
       resetForm();
       fetchCategories();
     } catch (error) {
-      toast.error("Failed to save category");
+      toast.error(t("categories.management.errors.saveFailed"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
+    if (!window.confirm(t("categories.management.actions.confirmDelete")))
       return;
 
     try {
@@ -96,12 +100,13 @@ const CategoryManager: React.FC = () => {
         },
       });
 
-      if (!response.ok) throw new Error("Failed to delete category");
+      if (!response.ok)
+        throw new Error(t("categories.management.errors.deleteFailed"));
 
-      toast.success("Category deleted successfully");
+      toast.success(t("categories.management.actions.deleteSuccess"));
       fetchCategories();
     } catch (error) {
-      toast.error("Failed to delete category");
+      toast.error(t("categories.management.errors.deleteFailed"));
     }
   };
 
@@ -151,10 +156,11 @@ const CategoryManager: React.FC = () => {
         body: JSON.stringify({ categories: updatedCategories }),
       });
 
-      if (!response.ok) throw new Error("Failed to reorder categories");
-      toast.success("Categories reordered successfully");
+      if (!response.ok)
+        throw new Error(t("categories.management.errors.reorderFailed"));
+      toast.success(t("categories.management.actions.reorderSuccess"));
     } catch (error) {
-      toast.error("Failed to reorder categories");
+      toast.error(t("categories.management.errors.reorderFailed"));
       fetchCategories(); // Revert to original order
     }
   };
@@ -173,7 +179,7 @@ const CategoryManager: React.FC = () => {
         <div className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
-              Categories Management
+              {t("categories.management.title")}
             </h2>
             <button
               type="button"
@@ -181,7 +187,7 @@ const CategoryManager: React.FC = () => {
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Category
+              {t("categories.management.addCategory")}
             </button>
           </div>
 
@@ -189,7 +195,9 @@ const CategoryManager: React.FC = () => {
             {/* Add Category Form */}
             <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                {isEditing ? "Edit Category" : "Add New Category"}
+                {isEditing
+                  ? t("categories.management.editCategory")
+                  : t("categories.management.addCategory")}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -198,7 +206,7 @@ const CategoryManager: React.FC = () => {
                       htmlFor="categoryName"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Category Name
+                      {t("categories.management.form.title")}
                     </label>
                     <input
                       type="text"
@@ -208,7 +216,9 @@ const CategoryManager: React.FC = () => {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter category name"
+                      placeholder={t(
+                        "categories.management.form.namePlaceholder"
+                      )}
                       required
                     />
                   </div>
@@ -217,7 +227,7 @@ const CategoryManager: React.FC = () => {
                       htmlFor="categoryIcon"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Icon URL
+                      {t("categories.management.form.iconUrl")}
                     </label>
                     <input
                       type="url"
@@ -227,7 +237,9 @@ const CategoryManager: React.FC = () => {
                         setFormData({ ...formData, icon: e.target.value })
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter icon URL"
+                      placeholder={t(
+                        "categories.management.form.iconUrlPlaceholder"
+                      )}
                       required
                     />
                   </div>
@@ -237,7 +249,7 @@ const CategoryManager: React.FC = () => {
                     htmlFor="categoryDescription"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Description
+                    {t("categories.management.form.description")}
                   </label>
                   <textarea
                     id="categoryDescription"
@@ -247,7 +259,9 @@ const CategoryManager: React.FC = () => {
                     }
                     rows={3}
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                    placeholder="Enter category description"
+                    placeholder={t(
+                      "categories.management.form.descriptionPlaceholder"
+                    )}
                     required
                   />
                 </div>
@@ -258,7 +272,7 @@ const CategoryManager: React.FC = () => {
                       onClick={resetForm}
                       className="px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
-                      Cancel
+                      {t("common.cancel")}
                     </button>
                   )}
                   <button
@@ -266,7 +280,9 @@ const CategoryManager: React.FC = () => {
                     className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
-                    {isEditing ? "Update Category" : "Add Category"}
+                    {isEditing
+                      ? t("categories.management.editCategory")
+                      : t("categories.management.addCategory")}
                   </button>
                 </div>
               </form>
@@ -275,7 +291,7 @@ const CategoryManager: React.FC = () => {
             {/* Categories List */}
             <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                Existing Categories
+                {t("categories.management.categoryList")}
               </h3>
               {categories.length === 0 ? (
                 <div className="text-center py-8">
@@ -283,7 +299,7 @@ const CategoryManager: React.FC = () => {
                     <Folder className="w-8 h-8 text-blue-500 dark:text-blue-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
-                    No categories added yet. Add your first category above!
+                    {t("categories.management.noCategories")}
                   </p>
                 </div>
               ) : (

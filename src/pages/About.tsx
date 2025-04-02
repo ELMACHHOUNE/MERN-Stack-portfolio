@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useAdminProfile } from "../context/AdminProfileContext";
+import { useLanguage } from "../context/LanguageContext";
 import { API_URL } from "../config";
 import {
   User,
@@ -18,11 +19,15 @@ import {
 
 const About: React.FC = () => {
   const { adminProfile, isLoading } = useAdminProfile();
+  const { t } = useLanguage();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+        <span className="ml-4 text-gray-600 dark:text-gray-300">
+          {t("about.loading")}
+        </span>
       </div>
     );
   }
@@ -32,32 +37,32 @@ const About: React.FC = () => {
       {
         icon: <Github className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.github,
-        label: "GitHub",
+        label: t("about.socialLinks.github"),
       },
       {
         icon: <Linkedin className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.linkedin,
-        label: "LinkedIn",
+        label: t("about.socialLinks.linkedin"),
       },
       {
         icon: <Twitter className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.twitter,
-        label: "Twitter",
+        label: t("about.socialLinks.twitter"),
       },
       {
         icon: <Facebook className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.facebook,
-        label: "Facebook",
+        label: t("about.socialLinks.facebook"),
       },
       {
         icon: <Instagram className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.instagram,
-        label: "Instagram",
+        label: t("about.socialLinks.instagram"),
       },
       {
         icon: <Youtube className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.youtube,
-        label: "YouTube",
+        label: t("about.socialLinks.youtube"),
       },
       {
         icon: (
@@ -66,17 +71,17 @@ const About: React.FC = () => {
           </svg>
         ),
         url: adminProfile?.socialLinks?.behance,
-        label: "Behance",
+        label: t("about.socialLinks.behance"),
       },
       {
         icon: <Mail className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.gmail,
-        label: "Gmail",
+        label: t("about.socialLinks.gmail"),
       },
       {
         icon: <MessageCircle className="w-5 h-5" />,
         url: adminProfile?.socialLinks?.whatsapp,
-        label: "WhatsApp",
+        label: t("about.socialLinks.whatsapp"),
       },
     ];
 
@@ -138,14 +143,14 @@ const About: React.FC = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
                   <h1 className="mt-8 text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
-                    {adminProfile?.name || "Your Name"}
+                    {adminProfile?.name || t("about.title")}
                   </h1>
                   <p className="mt-4 text-xl text-indigo-600 dark:text-indigo-400 font-medium">
-                    {adminProfile?.title || "Software Engineer"}
+                    {adminProfile?.title || t("about.subtitle")}
                   </p>
                   <div className="mt-3 flex items-center justify-center text-gray-600 dark:text-gray-300">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span>{adminProfile?.location || "Location"}</span>
+                    <span>{adminProfile?.location || t("about.location")}</span>
                   </div>
                   <div className="mt-8">{renderSocialLinks()}</div>
                 </motion.div>
@@ -166,11 +171,10 @@ const About: React.FC = () => {
             >
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  About Me
+                  {t("about.bio")}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {adminProfile?.bio ||
-                    "A passionate professional with experience in modern technologies."}
+                  {adminProfile?.bio || t("about.description")}
                 </p>
               </div>
             </motion.div>
@@ -185,7 +189,7 @@ const About: React.FC = () => {
               >
                 <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                    Core Values
+                    {t("about.coreValues")}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {adminProfile.values.map((value, index) => (
@@ -223,7 +227,7 @@ const About: React.FC = () => {
               >
                 <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                    Expertise
+                    {t("about.expertise")}
                   </h2>
                   <div className="flex flex-wrap gap-3">
                     {adminProfile.interests.map((interest, index) => (

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Mail, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Contact {
   _id: string;
@@ -16,6 +17,7 @@ interface Contact {
 }
 
 const ContactManager: React.FC = () => {
+  const { t } = useLanguage();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,14 +38,18 @@ const ContactManager: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch contacts");
+        throw new Error(t("contact.management.messages.error"));
       }
 
       const data = await response.json();
       setContacts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch contacts");
-      toast.error("Failed to fetch contact messages");
+      setError(
+        err instanceof Error
+          ? err.message
+          : t("contact.management.messages.error")
+      );
+      toast.error(t("contact.management.messages.error"));
     } finally {
       setLoading(false);
     }
@@ -64,7 +70,7 @@ const ContactManager: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to mark as read");
+        throw new Error(t("contact.management.messages.markReadError"));
       }
 
       setContacts(
@@ -72,16 +78,19 @@ const ContactManager: React.FC = () => {
           contact._id === id ? { ...contact, isRead: true } : contact
         )
       );
-      toast.success("Message marked as read");
+      toast.success(t("contact.management.messages.markReadSuccess"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to mark as read");
-      toast.error("Failed to mark message as read");
+      setError(
+        err instanceof Error
+          ? err.message
+          : t("contact.management.messages.markReadError")
+      );
+      toast.error(t("contact.management.messages.markReadError"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this message?"))
-      return;
+    if (!window.confirm(t("contact.management.messages.confirmDelete"))) return;
 
     try {
       const response = await fetch(
@@ -97,14 +106,18 @@ const ContactManager: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete message");
+        throw new Error(t("contact.management.messages.deleteError"));
       }
 
       setContacts(contacts.filter((contact) => contact._id !== id));
-      toast.success("Message deleted successfully");
+      toast.success(t("contact.management.messages.deleteSuccess"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete message");
-      toast.error("Failed to delete message");
+      setError(
+        err instanceof Error
+          ? err.message
+          : t("contact.management.messages.deleteError")
+      );
+      toast.error(t("contact.management.messages.deleteError"));
     }
   };
 
@@ -120,10 +133,12 @@ const ContactManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Contact Messages
+          {t("contact.management.title")}
         </h2>
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          {contacts.length} message{contacts.length !== 1 ? "s" : ""}
+          {t("contact.management.messages.messageCount", {
+            count: contacts.length,
+          })}
         </div>
       </div>
 
@@ -145,7 +160,7 @@ const ContactManager: React.FC = () => {
                   </h3>
                   {!contact.isRead && (
                     <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 rounded-full">
-                      New
+                      {t("contact.management.status.unread")}
                     </span>
                   )}
                 </div>
@@ -173,7 +188,7 @@ const ContactManager: React.FC = () => {
                   <button
                     onClick={() => handleMarkAsRead(contact._id)}
                     className="p-2 text-green-500 hover:text-green-400 transition-colors"
-                    title="Mark as read"
+                    title={t("contact.management.status.read")}
                   >
                     <CheckCircle className="h-5 w-5" />
                   </button>
@@ -181,7 +196,7 @@ const ContactManager: React.FC = () => {
                 <button
                   onClick={() => handleDelete(contact._id)}
                   className="p-2 text-red-500 hover:text-red-400 transition-colors"
-                  title="Delete message"
+                  title={t("common.delete")}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -192,7 +207,7 @@ const ContactManager: React.FC = () => {
 
         {contacts.length === 0 && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            No contact messages found
+            {t("contact.management.messages.noMessages")}
           </div>
         )}
       </div>

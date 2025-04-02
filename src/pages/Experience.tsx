@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Calendar, MapPin } from "lucide-react";
 import { API_URL } from "../config";
+import { useLanguage } from "../context/LanguageContext";
 
 interface Experience {
   _id: string;
@@ -17,6 +18,7 @@ interface Experience {
 }
 
 const Experience: React.FC = () => {
+  const { t } = useLanguage();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +33,22 @@ const Experience: React.FC = () => {
         const data = await response.json();
         setExperiences(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : t("experience.error"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchExperiences();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+        <span className="ml-4 text-gray-600 dark:text-gray-400">
+          {t("experience.loading")}
+        </span>
       </div>
     );
   }
@@ -52,12 +57,14 @@ const Experience: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <p className="text-red-600 dark:text-red-400 mb-4">
+            {t("experience.error")}
+          </p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
-            Try Again
+            {t("experience.tryAgain")}
           </button>
         </div>
       </div>
@@ -75,10 +82,10 @@ const Experience: React.FC = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Work Experience
+            {t("experience.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            A timeline of my professional journey and work experience
+            {t("experience.description")}
           </p>
         </motion.div>
 
@@ -123,7 +130,7 @@ const Experience: React.FC = () => {
                           {new Date(experience.startDate).toLocaleDateString()}{" "}
                           -{" "}
                           {experience.current
-                            ? "Present"
+                            ? t("experience.current")
                             : new Date(experience.endDate).toLocaleDateString()}
                         </span>
                       </div>

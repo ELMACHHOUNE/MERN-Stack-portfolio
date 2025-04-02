@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import debounce from "lodash/debounce";
+import { useLanguage } from "../context/LanguageContext";
 
 interface FormData {
   name: string;
@@ -10,6 +11,7 @@ interface FormData {
 }
 
 const Contact: React.FC = () => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -30,14 +32,16 @@ const Contact: React.FC = () => {
   };
 
   const validateForm = useCallback(() => {
-    if (!formData.name.trim()) return "Name is required";
-    if (!formData.email.trim()) return "Email is required";
-    if (!formData.subject.trim()) return "Subject is required";
-    if (!formData.message.trim()) return "Message is required";
+    if (!formData.name.trim()) return t("contact.validation.nameRequired");
+    if (!formData.email.trim()) return t("contact.validation.emailRequired");
+    if (!formData.subject.trim())
+      return t("contact.validation.subjectRequired");
+    if (!formData.message.trim())
+      return t("contact.validation.messageRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      return "Invalid email format";
+      return t("contact.validation.invalidEmail");
     return null;
-  }, [formData]);
+  }, [formData, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,49 +66,54 @@ const Contact: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to send message");
+        throw new Error(data.message || t("contact.errors.sendFailed"));
       }
 
       setStatus({
         type: "success",
-        message: "Message sent successfully! I'll get back to you soon.",
+        message: t("contact.success.messageSent"),
       });
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       setStatus({
         type: "error",
         message:
-          error instanceof Error ? error.message : "Failed to send message",
+          error instanceof Error
+            ? error.message
+            : t("contact.errors.sendFailed"),
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const debouncedSubmit = useCallback(debounce(handleSubmit, 300), [formData]);
+  const debouncedSubmit = useCallback(debounce(handleSubmit, 300), [
+    formData,
+    t,
+  ]);
 
   return (
-    <section id="contact" className="py-20">
+    <section id="contact" className="py-20 bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-white mb-4">Get in Touch</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            {t("contact.title")}
+          </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Have a question or want to work together? Feel free to reach out!
+            {t("contact.description")}
           </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-xl mx-auto"
         >
           <form onSubmit={debouncedSubmit} className="space-y-6">
             <div>
@@ -112,7 +121,7 @@ const Contact: React.FC = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-300"
               >
-                Name
+                {t("contact.name")}
               </label>
               <input
                 type="text"
@@ -121,7 +130,7 @@ const Contact: React.FC = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                placeholder="Your name"
+                placeholder={t("contact.namePlaceholder")}
               />
             </div>
 
@@ -130,7 +139,7 @@ const Contact: React.FC = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-300"
               >
-                Email
+                {t("contact.email")}
               </label>
               <input
                 type="email"
@@ -139,7 +148,7 @@ const Contact: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                placeholder="your.email@example.com"
+                placeholder={t("contact.emailPlaceholder")}
               />
             </div>
 
@@ -148,7 +157,7 @@ const Contact: React.FC = () => {
                 htmlFor="subject"
                 className="block text-sm font-medium text-gray-300"
               >
-                Subject
+                {t("contact.subject")}
               </label>
               <input
                 type="text"
@@ -157,7 +166,7 @@ const Contact: React.FC = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                placeholder="What's this about?"
+                placeholder={t("contact.subjectPlaceholder")}
               />
             </div>
 
@@ -166,7 +175,7 @@ const Contact: React.FC = () => {
                 htmlFor="message"
                 className="block text-sm font-medium text-gray-300"
               >
-                Message
+                {t("contact.message")}
               </label>
               <textarea
                 id="message"
@@ -175,7 +184,7 @@ const Contact: React.FC = () => {
                 onChange={handleChange}
                 rows={4}
                 className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                placeholder="Your message..."
+                placeholder={t("contact.messagePlaceholder")}
               />
             </div>
 
@@ -188,7 +197,7 @@ const Contact: React.FC = () => {
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isSubmitting ? "Sending..." : "Send Message"}
+              {isSubmitting ? t("contact.sending") : t("contact.send")}
             </motion.button>
           </form>
 

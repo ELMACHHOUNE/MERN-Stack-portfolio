@@ -25,6 +25,7 @@ import {
   Wrench as WrenchIcon,
 } from "lucide-react";
 import { API_URL } from "../config";
+import { useLanguage } from "../context/LanguageContext";
 
 interface Skill {
   _id: string;
@@ -70,6 +71,7 @@ const getDefaultIcon = (categoryName: string) => {
 };
 
 const Skills: React.FC = () => {
+  const { t } = useLanguage();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,83 +195,55 @@ const Skills: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 dark:border-blue-400"></div>
-            <div className="absolute top-0 left-0 w-full h-full animate-pulse">
-              <Sparkles className="w-6 h-6 text-blue-500 dark:text-blue-400 mx-auto" />
-            </div>
-          </div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400 text-lg font-medium">
-            Loading your skills...
-          </p>
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+        <span className="ml-4 text-gray-600 dark:text-gray-400">
+          {t("skills.loading")}
+        </span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8"
-        >
-          <div className="relative">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <div className="absolute -top-2 -right-2">
-              <Star className="h-6 w-6 text-yellow-400 animate-spin-slow" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-            Oops! Something went wrong
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-4">
+            {t("skills.error")}
+          </p>
+          <button
             onClick={handleRetry}
-            className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-lg text-base font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
-            <RefreshCw className="h-5 w-5 mr-2 animate-spin-slow" />
-            Try Again
-          </motion.button>
-        </motion.div>
+            {t("skills.retry")}
+          </button>
+        </div>
       </div>
     );
   }
 
-  // Filter out skills without categories
-  const validSkills = skills.filter(
-    (skill) => skill.category && skill.category._id
-  );
-  const validCategories = categories.filter((category) =>
-    validSkills.some((skill) => skill.category._id === category._id)
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 mb-4">
-            My Skills & Expertise
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            {t("skills.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            A comprehensive showcase of my technical skills and areas of
-            expertise
+            {t("skills.description")}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence>
-            {validCategories.map((category, index) => {
+          {categories
+            .filter((category) => category.isActive)
+            .sort((a, b) => a.order - b.order)
+            .map((category) => {
               const categorySkills = getSkillsByCategory(category._id);
               if (categorySkills.length === 0) return null;
 
@@ -278,106 +252,68 @@ const Skills: React.FC = () => {
                   key={category._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                  transition={{ duration: 0.5 }}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
                 >
-                  <div className="p-6">
-                    <div className="flex items-center space-x-4 mb-6">
-                      <div className="relative">
-                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          {category.icon ? (
+                  <div className="flex items-center mb-4">
+                    {getDefaultIcon(category.name)}
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-3">
+                      {t(
+                        `skills.categories.${category.name
+                          .toLowerCase()
+                          .replace(/\s+/g, "")}`
+                      )}
+                    </h2>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    {category.description}
+                  </p>
+                  <div className="space-y-4">
+                    {categorySkills.map((skill) => (
+                      <div
+                        key={skill._id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center">
+                          {skill.icon ? (
                             <img
-                              src={getImageUrl(category.icon)}
-                              alt={category.name}
-                              className="w-8 h-8 object-contain"
+                              src={getImageUrl(skill.icon)}
+                              alt={skill.name}
+                              className="w-6 h-6 mr-3"
                               onError={handleImageError}
                             />
                           ) : (
-                            <div className="text-blue-500 dark:text-blue-400">
-                              {getDefaultIcon(category.name)}
-                            </div>
+                            <Star className="w-6 h-6 text-yellow-400 mr-3" />
                           )}
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {skill.name}
+                          </span>
                         </div>
-                        <div className="absolute -top-2 -right-2">
-                          <Star className="h-6 w-6 text-yellow-400 animate-pulse" />
-                        </div>
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                          {category.name}
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
-                          {category.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      {categorySkills.map((skill, skillIndex) => (
-                        <motion.div
-                          key={skill._id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{
-                            duration: 0.3,
-                            delay: skillIndex * 0.1,
-                          }}
-                          className="group/skill"
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-700/50 flex items-center justify-center group-hover/skill:scale-110 transition-transform duration-300">
-                                {skill.icon ? (
-                                  <img
-                                    src={getImageUrl(skill.icon)}
-                                    alt={skill.name}
-                                    className="w-6 h-6 object-contain"
-                                    onError={(e) => {
-                                      console.log(
-                                        "Image error for:",
-                                        skill.icon
-                                      );
-                                      handleImageError(e);
-                                    }}
-                                    loading="lazy"
-                                  />
-                                ) : (
-                                  <div className="text-gray-500 dark:text-gray-400">
-                                    {getDefaultIcon(skill.name)}
-                                  </div>
-                                )}
-                              </div>
-                              <span className="text-gray-700 dark:text-gray-300 font-medium group-hover/skill:text-blue-500 dark:group-hover/skill:text-blue-400 transition-colors">
-                                {skill.name}
-                              </span>
-                            </div>
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                              {skill.level * 10}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${skill.level * 10}%` }}
-                              transition={{
-                                duration: 1,
-                                delay: 0.2 + skillIndex * 0.1,
-                                ease: "easeOut",
-                              }}
-                              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500"
+                        <div className="flex items-center">
+                          {[1, 2, 3, 4, 5].map((level) => (
+                            <Star
+                              key={level}
+                              className={`w-4 h-4 ${
+                                level <= skill.level
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-gray-300 dark:text-gray-600"
+                              }`}
                             />
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               );
             })}
-          </AnimatePresence>
         </div>
+
+        {categories.filter((category) => category.isActive).length === 0 && (
+          <div className="text-center text-gray-600 dark:text-gray-400">
+            {t("skills.noSkills")}
+          </div>
+        )}
       </div>
     </div>
   );

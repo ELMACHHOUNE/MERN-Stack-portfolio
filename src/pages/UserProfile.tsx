@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
 import { API_URL } from "../config";
 import {
@@ -24,6 +25,7 @@ interface ProfileFormData {
 }
 
 const UserProfile: React.FC = () => {
+  const { t } = useLanguage();
   const { user, token, setUser } = useAuth();
   const { isDarkMode } = useTheme();
   const [profileImage, setProfileImage] = useState<string | null>(
@@ -61,13 +63,13 @@ const UserProfile: React.FC = () => {
     // Validate file type
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
     if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a valid image file (JPEG, JPG, PNG, or GIF)");
+      toast.error(t("settings.image.invalidType"));
       return;
     }
 
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
+      toast.error(t("settings.image.sizeLimit"));
       return;
     }
 
@@ -86,16 +88,16 @@ const UserProfile: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to upload image");
+        throw new Error(errorData.message || t("settings.image.error"));
       }
 
       const data = await response.json();
       setProfileImage(`${API_URL}${data.profileImage}`);
-      toast.success("Profile image updated successfully");
+      toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to upload image"
+        error instanceof Error ? error.message : t("settings.image.error")
       );
     } finally {
       setIsUploading(false);
@@ -109,7 +111,7 @@ const UserProfile: React.FC = () => {
       formData.newPassword &&
       formData.newPassword !== formData.confirmPassword
     ) {
-      toast.error("New passwords do not match");
+      toast.error(t("settings.password.mismatch"));
       return;
     }
 
@@ -130,11 +132,11 @@ const UserProfile: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update profile");
+        throw new Error(errorData.message || t("settings.profile.error"));
       }
 
       const data = await response.json();
-      toast.success(data.message || "Profile updated successfully");
+      toast.success(data.message || t("settings.profile.success"));
 
       // Reset password fields
       setFormData((prev) => ({
@@ -152,7 +154,7 @@ const UserProfile: React.FC = () => {
     } catch (error) {
       console.error("Profile update error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to update profile"
+        error instanceof Error ? error.message : t("settings.profile.error")
       );
     }
   };
@@ -174,7 +176,7 @@ const UserProfile: React.FC = () => {
           className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800"
         >
           <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent mb-8">
-            Profile Settings
+            {t("settings.profile.title")}
           </h2>
 
           {/* Profile Image Section */}
@@ -185,7 +187,7 @@ const UserProfile: React.FC = () => {
                   {profileImage ? (
                     <img
                       src={profileImage}
-                      alt="Profile"
+                      alt={t("settings.profile.imageAlt")}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -217,7 +219,7 @@ const UserProfile: React.FC = () => {
                   {user?.email}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                  Update your profile picture and personal details here
+                  {t("settings.profile.description")}
                 </p>
               </div>
             </div>
@@ -228,7 +230,7 @@ const UserProfile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Name
+                  {t("settings.profile.fullName")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -240,14 +242,14 @@ const UserProfile: React.FC = () => {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Your full name"
+                    placeholder={t("settings.profile.namePlaceholder")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
+                  {t("settings.profile.email")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -259,7 +261,7 @@ const UserProfile: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="your.email@example.com"
+                    placeholder={t("settings.profile.emailPlaceholder")}
                   />
                 </div>
               </div>
@@ -267,12 +269,12 @@ const UserProfile: React.FC = () => {
 
             <div className="bg-gray-50 dark:bg-[#1B2333]/50 rounded-2xl p-6 space-y-6 border border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Change Password
+                {t("settings.password.title")}
               </h3>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Current Password
+                  {t("settings.password.currentPassword")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -284,7 +286,9 @@ const UserProfile: React.FC = () => {
                     value={formData.currentPassword}
                     onChange={handleChange}
                     className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter current password"
+                    placeholder={t(
+                      "settings.password.currentPasswordPlaceholder"
+                    )}
                   />
                   <button
                     type="button"
@@ -302,7 +306,7 @@ const UserProfile: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  New Password
+                  {t("settings.password.newPassword")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -314,7 +318,7 @@ const UserProfile: React.FC = () => {
                     value={formData.newPassword}
                     onChange={handleChange}
                     className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter new password"
+                    placeholder={t("settings.password.newPasswordPlaceholder")}
                   />
                   <button
                     type="button"
@@ -332,7 +336,7 @@ const UserProfile: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm New Password
+                  {t("settings.password.confirmPassword")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -344,7 +348,9 @@ const UserProfile: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Confirm new password"
+                    placeholder={t(
+                      "settings.password.confirmPasswordPlaceholder"
+                    )}
                   />
                   <button
                     type="button"
@@ -366,7 +372,7 @@ const UserProfile: React.FC = () => {
                 type="submit"
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                Save Changes
+                {t("settings.profile.saveChanges")}
                 <Save className="w-5 h-5" />
               </button>
             </div>

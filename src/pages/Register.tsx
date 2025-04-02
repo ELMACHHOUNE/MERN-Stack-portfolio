@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
 
 interface RegisterFormData {
@@ -17,6 +18,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
     email: "",
@@ -32,28 +34,20 @@ const Register: React.FC = () => {
     setLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("auth.passwordMismatch"));
       setLoading(false);
       return;
     }
 
     try {
-      const success = await register(
-        formData.name,
-        formData.email,
-        formData.password
-      );
-      if (success) {
-        toast.success(
-          "Registration successful! Please log in with your new account."
-        );
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      }
+      await register(formData.name, formData.email, formData.password);
+      toast.success(t("auth.registerSuccess"));
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error: any) {
-      setError(error.message || "Registration failed");
-      toast.error(error.message || "Registration failed");
+      setError(error.message || t("auth.registerFailed"));
+      toast.error(error.message || t("auth.registerFailed"));
     } finally {
       setLoading(false);
     }
@@ -81,15 +75,15 @@ const Register: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-3xl font-bold text-center bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent"
           >
-            Create Account
+            {t("auth.createAccount")}
           </motion.h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
             >
-              Sign in here
+              {t("auth.signInHere")}
             </Link>
           </p>
         </div>
@@ -115,7 +109,7 @@ const Register: React.FC = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Full Name
+                {t("auth.fullName")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -129,7 +123,7 @@ const Register: React.FC = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your full name"
+                  placeholder={t("auth.namePlaceholder")}
                 />
               </div>
             </motion.div>
@@ -142,7 +136,7 @@ const Register: React.FC = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Email address
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -157,7 +151,7 @@ const Register: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="your.email@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                 />
               </div>
             </motion.div>
@@ -170,7 +164,7 @@ const Register: React.FC = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -185,7 +179,7 @@ const Register: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Create a password"
+                  placeholder={t("auth.passwordPlaceholder")}
                 />
               </div>
             </motion.div>
@@ -198,7 +192,7 @@ const Register: React.FC = () => {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Confirm Password
+                {t("auth.confirmPassword")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -213,7 +207,7 @@ const Register: React.FC = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Confirm your password"
+                  placeholder={t("auth.confirmPasswordPlaceholder")}
                 />
               </div>
             </motion.div>
@@ -232,10 +226,10 @@ const Register: React.FC = () => {
               }`}
             >
               {loading ? (
-                "Creating account..."
+                t("auth.creatingAccount")
               ) : (
                 <>
-                  Create account
+                  {t("auth.registerButton")}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </>
               )}

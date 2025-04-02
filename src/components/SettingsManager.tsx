@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { Save, RefreshCw, AlertCircle } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 interface ProfileData {
   name: string;
@@ -16,6 +17,7 @@ interface PasswordData {
 }
 
 const SettingsManager: React.FC = () => {
+  const { t } = useLanguage();
   const { user, token } = useAuth();
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
@@ -79,12 +81,14 @@ const SettingsManager: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to update profile");
+        throw new Error(data.message || t("settings.profile.error"));
       }
 
-      setSuccess("Profile updated successfully");
+      setSuccess(t("settings.profile.success"));
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error ? error.message : t("settings.profile.error")
+      );
     } finally {
       setLoading(false);
     }
@@ -97,7 +101,7 @@ const SettingsManager: React.FC = () => {
     setSuccess(null);
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("New passwords do not match");
+      setError(t("settings.password.mismatch"));
       setLoading(false);
       return;
     }
@@ -121,17 +125,19 @@ const SettingsManager: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to update password");
+        throw new Error(data.message || t("settings.password.error"));
       }
 
-      setSuccess("Password updated successfully");
+      setSuccess(t("settings.password.success"));
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error ? error.message : t("settings.password.error")
+      );
     } finally {
       setLoading(false);
     }
@@ -163,16 +169,18 @@ const SettingsManager: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to upload image");
+        throw new Error(data.message || t("settings.image.error"));
       }
 
       setProfileData((prev) => ({
         ...prev,
         profileImage: data.profileImage,
       }));
-      setSuccess("Profile image updated successfully");
+      setSuccess(t("settings.image.success"));
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error ? error.message : t("settings.image.error")
+      );
     } finally {
       setLoading(false);
     }
@@ -191,7 +199,7 @@ const SettingsManager: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm`}
             >
-              Profile Settings
+              {t("settings.tabs.profile")}
             </button>
             <button
               onClick={() => setActiveTab("password")}
@@ -201,7 +209,7 @@ const SettingsManager: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm`}
             >
-              Change Password
+              {t("settings.tabs.password")}
             </button>
           </nav>
         </div>
@@ -255,10 +263,10 @@ const SettingsManager: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Profile Picture
+                    {t("settings.profile.title")}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Upload a new profile picture
+                    {t("settings.profile.upload")}
                   </p>
                 </div>
               </div>
@@ -268,7 +276,7 @@ const SettingsManager: React.FC = () => {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Full Name
+                  {t("settings.profile.fullName")}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -295,7 +303,7 @@ const SettingsManager: React.FC = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Email
+                  {t("settings.profile.email")}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -326,7 +334,7 @@ const SettingsManager: React.FC = () => {
                   {loading ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                   ) : (
-                    "Save Changes"
+                    t("settings.profile.saveChanges")
                   )}
                 </button>
               </div>
@@ -343,7 +351,7 @@ const SettingsManager: React.FC = () => {
                   htmlFor="current-password"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Current Password
+                  {t("settings.password.currentPassword")}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -370,7 +378,7 @@ const SettingsManager: React.FC = () => {
                   htmlFor="new-password"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  New Password
+                  {t("settings.password.newPassword")}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -397,7 +405,7 @@ const SettingsManager: React.FC = () => {
                   htmlFor="confirm-password"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Confirm New Password
+                  {t("settings.password.confirmPassword")}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -428,7 +436,7 @@ const SettingsManager: React.FC = () => {
                   {loading ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                   ) : (
-                    "Update Password"
+                    t("settings.password.updatePassword")
                   )}
                 </button>
               </div>

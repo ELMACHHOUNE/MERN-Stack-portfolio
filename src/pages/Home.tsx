@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   Code,
   Brain,
@@ -65,11 +66,10 @@ interface Skill {
 }
 
 const defaultProfile = {
-  name: "Your Name",
-  title: "Full Stack Developer",
-  location: "Your Location",
-  bio: `Passionate about creating elegant solutions to complex problems. Specializing in modern web technologies 
-  and cloud architecture. Let's build something amazing together.`,
+  name: "home.defaultProfile.name",
+  title: "home.defaultProfile.title",
+  location: "home.defaultProfile.location",
+  bio: "home.defaultProfile.bio",
 };
 
 const defaultSocialLinks: SocialLink[] = [
@@ -90,15 +90,16 @@ const defaultSocialLinks: SocialLink[] = [
   },
 ];
 
-const getSkillLevel = (level: number): string => {
-  if (level >= 90) return "Expert";
-  if (level >= 75) return "Advanced";
-  if (level >= 50) return "Intermediate";
-  if (level >= 25) return "Basic";
-  return "Beginner";
+const getSkillLevel = (level: number, t: (key: string) => string): string => {
+  if (level >= 90) return t("home.skills.level.expert");
+  if (level >= 75) return t("home.skills.level.advanced");
+  if (level >= 50) return t("home.skills.level.intermediate");
+  if (level >= 25) return t("home.skills.level.basic");
+  return t("home.skills.level.beginner");
 };
 
 const Home: React.FC = () => {
+  const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -211,34 +212,30 @@ const Home: React.FC = () => {
   };
 
   const personalInfo = {
-    name: adminProfile?.name || defaultProfile.name,
-    title: adminProfile?.title || defaultProfile.title,
-    location: adminProfile?.location || defaultProfile.location,
-    bio: adminProfile?.bio || defaultProfile.bio,
+    name: adminProfile?.name || t(defaultProfile.name),
+    title: adminProfile?.title || t(defaultProfile.title),
+    location: adminProfile?.location || t(defaultProfile.location),
+    bio: adminProfile?.bio || t(defaultProfile.bio),
     values: [
       {
         icon: Code,
-        title: "Clean Code",
-        description:
-          "Writing maintainable and efficient code that follows best practices.",
+        title: t("home.values.cleanCode.title"),
+        description: t("home.values.cleanCode.description"),
       },
       {
         icon: Brain,
-        title: "Problem Solving",
-        description:
-          "Finding innovative solutions to complex technical challenges.",
+        title: t("home.values.problemSolving.title"),
+        description: t("home.values.problemSolving.description"),
       },
       {
         icon: Heart,
-        title: "User Experience",
-        description:
-          "Creating intuitive and accessible applications that users love.",
+        title: t("home.values.userExperience.title"),
+        description: t("home.values.userExperience.description"),
       },
       {
         icon: Rocket,
-        title: "Innovation",
-        description:
-          "Pushing boundaries with cutting-edge technologies and approaches.",
+        title: t("home.values.innovation.title"),
+        description: t("home.values.innovation.description"),
       },
     ],
     socialLinks: Array.isArray(adminProfile?.socialLinks)
@@ -256,6 +253,29 @@ const Home: React.FC = () => {
         }))
       : defaultSocialLinks,
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+        <span className="ml-4 text-gray-600 dark:text-gray-400">
+          {t("home.skills.loading")}
+        </span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-4">
+            {t("home.skills.error")}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -285,14 +305,14 @@ const Home: React.FC = () => {
               to="/projects"
               className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transform hover:scale-105 transition-all"
             >
-              View My Work
+              {t("home.cta.viewWork")}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
             <Link
               to="/contact"
               className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 transform hover:scale-105 transition-all"
             >
-              Get in Touch
+              {t("home.cta.getInTouch")}
             </Link>
           </div>
           <div className="flex justify-center gap-6">
@@ -323,187 +343,116 @@ const Home: React.FC = () => {
 
       {/* Technologies Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Technologies I Work With
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              {t("home.skills.title")}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              Modern tools for modern solutions
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              {t("home.skills.description")}
             </p>
-          </motion.div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              // Loading skeleton
-              [...Array(3)].map((_, index) => (
-                <div
-                  key={`skeleton-${index}`}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 animate-pulse"
-                >
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
-                  <div className="space-y-2">
-                    {[...Array(3)].map((_, i) => (
-                      <div
-                        key={`item-${i}`}
-                        className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"
-                      ></div>
-                    ))}
-                  </div>
+            {getSkillsByCategory().map((group) => (
+              <motion.div
+                key={group.category._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              >
+                <div className="flex items-center mb-4">
+                  {(() => {
+                    const IconComponent = getIconComponent(group.category);
+                    return (
+                      <IconComponent className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-3" />
+                    );
+                  })()}
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white ml-3">
+                    {t(
+                      `skills.categories.${group.category.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "")}`
+                    )}
+                  </h3>
                 </div>
-              ))
-            ) : error ? (
-              <div className="col-span-3 text-center text-red-500">{error}</div>
-            ) : skills.length === 0 ? (
-              <div className="col-span-3 text-center text-gray-500 dark:text-gray-400">
-                No skills found
-              </div>
-            ) : (
-              getSkillsByCategory().map(({ category, skills }, index) => {
-                const IconComponent = getIconComponent(category);
+                <div className="space-y-4">
+                  {group.skills.map((skill) => (
+                    <div
+                      key={skill._id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center">
+                        {skill.icon ? (
+                          <img
+                            src={skill.icon}
+                            alt={skill.name}
+                            className="w-6 h-6 mr-3"
+                            onError={(e) => {
+                              console.log("Image error for:", skill.icon);
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.style.display = "none";
+                              const parent = target.parentNode as HTMLElement;
 
-                return (
-                  <motion.div
-                    key={category._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
-                  >
-                    <IconComponent className="h-12 w-12 text-blue-500 dark:text-blue-400 mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 capitalize">
-                      {category.name}
-                    </h3>
-                    <div className="space-y-6">
-                      {skills.map((skill) => (
-                        <div key={skill._id} className="group">
-                          <div className="flex justify-between items-center text-sm mb-2">
-                            <div className="flex items-center space-x-2">
-                              {skill.icon ? (
-                                <img
-                                  src={skill.icon}
-                                  alt={skill.name}
-                                  className="w-5 h-5 object-contain"
-                                  onError={(e) => {
-                                    console.log(
-                                      "Image failed to load:",
-                                      skill.icon
-                                    );
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null;
-                                    target.style.display = "none";
-                                    const parent =
-                                      target.parentNode as HTMLElement;
+                              // Create a span element for the fallback icon
+                              const fallbackIcon =
+                                document.createElement("span");
+                              fallbackIcon.className =
+                                "w-6 h-6 mr-3 text-blue-500 dark:text-blue-400";
 
-                                    // Use category-specific icon as fallback
-                                    const IconComponent = getIconComponent(
-                                      skill.category
-                                    );
-                                    const fallbackIcon =
-                                      document.createElement("span");
-                                    fallbackIcon.className =
-                                      "w-5 h-5 text-blue-500 dark:text-blue-400";
+                              // Create SVG element
+                              const iconSvg = document.createElementNS(
+                                "http://www.w3.org/2000/svg",
+                                "svg"
+                              );
+                              iconSvg.setAttribute("viewBox", "0 0 24 24");
+                              iconSvg.setAttribute("width", "24");
+                              iconSvg.setAttribute("height", "24");
+                              iconSvg.setAttribute("fill", "none");
+                              iconSvg.setAttribute("stroke", "currentColor");
+                              iconSvg.setAttribute("stroke-width", "2");
+                              iconSvg.setAttribute("stroke-linecap", "round");
+                              iconSvg.setAttribute("stroke-linejoin", "round");
 
-                                    // Create SVG element using the category icon
-                                    const iconSvg = document.createElementNS(
-                                      "http://www.w3.org/2000/svg",
-                                      "svg"
-                                    );
-                                    iconSvg.setAttribute(
-                                      "viewBox",
-                                      "0 0 24 24"
-                                    );
-                                    iconSvg.setAttribute("width", "20");
-                                    iconSvg.setAttribute("height", "20");
-                                    iconSvg.setAttribute("fill", "none");
-                                    iconSvg.setAttribute(
-                                      "stroke",
-                                      "currentColor"
-                                    );
-                                    iconSvg.setAttribute("stroke-width", "2");
-                                    iconSvg.setAttribute(
-                                      "stroke-linecap",
-                                      "round"
-                                    );
-                                    iconSvg.setAttribute(
-                                      "stroke-linejoin",
-                                      "round"
-                                    );
+                              // Add the code icon path
+                              iconSvg.innerHTML = `
+                                <path d="M16 18l6-6-6-6"></path>
+                                <path d="M8 6l-6 6 6 6"></path>
+                              `;
 
-                                    // Use a simple code icon path as fallback
-                                    iconSvg.innerHTML = `
-                                      <path d="M16 18l6-6-6-6"></path>
-                                      <path d="M8 6l-6 6 6 6"></path>
-                                    `;
-
-                                    fallbackIcon.appendChild(iconSvg);
-                                    parent.appendChild(fallbackIcon);
-                                  }}
-                                />
-                              ) : (
-                                <span className="w-5 h-5 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-md">
-                                  <Code2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                                </span>
-                              )}
-                              <span className="text-gray-700 dark:text-gray-200 font-medium">
-                                {skill.name}
-                              </span>
-                            </div>
-                            <div className="flex items-center">
-                              <div className="relative">
-                                <motion.span
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-blue-500 dark:bg-blue-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                >
-                                  {skill.level}%
-                                </motion.span>
-                                <span className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-400/20 dark:to-purple-400/20 text-blue-600 dark:text-blue-400 rounded-full font-medium text-xs">
-                                  {getSkillLevel(skill.level)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="relative h-2.5 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-xl">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${skill.level}%` }}
-                              transition={{
-                                duration: 1.5,
-                                ease: [0.4, 0, 0.2, 1],
-                                delay: 0.2,
-                              }}
-                              className="absolute top-0 left-0 h-full rounded-full"
-                            >
-                              <div className="relative w-full h-full">
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-purple-500 dark:from-blue-400 dark:via-blue-300 dark:to-purple-400 animate-gradient" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" />
-                              </div>
-                            </motion.div>
-                            <div className="absolute inset-0 flex justify-between px-1">
-                              {[25, 50, 75].map((marker) => (
-                                <div
-                                  key={marker}
-                                  className="w-px h-full bg-gray-200 dark:bg-gray-600/50"
-                                  style={{ left: `${marker}%` }}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                              fallbackIcon.appendChild(iconSvg);
+                              parent.appendChild(fallbackIcon);
+                            }}
+                          />
+                        ) : (
+                          <span className="w-6 h-6 mr-3 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-md">
+                            <Code2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                          </span>
+                        )}
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {skill.name}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {getSkillLevel(skill.level, t)}
+                      </span>
                     </div>
-                  </motion.div>
-                );
-              })
-            )}
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/skills"
+              className="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors"
+            >
+              {t("home.skills.viewAll")}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -519,10 +468,10 @@ const Home: React.FC = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              My Values
+              {t("home.values.sectionTitle")}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Principles that guide my work
+              {t("home.values.sectionDescription")}
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -560,16 +509,16 @@ const Home: React.FC = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold text-white mb-6">
-              Ready to Start Your Next Project?
+              {t("home.cta.readyToStart")}
             </h2>
             <p className="text-xl text-blue-100 mb-10">
-              Let's collaborate and create something extraordinary together
+              {t("home.cta.collaborateMessage")}
             </p>
             <Link
               to="/contact"
               className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-blue-600 dark:text-blue-500 bg-white dark:bg-gray-100 hover:bg-blue-50 dark:hover:bg-gray-200 transform hover:scale-105 transition-all"
             >
-              Let's Talk
+              {t("home.cta.letsTalk")}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
           </motion.div>

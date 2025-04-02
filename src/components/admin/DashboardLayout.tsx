@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -9,21 +10,38 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const menuItems = [
-    { path: "/admin", label: "Overview", icon: "📊" },
-    { path: "/admin/projects", label: "Projects", icon: "🚀" },
-    { path: "/admin/skills", label: "Skills", icon: "💡" },
-    { path: "/admin/experience", label: "Experience", icon: "💼" },
-    { path: "/admin/about", label: "About", icon: "👤" },
+    { path: "/admin", label: t("dashboardLayout.menu.overview"), icon: "📊" },
+    {
+      path: "/admin/projects",
+      label: t("dashboardLayout.menu.projects"),
+      icon: "🚀",
+    },
+    {
+      path: "/admin/skills",
+      label: t("dashboardLayout.menu.skills"),
+      icon: "💡",
+    },
+    {
+      path: "/admin/experience",
+      label: t("dashboardLayout.menu.experience"),
+      icon: "💼",
+    },
+    {
+      path: "/admin/about",
+      label: t("dashboardLayout.menu.about"),
+      icon: "👤",
+    },
   ];
 
   if (!user?.isAdmin) {
-    return <div>Access denied. Admin privileges required.</div>;
+    return <div>{t("dashboardLayout.accessDenied")}</div>;
   }
 
   return (
@@ -53,13 +71,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         {/* Top bar */}
         <div className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 bg-gray-800">
           <div className="flex items-center">
-            <span className="text-gray-300">Welcome, {user.name}</span>
+            <span className="text-gray-300">
+              {t("dashboardLayout.welcome")} {user.name}
+            </span>
           </div>
           <button
             onClick={logout}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
           >
-            Logout
+            {t("dashboardLayout.logout")}
           </button>
         </div>
 

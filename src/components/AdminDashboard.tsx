@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
 import {
   Users,
   Mail,
@@ -15,6 +16,7 @@ import {
   User,
   Menu,
   X,
+  Layout,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -38,6 +40,7 @@ const AdminDashboard: React.FC = () => {
   const location = useLocation();
   const { isDarkMode } = useTheme();
   const { adminProfile } = useAdminProfile();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
@@ -129,7 +132,7 @@ const AdminDashboard: React.FC = () => {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  Admin Panel
+                  {t("admin.dashboard")}
                 </h2>
                 <button
                   onClick={toggleSidebar}
@@ -152,7 +155,7 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <LayoutDashboard className="w-5 h-5 mr-3" />
-                Overview
+                {t("admin.overview")}
               </button>
               <button
                 onClick={() => handleTabClick("users")}
@@ -163,7 +166,7 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <Users className="w-5 h-5 mr-3" />
-                Users
+                {t("admin.users")}
               </button>
               <button
                 onClick={() => handleTabClick("skills")}
@@ -174,7 +177,7 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <Wrench className="w-5 h-5 mr-3" />
-                Skills
+                {t("admin.skills")}
               </button>
               <button
                 onClick={() => handleTabClick("categories")}
@@ -184,8 +187,8 @@ const AdminDashboard: React.FC = () => {
                     : ""
                 }`}
               >
-                <FolderKanban className="w-5 h-5 mr-3" />
-                Categories
+                <Layout className="w-5 h-5 mr-3" />
+                {t("admin.categories")}
               </button>
               <button
                 onClick={() => handleTabClick("projects")}
@@ -195,19 +198,19 @@ const AdminDashboard: React.FC = () => {
                     : ""
                 }`}
               >
-                <User className="w-5 h-5 mr-3" />
-                Projects
+                <FolderKanban className="w-5 h-5 mr-3" />
+                {t("admin.projects")}
               </button>
               <button
                 onClick={() => handleTabClick("experience")}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
                   activeTab === "experience"
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
                 }`}
               >
-                <Settings className="w-5 h-5" />
-                Experience
+                <Briefcase className="w-5 h-5 mr-3" />
+                {t("admin.experience")}
               </button>
               <button
                 onClick={() => handleTabClick("analytics")}
@@ -218,7 +221,7 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <BarChart3 className="w-5 h-5 mr-3" />
-                Analytics
+                {t("admin.analytics")}
               </button>
               <button
                 onClick={() => handleTabClick("messages")}
@@ -229,7 +232,7 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <Mail className="w-5 h-5 mr-3" />
-                Messages
+                {t("admin.messages")}
               </button>
               <button
                 onClick={() => handleTabClick("settings")}
@@ -240,14 +243,14 @@ const AdminDashboard: React.FC = () => {
                 }`}
               >
                 <Settings className="w-5 h-5 mr-3" />
-                Settings
+                {t("admin.settings")}
               </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full px-6 py-3 text-red-600 hover:bg-red-50 mt-4"
               >
                 <LogOut className="w-5 h-5 mr-3" />
-                Logout
+                {t("auth.logout")}
               </button>
             </nav>
           </motion.div>
@@ -264,7 +267,7 @@ const AdminDashboard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Total Users
+                {t("admin.totalUsers")}
               </h3>
               <p className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">
                 {users.length}
@@ -272,7 +275,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Admin Users
+                {t("admin.adminUsers")}
               </h3>
               <p className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
                 {users.filter((u) => u.isAdmin).length}
@@ -280,7 +283,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Regular Users
+                {t("admin.regularUsers")}
               </h3>
               <p className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400 mt-2">
                 {users.filter((u) => !u.isAdmin).length}
@@ -292,23 +295,23 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
               <div className="p-4 md:p-6">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                  User Management
+                  {t("admin.userManagement")}
                 </h2>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead>
                       <tr>
                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Name
+                          {t("admin.name")}
                         </th>
                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Email
+                          {t("auth.email")}
                         </th>
                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Role
+                          {t("admin.role")}
                         </th>
                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Last Login
+                          {t("admin.lastLogin")}
                         </th>
                       </tr>
                     </thead>
@@ -333,7 +336,9 @@ const AdminDashboard: React.FC = () => {
                                   : "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
                               }`}
                             >
-                              {user.isAdmin ? "Admin" : "User"}
+                              {user.isAdmin
+                                ? t("admin.admin")
+                                : t("admin.user")}
                             </span>
                           </td>
                           <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -383,11 +388,10 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "overview" && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                Dashboard Overview
+                {t("admin.dashboard")} {t("admin.overview")}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Welcome to your admin dashboard. Here you can manage users,
-                skills, view analytics, and configure your application settings.
+                {t("admin.overviewDescription")}
               </p>
             </div>
           )}
@@ -395,10 +399,10 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "analytics" && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                Analytics
+                {t("admin.analytics")}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Analytics features coming soon...
+                {t("admin.analyticsComingSoon")}
               </p>
             </div>
           )}
@@ -414,10 +418,10 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "settings" && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                Settings
+                {t("admin.settings")}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Application settings features coming soon...
+                {t("admin.settingsComingSoon")}
               </p>
             </div>
           )}

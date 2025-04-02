@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-hot-toast";
 
 interface LoginFormData {
@@ -18,6 +19,7 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +44,9 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       console.error("Login error in component:", error);
-      toast.error(error instanceof Error ? error.message : "Login failed");
+      toast.error(
+        error instanceof Error ? error.message : t("auth.loginFailed")
+      );
     } finally {
       setIsLoading(false);
     }
@@ -63,15 +67,15 @@ const Login: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-3xl font-bold text-center bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent"
           >
-            Welcome Back
+            {t("auth.welcomeBack")}
           </motion.h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link
               to="/register"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
             >
-              Create one now
+              {t("auth.createAccount")}
             </Link>
           </p>
         </div>
@@ -87,7 +91,7 @@ const Login: React.FC = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Email address
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -102,7 +106,7 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="your.email@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                 />
               </div>
             </motion.div>
@@ -115,7 +119,7 @@ const Login: React.FC = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -130,7 +134,7 @@ const Login: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none relative block w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your password"
+                  placeholder={t("auth.passwordPlaceholder")}
                 />
               </div>
             </motion.div>
@@ -149,10 +153,10 @@ const Login: React.FC = () => {
               }`}
             >
               {isLoading ? (
-                "Signing in..."
+                t("auth.signingIn")
               ) : (
                 <>
-                  Sign in
+                  {t("auth.loginButton")}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </>
               )}

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { Github, Link, ExternalLink } from "lucide-react";
 
 // Register ScrollTrigger plugin
@@ -25,6 +26,7 @@ interface Project {
 
 const Projects: React.FC = () => {
   const { isDarkMode } = useTheme();
+  const { t, currentLanguage } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
@@ -32,16 +34,12 @@ const Projects: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
-    selectedCategory: "All",
+    selectedCategory: t("projects.all"),
     selectedTechnologies: [] as string[],
     searchTerm: "",
     sortBy: "newest",
     showFilters: false,
   });
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
 
   const fetchProjects = async () => {
     try {
@@ -54,19 +52,34 @@ const Projects: React.FC = () => {
       }
 
       const data = await response.json();
-
       setProjects(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch projects");
+      setError(err instanceof Error ? err.message : t("projects.error"));
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch projects on mount and when language changes
+  useEffect(() => {
+    fetchProjects();
+  }, [currentLanguage]);
+
+  // Reset filters when language changes
+  useEffect(() => {
+    setFilters({
+      selectedCategory: t("projects.all"),
+      selectedTechnologies: [],
+      searchTerm: "",
+      sortBy: "newest",
+      showFilters: false,
+    });
+  }, [currentLanguage, t]);
+
   const filterProjects = (projects: Project[]) => {
     const filtered = projects.filter((project) => {
       const matchesCategory =
-        filters.selectedCategory === "All" ||
+        filters.selectedCategory === t("projects.all") ||
         project.category === filters.selectedCategory;
 
       const matchesTechnologies =
@@ -132,7 +145,7 @@ const Projects: React.FC = () => {
 
   const resetFilters = () => {
     setFilters({
-      selectedCategory: "All",
+      selectedCategory: t("projects.all"),
       selectedTechnologies: [],
       searchTerm: "",
       sortBy: "newest",
@@ -190,6 +203,7 @@ const Projects: React.FC = () => {
       <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <span className="ml-4 text-gray-400">{t("projects.loading")}</span>
         </div>
       </section>
     );
@@ -199,7 +213,7 @@ const Projects: React.FC = () => {
     return (
       <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="text-center text-red-500">
-          <p>Error loading projects: {error}</p>
+          <p>{t("projects.error")}</p>
         </div>
       </section>
     );
@@ -222,7 +236,7 @@ const Projects: React.FC = () => {
             isDarkMode ? "text-white" : "text-gray-900"
           }`}
         >
-          My Projects
+          {t("projects.title")}
           <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></span>
         </h2>
 
@@ -232,7 +246,7 @@ const Projects: React.FC = () => {
             <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder={t("projects.search")}
               value={filters.searchTerm}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
@@ -258,7 +272,7 @@ const Projects: React.FC = () => {
             }`}
           >
             <Github className="w-5 h-5 mr-2" />
-            Filters
+            {t("projects.filter")}
           </button>
         </div>
 
@@ -275,7 +289,7 @@ const Projects: React.FC = () => {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Filters
+                {t("projects.filter")}
               </h3>
               <button
                 onClick={resetFilters}
@@ -296,26 +310,27 @@ const Projects: React.FC = () => {
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                Category
+                {t("projects.categories.category")}
               </h4>
               <div className="flex flex-wrap gap-2">
-                {["All", ...new Set(projects.map((p) => p.category))].map(
-                  (category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleCategoryChange(category)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        filters.selectedCategory === category
-                          ? "bg-blue-600 text-white"
-                          : isDarkMode
-                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  )
-                )}
+                {[
+                  t("projects.all"),
+                  ...new Set(projects.map((p) => p.category)),
+                ].map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => handleCategoryChange(category)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      filters.selectedCategory === category
+                        ? "bg-blue-600 text-white"
+                        : isDarkMode
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -326,7 +341,7 @@ const Projects: React.FC = () => {
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                Technologies
+                {t("projects.technologies")}
               </h4>
               <div className="flex flex-wrap gap-2">
                 {allTechnologies.map((tech) => (
@@ -354,12 +369,12 @@ const Projects: React.FC = () => {
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                Sort By
+                {t("projects.sortBy")}
               </h4>
               <div className="flex gap-2">
                 {[
-                  { value: "newest", label: "Newest First" },
-                  { value: "oldest", label: "Oldest First" },
+                  { value: "newest", label: t("projects.newest") },
+                  { value: "oldest", label: t("projects.oldest") },
                 ].map((option) => (
                   <button
                     key={option.value}
@@ -482,6 +497,7 @@ const Projects: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:text-blue-400"
+                      title={t("projects.viewCode")}
                     >
                       <Github className="h-5 w-5" />
                     </a>
@@ -492,6 +508,7 @@ const Projects: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-500 hover:text-green-400"
+                      title={t("projects.viewProject")}
                     >
                       <Link className="h-5 w-5" />
                     </a>
@@ -508,7 +525,7 @@ const Projects: React.FC = () => {
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
-            No projects found matching your criteria.
+            {t("projects.noProjects")}
           </div>
         )}
       </div>

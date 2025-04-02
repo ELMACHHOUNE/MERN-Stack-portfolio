@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Project {
   _id: string;
@@ -22,6 +23,7 @@ interface Project {
 }
 
 const ProjectManager: React.FC = () => {
+  const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,13 +50,14 @@ const ProjectManager: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Failed to fetch projects");
+      if (!response.ok)
+        throw new Error(t("projects.management.errors.fetchFailed"));
       const data = await response.json();
-      setProjects(data || []); // Ensure we always set an array
+      setProjects(data || []);
     } catch (error) {
       console.error("Error fetching projects:", error);
-      toast.error("Failed to fetch projects");
-      setProjects([]); // Set empty array on error
+      toast.error(t("projects.management.errors.fetchFailed"));
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -85,24 +88,24 @@ const ProjectManager: React.FC = () => {
         body: JSON.stringify(projectData),
       });
 
-      if (!response.ok) throw new Error("Failed to save project");
+      if (!response.ok)
+        throw new Error(t("projects.management.errors.saveFailed"));
 
       toast.success(
         isEditing
-          ? "Project updated successfully"
-          : "Project added successfully"
+          ? t("projects.management.actions.updateSuccess")
+          : t("projects.management.actions.addSuccess")
       );
       resetForm();
       fetchProjects();
     } catch (error) {
       console.error("Error saving project:", error);
-      toast.error("Failed to save project");
+      toast.error(t("projects.management.errors.saveFailed"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
+    if (!window.confirm(t("projects.management.actions.confirmDelete"))) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -113,13 +116,14 @@ const ProjectManager: React.FC = () => {
         },
       });
 
-      if (!response.ok) throw new Error("Failed to delete project");
+      if (!response.ok)
+        throw new Error(t("projects.management.errors.deleteFailed"));
 
-      toast.success("Project deleted successfully");
+      toast.success(t("projects.management.actions.deleteSuccess"));
       fetchProjects();
     } catch (error) {
       console.error("Error deleting project:", error);
-      toast.error("Failed to delete project");
+      toast.error(t("projects.management.errors.deleteFailed"));
     }
   };
 
@@ -163,14 +167,14 @@ const ProjectManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-          Projects
+          {t("projects.management.title")}
         </h2>
         <button
           onClick={resetForm}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
         >
           <Plus className="w-5 h-5" />
-          Add Project
+          {t("projects.management.addProject")}
         </button>
       </div>
 
@@ -183,7 +187,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="title"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Title
+            {t("projects.management.form.title")}
           </label>
           <input
             type="text"
@@ -202,7 +206,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="description"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Description
+            {t("projects.management.form.description")}
           </label>
           <textarea
             id="description"
@@ -221,7 +225,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="technologies"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Technologies (comma-separated)
+            {t("projects.management.form.technologies")}
           </label>
           <input
             type="text"
@@ -231,7 +235,7 @@ const ProjectManager: React.FC = () => {
               setFormData({ ...formData, technologies: e.target.value })
             }
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder="React, Node.js, MongoDB, etc."
+            placeholder={t("projects.management.form.technologiesPlaceholder")}
             required
           />
         </div>
@@ -241,7 +245,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="imageUrl"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Image URL
+            {t("projects.management.form.imageUrl")}
           </label>
           <input
             type="url"
@@ -260,7 +264,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="githubUrl"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            GitHub URL
+            {t("projects.management.form.githubUrl")}
           </label>
           <input
             type="url"
@@ -279,7 +283,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="liveUrl"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Live URL
+            {t("projects.management.form.liveUrl")}
           </label>
           <input
             type="url"
@@ -307,7 +311,7 @@ const ProjectManager: React.FC = () => {
             htmlFor="featured"
             className="ml-2 text-sm text-gray-700 dark:text-gray-300"
           >
-            Featured Project
+            {t("projects.management.form.featured")}
           </label>
         </div>
 
@@ -318,21 +322,23 @@ const ProjectManager: React.FC = () => {
               onClick={resetForm}
               className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1E2A3B] hover:bg-gray-50 dark:hover:bg-[#242E42] transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           )}
           <button
             type="submit"
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
           >
-            {isEditing ? "Update Project" : "Add Project"}
+            {isEditing
+              ? t("projects.management.editProject")
+              : t("projects.management.addProject")}
           </button>
         </div>
       </form>
 
       <div className="mt-8">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          Project List
+          {t("projects.management.projectList")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
@@ -389,7 +395,7 @@ const ProjectManager: React.FC = () => {
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
                 >
                   <Github className="w-4 h-4" />
-                  GitHub
+                  {t("projects.management.actions.viewGitHub")}
                 </a>
                 <a
                   href={project.liveUrl}
@@ -398,7 +404,7 @@ const ProjectManager: React.FC = () => {
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Live Demo
+                  {t("projects.management.actions.viewDemo")}
                 </a>
               </div>
             </div>
@@ -411,7 +417,7 @@ const ProjectManager: React.FC = () => {
               <FolderKanban className="w-8 h-8 text-blue-500 dark:text-blue-400" />
             </div>
             <p className="text-gray-500 dark:text-gray-400">
-              No projects found. Add your first project to get started.
+              {t("projects.management.noProjects")}
             </p>
           </div>
         )}

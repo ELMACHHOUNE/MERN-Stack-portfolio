@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Skill {
   _id: string;
@@ -20,6 +21,7 @@ interface Category {
 }
 
 const SkillsManager: React.FC = () => {
+  const { t } = useLanguage();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("No authentication token found");
+        toast.error(t("common.error"));
         return;
       }
       console.log(
@@ -58,16 +60,14 @@ const SkillsManager: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Skills fetch error:", errorData);
-        throw new Error(errorData.message || "Failed to fetch skills");
+        throw new Error(errorData.message || t("common.error"));
       }
       const data = await response.json();
       console.log("Received skills data:", data);
       setSkills(data);
     } catch (error) {
       console.error("Skills fetch error:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch skills"
-      );
+      toast.error(error instanceof Error ? error.message : t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("No authentication token found");
+        toast.error(t("common.error"));
         return;
       }
       console.log(
@@ -92,16 +92,14 @@ const SkillsManager: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Categories fetch error:", errorData);
-        throw new Error(errorData.message || "Failed to fetch categories");
+        throw new Error(errorData.message || t("common.error"));
       }
       const data = await response.json();
       console.log("Received categories data:", data);
       setCategories(data);
     } catch (error) {
       console.error("Categories fetch error:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch categories"
-      );
+      toast.error(error instanceof Error ? error.message : t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -112,42 +110,30 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("No authentication token found");
+        toast.error(t("common.error"));
         return;
       }
 
-      // Log form data for debugging
-      console.log("Form data before validation:", formData);
-
-      // Validate required fields
       if (!formData.name || !formData.category || !formData.icon) {
-        console.log("Validation failed:", {
-          name: formData.name,
-          category: formData.category,
-          icon: formData.icon,
-        });
-        toast.error("Please fill in all required fields");
+        toast.error(t("common.error"));
         return;
       }
 
-      // Validate level
       if (formData.level < 1 || formData.level > 10) {
-        toast.error("Skill level must be between 1 and 10");
+        toast.error(t("skills.validation.levelRange"));
         return;
       }
 
       const skillData = {
         ...formData,
         order: isEditing ? currentSkill?.order : skills.length,
-        level: Number(formData.level), // Ensure level is a number
+        level: Number(formData.level),
       };
 
       const url = isEditing
         ? `${API_URL}/api/skills/${currentSkill?._id}`
         : `${API_URL}/api/skills`;
       const method = isEditing ? "PATCH" : "POST";
-
-      console.log("Submitting skill data:", skillData);
 
       const response = await fetch(url, {
         method,
@@ -160,25 +146,24 @@ const SkillsManager: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Server error response:", errorData);
-        throw new Error(errorData.message || "Failed to save skill");
+        throw new Error(errorData.message || t("common.error"));
       }
 
       toast.success(
-        isEditing ? "Skill updated successfully" : "Skill added successfully"
+        isEditing
+          ? t("skills.management.updateSuccess")
+          : t("skills.management.addSuccess")
       );
       resetForm();
       fetchSkills();
     } catch (error) {
       console.error("Error saving skill:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save skill"
-      );
+      toast.error(error instanceof Error ? error.message : t("common.error"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this skill?")) return;
+    if (!window.confirm(t("skills.management.confirmDelete"))) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -189,12 +174,12 @@ const SkillsManager: React.FC = () => {
         },
       });
 
-      if (!response.ok) throw new Error("Failed to delete skill");
+      if (!response.ok) throw new Error(t("common.error"));
 
-      toast.success("Skill deleted successfully");
+      toast.success(t("skills.management.deleteSuccess"));
       fetchSkills();
     } catch (error) {
-      toast.error("Failed to delete skill");
+      toast.error(t("common.error"));
     }
   };
 
@@ -236,14 +221,14 @@ const SkillsManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-          Skills
+          {t("skills.management.title")}
         </h2>
         <button
           onClick={resetForm}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
         >
           <Plus className="w-5 h-5" />
-          Add Skill
+          {t("skills.management.addSkill")}
         </button>
       </div>
 
@@ -256,7 +241,7 @@ const SkillsManager: React.FC = () => {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Skill Name
+            {t("skills.management.name")}
           </label>
           <input
             type="text"
@@ -273,19 +258,20 @@ const SkillsManager: React.FC = () => {
             htmlFor="category"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Category
+            {t("skills.management.category")}
           </label>
           <select
             id="category"
             value={formData.category}
-            onChange={(e) => {
-              console.log("Selected category:", e.target.value);
-              setFormData({ ...formData, category: e.target.value });
-            }}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             required
           >
-            <option value="">Select a category</option>
+            <option value="">
+              {t("skills.management.selectSkillsCategory")}
+            </option>
             {categories.map((category) => (
               <option key={category._id} value={category._id}>
                 {category.name}
@@ -294,7 +280,7 @@ const SkillsManager: React.FC = () => {
           </select>
           {categories.length === 0 && (
             <p className="mt-2 text-sm text-red-500">
-              No categories available. Please create a category first.
+              {t("skills.management.noCategories")}
             </p>
           )}
         </div>
@@ -304,7 +290,7 @@ const SkillsManager: React.FC = () => {
             htmlFor="level"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Skill Level (1-10)
+            {t("skills.management.level")} (1-10)
           </label>
           <input
             type="number"
@@ -325,7 +311,7 @@ const SkillsManager: React.FC = () => {
             htmlFor="icon"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Icon URL
+            {t("skills.management.icon")}
           </label>
           <input
             type="text"
@@ -333,7 +319,7 @@ const SkillsManager: React.FC = () => {
             value={formData.icon}
             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder="Enter icon URL (e.g., from devicons.dev)"
+            placeholder={t("skills.management.iconPlaceholder")}
             required
           />
           {formData.icon && (
@@ -341,7 +327,7 @@ const SkillsManager: React.FC = () => {
               <div className="relative w-8 h-8">
                 <img
                   src={formData.icon}
-                  alt="Icon preview"
+                  alt={t("skills.management.iconPreview")}
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -356,7 +342,7 @@ const SkillsManager: React.FC = () => {
                 />
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                Icon preview
+                {t("skills.management.iconPreview")}
               </span>
             </div>
           )}
@@ -369,14 +355,16 @@ const SkillsManager: React.FC = () => {
               onClick={resetForm}
               className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1E2A3B] hover:bg-gray-50 dark:hover:bg-[#242E42] transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           )}
           <button
             type="submit"
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
           >
-            {isEditing ? "Update Skill" : "Add Skill"}
+            {isEditing
+              ? t("skills.management.editSkill")
+              : t("skills.management.addSkill")}
           </button>
         </div>
       </form>

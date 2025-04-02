@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Briefcase } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Experience {
   _id: string;
@@ -15,6 +16,7 @@ interface Experience {
 }
 
 const ExperienceManager: React.FC = () => {
+  const { t } = useLanguage();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +41,7 @@ const ExperienceManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found. Please login again.");
+        toast.error(t("experience.management.errors.authError"));
         return;
       }
 
@@ -50,14 +52,18 @@ const ExperienceManager: React.FC = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch experiences");
+        throw new Error(
+          errorData.message || t("experience.management.errors.fetchFailed")
+        );
       }
       const data = await response.json();
       setExperiences(data || []);
     } catch (error) {
       console.error("Error fetching experiences:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to fetch experiences"
+        error instanceof Error
+          ? error.message
+          : t("experience.management.errors.fetchFailed")
       );
       setExperiences([]);
     } finally {
@@ -70,7 +76,7 @@ const ExperienceManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found. Please login again.");
+        toast.error(t("experience.management.errors.authError"));
         return;
       }
 
@@ -99,32 +105,36 @@ const ExperienceManager: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save experience");
+        throw new Error(
+          errorData.message || t("experience.management.errors.saveFailed")
+        );
       }
 
       toast.success(
         isEditing
-          ? "Experience updated successfully"
-          : "Experience added successfully"
+          ? t("experience.management.actions.updateSuccess")
+          : t("experience.management.actions.addSuccess")
       );
       resetForm();
       fetchExperiences();
     } catch (error) {
       console.error("Error saving experience:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to save experience"
+        error instanceof Error
+          ? error.message
+          : t("experience.management.errors.saveFailed")
       );
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this experience?"))
+    if (!window.confirm(t("experience.management.actions.confirmDelete")))
       return;
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found. Please login again.");
+        toast.error(t("experience.management.errors.authError"));
         return;
       }
 
@@ -137,15 +147,19 @@ const ExperienceManager: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete experience");
+        throw new Error(
+          errorData.message || t("experience.management.errors.deleteFailed")
+        );
       }
 
-      toast.success("Experience deleted successfully");
+      toast.success(t("experience.management.actions.deleteSuccess"));
       fetchExperiences();
     } catch (error) {
       console.error("Error deleting experience:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete experience"
+        error instanceof Error
+          ? error.message
+          : t("experience.management.errors.deleteFailed")
       );
     }
   };
@@ -190,14 +204,14 @@ const ExperienceManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-          Work Experience
+          {t("experience.management.title")}
         </h2>
         <button
           onClick={resetForm}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
         >
           <Plus className="w-5 h-5" />
-          Add Experience
+          {t("experience.management.addExperience")}
         </button>
       </div>
 
@@ -210,7 +224,7 @@ const ExperienceManager: React.FC = () => {
             htmlFor="company"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Company
+            {t("experience.management.form.company")}
           </label>
           <input
             type="text"
@@ -229,7 +243,7 @@ const ExperienceManager: React.FC = () => {
             htmlFor="position"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Position
+            {t("experience.management.form.position")}
           </label>
           <input
             type="text"
@@ -249,7 +263,7 @@ const ExperienceManager: React.FC = () => {
               htmlFor="startDate"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
-              Start Date
+              {t("experience.management.form.startDate")}
             </label>
             <input
               type="date"
@@ -268,7 +282,7 @@ const ExperienceManager: React.FC = () => {
               htmlFor="endDate"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
-              End Date
+              {t("experience.management.form.endDate")}
             </label>
             <input
               type="date"
@@ -298,7 +312,7 @@ const ExperienceManager: React.FC = () => {
             htmlFor="current"
             className="ml-2 text-sm text-gray-700 dark:text-gray-300"
           >
-            Current Position
+            {t("experience.management.form.current")}
           </label>
         </div>
 
@@ -307,7 +321,7 @@ const ExperienceManager: React.FC = () => {
             htmlFor="description"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Description
+            {t("experience.management.form.description")}
           </label>
           <textarea
             id="description"
@@ -326,7 +340,7 @@ const ExperienceManager: React.FC = () => {
             htmlFor="technologies"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Technologies (comma-separated)
+            {t("experience.management.form.technologies")}
           </label>
           <input
             type="text"
@@ -336,7 +350,9 @@ const ExperienceManager: React.FC = () => {
               setFormData({ ...formData, technologies: e.target.value })
             }
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder="React, Node.js, MongoDB, etc."
+            placeholder={t(
+              "experience.management.form.technologiesPlaceholder"
+            )}
             required
           />
         </div>
@@ -348,21 +364,23 @@ const ExperienceManager: React.FC = () => {
               onClick={resetForm}
               className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1E2A3B] hover:bg-gray-50 dark:hover:bg-[#242E42] transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           )}
           <button
             type="submit"
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
           >
-            {isEditing ? "Update Experience" : "Add Experience"}
+            {isEditing
+              ? t("experience.management.editExperience")
+              : t("experience.management.addExperience")}
           </button>
         </div>
       </form>
 
       <div className="mt-8">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          Experience List
+          {t("experience.management.experienceList")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {experiences && experiences.length > 0 ? (
@@ -402,7 +420,7 @@ const ExperienceManager: React.FC = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-500">
                       {new Date(experience.startDate).toLocaleDateString()} -{" "}
                       {experience.current
-                        ? "Present"
+                        ? t("experience.current")
                         : new Date(experience.endDate).toLocaleDateString()}
                     </p>
                     <p className="mt-2 text-gray-600 dark:text-gray-300">
@@ -429,7 +447,7 @@ const ExperienceManager: React.FC = () => {
                 <Briefcase className="w-8 h-8 text-blue-500 dark:text-blue-400" />
               </div>
               <p className="text-gray-500 dark:text-gray-400">
-                No experiences found. Add your first experience to get started.
+                {t("experience.management.noExperiences")}
               </p>
             </div>
           )}

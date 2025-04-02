@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { motion } from "framer-react";
 import { User, Lock, Mail, Save, X, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ interface UserProfile {
 const UserDashboard: React.FC = () => {
   const { user, token, logout } = useAuth();
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("profile");
   const [profile, setProfile] = useState<UserProfile>({
     name: user?.name || "",
@@ -57,12 +59,12 @@ const UserDashboard: React.FC = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || "Failed to update profile");
+        throw new Error(data.message || t("user.profile.updateError"));
       }
 
-      setSuccess("Profile updated successfully!");
+      setSuccess(t("user.profile.updateSuccess"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("user.error"));
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,7 @@ const UserDashboard: React.FC = () => {
     setSuccess(null);
 
     if (profile.newPassword !== profile.confirmPassword) {
-      setError("New passwords do not match");
+      setError(t("user.security.passwordMismatch"));
       setLoading(false);
       return;
     }
@@ -98,10 +100,10 @@ const UserDashboard: React.FC = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || "Failed to update password");
+        throw new Error(data.message || t("user.security.updateError"));
       }
 
-      setSuccess("Password updated successfully!");
+      setSuccess(t("user.security.updateSuccess"));
       setProfile({
         ...profile,
         currentPassword: "",
@@ -109,7 +111,7 @@ const UserDashboard: React.FC = () => {
         confirmPassword: "",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("user.error"));
     } finally {
       setLoading(false);
     }
@@ -135,14 +137,14 @@ const UserDashboard: React.FC = () => {
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            User Dashboard
+            {t("user.dashboard")}
           </h1>
           <button
             onClick={handleLogout}
             className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
           >
             <LogOut className="h-5 w-5" />
-            <span>Logout</span>
+            <span>{t("user.logout")}</span>
           </button>
         </div>
 
@@ -198,12 +200,12 @@ const UserDashboard: React.FC = () => {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Profile Settings
+                {t("user.profile.title")}
               </h3>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
               >
-                Manage your profile information and preferences
+                {t("user.profile.description")}
               </p>
             </div>
 
@@ -217,12 +219,12 @@ const UserDashboard: React.FC = () => {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Account Security
+                {t("user.security.title")}
               </h3>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
               >
-                Update your password and security settings
+                {t("user.security.description")}
               </p>
             </div>
 
@@ -236,12 +238,12 @@ const UserDashboard: React.FC = () => {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Notifications
+                {t("user.notifications.title")}
               </h3>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
               >
-                Configure your notification preferences
+                {t("user.notifications.description")}
               </p>
             </div>
           </div>

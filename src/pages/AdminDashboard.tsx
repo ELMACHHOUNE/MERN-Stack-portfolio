@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
+import { useLanguage } from "../context/LanguageContext";
 import { User, Settings, FolderTree, Cog, Mail } from "lucide-react";
 import SkillsManager from "../components/admin/SkillsManager";
 import ProjectManager from "../components/admin/ProjectManager";
@@ -15,6 +16,7 @@ const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
   const { adminProfile } = useAdminProfile();
+  const { t } = useLanguage();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
@@ -30,7 +32,13 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow"></header>
+      <header className="bg-white dark:bg-gray-800 shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {t("admin.dashboard.title")}
+          </h1>
+        </div>
+      </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -45,7 +53,7 @@ const AdminDashboard: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Skills
+              {t("admin.tabs.skills")}
             </button>
             <button
               onClick={() => setActiveTab("projects")}
@@ -55,7 +63,7 @@ const AdminDashboard: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Projects
+              {t("admin.tabs.projects")}
             </button>
             <button
               onClick={() => setActiveTab("experience")}
@@ -65,7 +73,7 @@ const AdminDashboard: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Experience
+              {t("admin.tabs.experience")}
             </button>
             <button
               onClick={() => setActiveTab("categories")}
@@ -75,7 +83,7 @@ const AdminDashboard: React.FC = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Categories
+              {t("admin.tabs.categories")}
             </button>
             <button
               onClick={() => setActiveTab("messages")}
@@ -86,7 +94,7 @@ const AdminDashboard: React.FC = () => {
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
             >
               <Mail className="w-4 h-4 mr-2" />
-              Messages
+              {t("admin.tabs.messages")}
             </button>
             <button
               onClick={() => setActiveTab("settings")}
@@ -97,7 +105,7 @@ const AdminDashboard: React.FC = () => {
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
             >
               <Cog className="w-4 h-4 mr-2" />
-              Settings
+              {t("admin.tabs.settings")}
             </button>
           </nav>
         </div>

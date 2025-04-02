@@ -1,18 +1,35 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Dashboard: React.FC = () => {
+  const { t } = useLanguage();
+
   const stats = [
-    { label: "Total Projects", value: "12", path: "/admin/projects" },
-    { label: "Skills", value: "8", path: "/admin/skills" },
-    { label: "Experience Items", value: "5", path: "/admin/experience" },
+    {
+      label: t("admin.dashboard.stats.totalProjects"),
+      value: "12",
+      path: "/admin/projects",
+    },
+    {
+      label: t("admin.dashboard.stats.skills"),
+      value: "8",
+      path: "/admin/skills",
+    },
+    {
+      label: t("admin.dashboard.stats.experienceItems"),
+      value: "5",
+      path: "/admin/experience",
+    },
   ];
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-white">Dashboard Overview</h1>
+        <h1 className="text-2xl font-bold text-white">
+          {t("admin.dashboard.title")}
+        </h1>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -33,20 +50,28 @@ const Dashboard: React.FC = () => {
         {/* Recent Activity */}
         <div className="bg-gray-800 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
-            Recent Activity
+            {t("admin.dashboard.recentActivity.title")}
           </h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between text-gray-300">
-              <span>New project added</span>
-              <span className="text-sm">2 hours ago</span>
+              <span>{t("admin.dashboard.recentActivity.newProject")}</span>
+              <span className="text-sm">
+                2 {t("admin.dashboard.recentActivity.hoursAgo")}
+              </span>
             </div>
             <div className="flex items-center justify-between text-gray-300">
-              <span>Skill updated</span>
-              <span className="text-sm">5 hours ago</span>
+              <span>{t("admin.dashboard.recentActivity.skillUpdated")}</span>
+              <span className="text-sm">
+                5 {t("admin.dashboard.recentActivity.hoursAgo")}
+              </span>
             </div>
             <div className="flex items-center justify-between text-gray-300">
-              <span>Experience section modified</span>
-              <span className="text-sm">1 day ago</span>
+              <span>
+                {t("admin.dashboard.recentActivity.experienceModified")}
+              </span>
+              <span className="text-sm">
+                1 {t("admin.dashboard.recentActivity.dayAgo")}
+              </span>
             </div>
           </div>
         </div>
@@ -54,38 +79,38 @@ const Dashboard: React.FC = () => {
         {/* Quick Actions */}
         <div className="bg-gray-800 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
-            Quick Actions
+            {t("admin.dashboard.quickActions.title")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
               to="/admin/projects/new"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >
-              Add New Project
+              {t("admin.dashboard.quickActions.addNewProject")}
             </Link>
             <Link
               to="/admin/skills/new"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >
-              Add New Skill
+              {t("admin.dashboard.quickActions.addNewSkill")}
             </Link>
             <Link
               to="/admin/experience/new"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >
-              Add Experience
+              {t("admin.dashboard.quickActions.addExperience")}
             </Link>
             <Link
               to="/admin/categories"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >
-              Manage Categories
+              {t("admin.dashboard.quickActions.manageCategories")}
             </Link>
             <Link
               to="/admin/about/edit"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >
-              Edit About Section
+              {t("admin.dashboard.quickActions.editAbout")}
             </Link>
           </div>
         </div>

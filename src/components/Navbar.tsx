@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { API_URL } from "../config";
 import {
   Menu,
@@ -25,6 +26,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
@@ -43,12 +45,16 @@ const Navbar: React.FC = () => {
   }, [location]);
 
   const navItems = [
-    { path: "/", label: "Home", icon: Home },
-    { path: "/about", label: "About", icon: User },
-    { path: "/projects", label: "Projects", icon: Briefcase },
-    { path: "/experience", label: "Experience", icon: Briefcase },
-    { path: "/skills", label: "Skills", icon: Code },
-    { path: "/contact", label: "Contact", icon: Mail },
+    { path: "/", label: t("navbar.menu.home"), icon: Home },
+    { path: "/about", label: t("navbar.menu.about"), icon: User },
+    { path: "/projects", label: t("navbar.menu.projects"), icon: Briefcase },
+    {
+      path: "/experience",
+      label: t("navbar.menu.experience"),
+      icon: Briefcase,
+    },
+    { path: "/skills", label: t("navbar.menu.skills"), icon: Code },
+    { path: "/contact", label: t("navbar.menu.contact"), icon: Mail },
   ];
 
   const handleLogout = () => {
@@ -77,7 +83,9 @@ const Navbar: React.FC = () => {
             to="/"
             className="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-white"
           >
-            <span className="text-blue-600 dark:text-blue-400">Portfolio</span>
+            <span className="text-blue-600 dark:text-blue-400">
+              {t("navbar.brand")}
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -116,13 +124,13 @@ const Navbar: React.FC = () => {
                 className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200"
               >
                 <LayoutDashboard className="h-5 w-5 mr-1" />
-                Dashboard
+                {t("navbar.menu.dashboard")}
               </Link>
             )}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle theme"
+              aria-label={t("navbar.theme.toggle")}
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -138,7 +146,9 @@ const Navbar: React.FC = () => {
                       onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                       className="flex text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
                     >
-                      <span className="sr-only">Open user menu</span>
+                      <span className="sr-only">
+                        {t("navbar.profile.openMenu")}
+                      </span>
                       {user.profileImage ? (
                         <img
                           className="h-8 w-8 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700"
@@ -173,7 +183,7 @@ const Navbar: React.FC = () => {
                           onClick={() => setIsProfileMenuOpen(false)}
                         >
                           <Settings className="h-4 w-4 mr-2" />
-                          Profile Settings
+                          {t("navbar.profile.settings")}
                         </Link>
                         <button
                           onClick={() => {
@@ -183,7 +193,7 @@ const Navbar: React.FC = () => {
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] flex items-center transition-colors duration-200"
                         >
                           <LogOut className="h-4 w-4 mr-2" />
-                          Sign out
+                          {t("navbar.profile.signOut")}
                         </button>
                       </motion.div>
                     )}
@@ -195,7 +205,7 @@ const Navbar: React.FC = () => {
                 to="/login"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200"
               >
-                Login
+                {t("navbar.auth.login")}
               </Link>
             )}
           </div>
@@ -205,7 +215,7 @@ const Navbar: React.FC = () => {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle theme"
+              aria-label={t("navbar.theme.toggle")}
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -216,7 +226,7 @@ const Navbar: React.FC = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle menu"
+              aria-label={t("navbar.menu.toggle")}
             >
               {isOpen ? (
                 <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
@@ -261,7 +271,7 @@ const Navbar: React.FC = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="w-5 h-5" />
-                  <span>Dashboard</span>
+                  <span>{t("navbar.menu.dashboard")}</span>
                 </Link>
               )}
               {user ? (
@@ -294,7 +304,7 @@ const Navbar: React.FC = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <Settings className="w-5 h-5" />
-                      <span>Profile Settings</span>
+                      <span>{t("navbar.profile.settings")}</span>
                     </Link>
                     <button
                       onClick={() => {
@@ -304,7 +314,7 @@ const Navbar: React.FC = () => {
                       className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       <LogOut className="w-5 h-5" />
-                      <span>Sign out</span>
+                      <span>{t("navbar.profile.signOut")}</span>
                     </button>
                   </div>
                 </div>
@@ -314,7 +324,7 @@ const Navbar: React.FC = () => {
                   className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
-                  <span>Login</span>
+                  <span>{t("navbar.auth.login")}</span>
                 </Link>
               )}
             </div>
