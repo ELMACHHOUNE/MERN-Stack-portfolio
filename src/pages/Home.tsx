@@ -5,9 +5,6 @@ import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Code,
-  Brain,
-  Heart,
-  Rocket,
   ChevronDown,
   Cloud,
   Database,
@@ -48,6 +45,22 @@ interface Skill {
   isActive: boolean;
 }
 
+interface AdminProfile {
+  name: string;
+  title: string;
+  location: string;
+  bio: string;
+  values: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }>;
+  socialLinks: Array<{
+    platform: string;
+    url: string;
+  }>;
+}
+
 const defaultProfile = {
   name: "home.defaultProfile.name",
   title: "home.defaultProfile.title",
@@ -83,7 +96,9 @@ const getSkillLevel = (level: number, t: (key: string) => string): string => {
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
-  const { adminProfile } = useAdminProfile();
+  const { adminProfile } = useAdminProfile() as {
+    adminProfile: AdminProfile | null;
+  };
   const [data, setData] = useState<{
     skills: Skill[];
     categories: Category[];
@@ -164,6 +179,28 @@ const Home: React.FC = () => {
     fetchData();
   }, []);
 
+  const getSocialLinks = () => {
+    if (
+      !adminProfile?.socialLinks ||
+      !Array.isArray(adminProfile.socialLinks)
+    ) {
+      return defaultSocialLinks;
+    }
+
+    return adminProfile.socialLinks.map((link) => ({
+      icon:
+        link.platform === "github"
+          ? Github
+          : link.platform === "linkedin"
+          ? Linkedin
+          : link.platform === "email"
+          ? Mail
+          : Github,
+      url: link.url || "#",
+      label: link.platform || "Social Link",
+    }));
+  };
+
   // Map icon strings to actual icon components
   const getIconComponent = (category: Category) => {
     const iconMap: { [key: string]: any } = {
@@ -210,42 +247,33 @@ const Home: React.FC = () => {
     title: adminProfile?.title || t(defaultProfile.title),
     location: adminProfile?.location || t(defaultProfile.location),
     bio: adminProfile?.bio || t(defaultProfile.bio),
-    values: [
+    values: adminProfile?.values?.map((value) => ({
+      icon: value.icon,
+      title: value.title,
+      description: value.description,
+    })) || [
       {
-        icon: Code,
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
         title: t("home.values.cleanCode.title"),
         description: t("home.values.cleanCode.description"),
       },
       {
-        icon: Brain,
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
         title: t("home.values.problemSolving.title"),
         description: t("home.values.problemSolving.description"),
       },
       {
-        icon: Heart,
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
         title: t("home.values.userExperience.title"),
         description: t("home.values.userExperience.description"),
       },
       {
-        icon: Rocket,
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
         title: t("home.values.innovation.title"),
         description: t("home.values.innovation.description"),
       },
     ],
-    socialLinks: Array.isArray(adminProfile?.socialLinks)
-      ? adminProfile.socialLinks.map((link: any) => ({
-          icon:
-            link.platform === "github"
-              ? Github
-              : link.platform === "linkedin"
-              ? Linkedin
-              : link.platform === "email"
-              ? Mail
-              : Github,
-          url: link.url || "#",
-          label: link.platform || "Social Link",
-        }))
-      : defaultSocialLinks,
+    socialLinks: getSocialLinks(),
   };
 
   if (data.loading) {
@@ -443,7 +471,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900/50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -470,7 +498,11 @@ const Home: React.FC = () => {
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all transform hover:-translate-y-1"
               >
                 <div className="flex items-center mb-6">
-                  <value.icon className="h-10 w-10 text-blue-500 dark:text-blue-400 mr-4" />
+                  <img
+                    src={value.icon}
+                    alt={value.title}
+                    className="h-10 w-10 mr-4"
+                  />
                   <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {value.title}
                   </h3>

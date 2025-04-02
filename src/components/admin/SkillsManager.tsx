@@ -105,21 +105,6 @@ const SkillsManager: React.FC = () => {
     }
   };
 
-  const convertToCDNUrl = (iconUrl: string) => {
-    // If it's already a CDN URL, return as is
-    if (iconUrl.startsWith("http")) {
-      return iconUrl;
-    }
-
-    // If it's a local path, convert it to the full CDN URL
-    if (iconUrl.startsWith("skill-icons/")) {
-      return `${API_URL}/uploads/${iconUrl}`;
-    }
-
-    // Default to Devicon CDN if no URL is provided
-    return "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg";
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
