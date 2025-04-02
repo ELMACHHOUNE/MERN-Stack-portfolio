@@ -30,9 +30,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-900">
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-64 bg-gray-800">
-        <div className="flex items-center justify-center h-16 bg-gray-900">
-          <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
-        </div>
         <nav className="mt-5 px-2">
           {menuItems.map((item) => (
             <Link

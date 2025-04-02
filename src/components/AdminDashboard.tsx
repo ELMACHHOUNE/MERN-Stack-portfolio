@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -13,6 +13,8 @@ import {
   Briefcase,
   FolderKanban,
   User,
+  Menu,
+  X,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -47,6 +49,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/messages")) return "messages";
     return "skills";
   });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -83,6 +86,15 @@ const AdminDashboard: React.FC = () => {
     navigate("/");
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false); // Close sidebar on mobile when tab is clicked
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -93,146 +105,154 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <motion.div
-        initial={{ x: -300 }}
-        animate={{ x: 0 }}
-        className="fixed md:relative w-64 bg-white dark:bg-gray-800 shadow-lg z-50 h-full overflow-y-auto"
+      {/* Mobile Menu Button */}
+      <button
+        onClick={toggleSidebar}
+        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-800 shadow-lg md:hidden"
       >
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-              Admin Panel
-            </h2>
-            <button className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {isSidebarOpen ? (
+          <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+        ) : (
+          <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <AnimatePresence>
+        {(isSidebarOpen || window.innerWidth >= 768) && (
+          <motion.div
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg z-40 overflow-y-auto md:relative md:translate-x-0"
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Admin Panel
+                </h2>
+                <button
+                  onClick={toggleSidebar}
+                  className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {user?.email}
+              </p>
+            </div>
+            <nav className="mt-6">
+              <button
+                onClick={() => handleTabClick("overview")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "overview"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {user?.email}
-          </p>
-        </div>
-        <nav className="mt-6">
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "overview"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <LayoutDashboard className="w-5 h-5 mr-3" />
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab("users")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "users"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <Users className="w-5 h-5 mr-3" />
-            Users
-          </button>
-          <button
-            onClick={() => setActiveTab("skills")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "skills"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <Wrench className="w-5 h-5 mr-3" />
-            Skills
-          </button>
-          <button
-            onClick={() => setActiveTab("categories")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "categories"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <FolderKanban className="w-5 h-5 mr-3" />
-            Categories
-          </button>
-          <button
-            onClick={() => setActiveTab("projects")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "projects"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <User className="w-5 h-5 mr-3" />
-            Projects
-          </button>
-          <button
-            onClick={() => setActiveTab("experience")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-              activeTab === "experience"
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            Experience
-          </button>
-          <button
-            onClick={() => setActiveTab("analytics")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "analytics"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <BarChart3 className="w-5 h-5 mr-3" />
-            Analytics
-          </button>
-          <button
-            onClick={() => setActiveTab("messages")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "messages"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <Mail className="w-5 h-5 mr-3" />
-            Messages
-          </button>
-          <button
-            onClick={() => setActiveTab("settings")}
-            className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-              activeTab === "settings"
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : ""
-            }`}
-          >
-            <Settings className="w-5 h-5 mr-3" />
-            Settings
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-6 py-3 text-red-600 hover:bg-red-50 mt-4"
-          >
-            <LogOut className="w-5 h-5 mr-3" />
-            Logout
-          </button>
-        </nav>
-      </motion.div>
+                <LayoutDashboard className="w-5 h-5 mr-3" />
+                Overview
+              </button>
+              <button
+                onClick={() => handleTabClick("users")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "users"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <Users className="w-5 h-5 mr-3" />
+                Users
+              </button>
+              <button
+                onClick={() => handleTabClick("skills")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "skills"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <Wrench className="w-5 h-5 mr-3" />
+                Skills
+              </button>
+              <button
+                onClick={() => handleTabClick("categories")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "categories"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <FolderKanban className="w-5 h-5 mr-3" />
+                Categories
+              </button>
+              <button
+                onClick={() => handleTabClick("projects")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "projects"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <User className="w-5 h-5 mr-3" />
+                Projects
+              </button>
+              <button
+                onClick={() => handleTabClick("experience")}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === "experience"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Settings className="w-5 h-5" />
+                Experience
+              </button>
+              <button
+                onClick={() => handleTabClick("analytics")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "analytics"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <BarChart3 className="w-5 h-5 mr-3" />
+                Analytics
+              </button>
+              <button
+                onClick={() => handleTabClick("messages")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "messages"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <Mail className="w-5 h-5 mr-3" />
+                Messages
+              </button>
+              <button
+                onClick={() => handleTabClick("settings")}
+                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  activeTab === "settings"
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
+              >
+                <Settings className="w-5 h-5 mr-3" />
+                Settings
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-6 py-3 text-red-600 hover:bg-red-50 mt-4"
+              >
+                <LogOut className="w-5 h-5 mr-3" />
+                Logout
+              </button>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <motion.div
