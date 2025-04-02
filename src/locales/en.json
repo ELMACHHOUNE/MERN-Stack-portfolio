@@ -96,7 +96,7 @@
   },
   "about": {
     "title": "About Me",
-    "subtitle": "Full Stack Developer",
+    "subtitle": "Subtitle",
     "description": "I am a passionate Full Stack Developer with expertise in building modern web applications. I love creating elegant solutions to complex problems and am constantly learning new technologies to stay at the forefront of web development.",
     "experience": "Experience",
     "education": "Education",
@@ -364,7 +364,8 @@
   },
   "hero": {
     "greeting": "Hi, I'm",
-    "role": "Full Stack Developer",
+    "defaultName": "Your Name",
+    "subtitle": "Subtitle",
     "description": "I create beautiful and functional web applications using modern technologies.",
     "scrollDown": "Scroll Down"
   },
@@ -414,8 +415,8 @@
       }
     },
     "defaultProfile": {
-      "name": "John Doe",
-      "title": "Full Stack Developer",
+      "name": "Your Name",
+      "title": "Subtitle",
       "location": "New York, USA",
       "bio": "Passionate about creating elegant solutions to complex problems"
     },

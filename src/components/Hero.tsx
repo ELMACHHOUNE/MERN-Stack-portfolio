@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 interface SocialLink {
   href: string;
@@ -15,6 +16,7 @@ interface AdminProfile {
 }
 
 const Hero: React.FC = () => {
+  const { t } = useLanguage();
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -182,9 +184,9 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-4xl md:text-6xl font-bold mb-6"
         >
-          Hi, I'm{" "}
+          {t("hero.greeting")}{" "}
           <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            {adminProfile?.name || "Your Name"}
+            {adminProfile?.name || t("hero.defaultName")}
           </span>
         </motion.h1>
         <motion.h2
@@ -193,7 +195,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-2xl md:text-4xl font-semibold mb-8 text-gray-200"
         >
-          Full Stack Developer
+          {t("hero.subtitle")}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -201,8 +203,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-lg md:text-xl mb-12 text-gray-300 max-w-2xl mx-auto"
         >
-          I create beautiful and functional web applications using modern
-          technologies.
+          {t("hero.description")}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

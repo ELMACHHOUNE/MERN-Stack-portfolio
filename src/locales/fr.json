@@ -140,7 +140,7 @@
   },
   "about": {
     "title": "À Propos de Moi",
-    "subtitle": "Développeur Full Stack",
+    "subtitle": "Sous-titre",
     "description": "Je suis un développeur Full Stack passionné, spécialisé dans la création d'applications web modernes. J'aime créer des solutions élégantes pour des problèmes complexes et j'apprends constamment de nouvelles technologies pour rester à la pointe du développement web.",
     "experience": "Expérience",
     "education": "Formation",
@@ -417,9 +417,9 @@
   },
   "hero": {
     "greeting": "Bonjour, je suis",
-    "role": "Développeur Full Stack",
-    "description": "Je crée des applications web belles et fonctionnelles en utilisant des technologies modernes.",
-    "scrollDown": "Défiler vers le bas"
+    "defaultName": "Votre Nom",
+    "subtitle": "Sous-titre",
+    "description": "Je crée des applications web belles et fonctionnelles en utilisant des technologies modernes."
   },
   "nav": {
     "home": "Accueil",
@@ -433,8 +433,8 @@
   },
   "home": {
     "defaultProfile": {
-      "name": "John Doe",
-      "title": "Développeur Full Stack",
+      "name": "Votre Nom",
+      "title": "Sous-titre",
       "location": "New York, États-Unis",
       "bio": "Passionné par la création de solutions élégantes pour des problèmes complexes"
     },

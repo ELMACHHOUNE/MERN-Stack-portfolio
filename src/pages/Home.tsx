@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
@@ -10,8 +9,6 @@ import {
   Heart,
   Rocket,
   ChevronDown,
-  Terminal,
-  Laptop,
   Cloud,
   Database,
   Github,
@@ -19,15 +16,10 @@ import {
   Mail,
   LucideIcon,
   Server,
-  Globe,
   Layout,
-  Cpu,
   Smartphone,
   Code2,
-  Box,
-  Layers,
   Settings,
-  Monitor,
 } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 
@@ -35,15 +27,6 @@ interface SocialLink {
   icon: LucideIcon;
   url: string;
   label: string;
-}
-
-interface AdminProfile {
-  name: string;
-  email: string;
-  profileImage: string | null;
-  title?: string;
-  location?: string;
-  bio?: string;
 }
 
 interface Category {
@@ -101,10 +84,17 @@ const getSkillLevel = (level: number, t: (key: string) => string): string => {
 const Home: React.FC = () => {
   const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<{
+    skills: Skill[];
+    categories: Category[];
+    loading: boolean;
+    error: string | null;
+  }>({
+    skills: [],
+    categories: [],
+    loading: true,
+    error: null,
+  });
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
@@ -117,6 +107,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setData((prev) => ({ ...prev, loading: true, error: null }));
+
         // Fetch categories first
         const categoriesResponse = await fetch(
           "http://localhost:5000/api/categories"
@@ -127,7 +119,6 @@ const Home: React.FC = () => {
           );
         }
         const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
 
         // Then fetch skills
         const skillsResponse = await fetch("http://localhost:5000/api/skills");
@@ -135,16 +126,13 @@ const Home: React.FC = () => {
           throw new Error(`Failed to fetch skills: ${skillsResponse.status}`);
         }
         const skillsData = await skillsResponse.json();
-        console.log("Raw skills data:", skillsData);
 
-        // Filter active skills and normalize the data
-        const activeSkills = skillsData
+        // Process skills data
+        const processedSkills = skillsData
           .filter((skill: Skill) => skill.isActive)
           .map((skill: Skill) => ({
             ...skill,
-            // Multiply by 10 if the level is less than 10 (assuming it's in 0-10 scale)
             level: skill.level < 10 ? skill.level * 10 : skill.level,
-            // Ensure icon path is absolute and handle both full URLs and relative paths
             icon: skill.icon
               ? skill.icon.startsWith("http")
                 ? skill.icon
@@ -156,15 +144,20 @@ const Home: React.FC = () => {
           }))
           .sort((a: Skill, b: Skill) => (a.order || 0) - (b.order || 0));
 
-        console.log("Processed active skills:", activeSkills);
-        setSkills(activeSkills);
+        setData({
+          skills: processedSkills,
+          categories: categoriesData,
+          loading: false,
+          error: null,
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to fetch data"
-        );
-      } finally {
-        setLoading(false);
+        setData((prev) => ({
+          ...prev,
+          loading: false,
+          error:
+            error instanceof Error ? error.message : "Failed to fetch data",
+        }));
       }
     };
 
@@ -193,13 +186,14 @@ const Home: React.FC = () => {
 
   // Group skills by category
   const getSkillsByCategory = () => {
-    if (!Array.isArray(skills) || !Array.isArray(categories)) return [];
+    if (!Array.isArray(data.skills) || !Array.isArray(data.categories))
+      return [];
 
-    return categories
+    return data.categories
       .filter((category) => category.isActive)
       .map((category) => ({
         category,
-        skills: skills
+        skills: data.skills
           .filter(
             (skill) =>
               skill.isActive &&
@@ -254,7 +248,7 @@ const Home: React.FC = () => {
       : defaultSocialLinks,
   };
 
-  if (loading) {
+  if (data.loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
@@ -265,7 +259,7 @@ const Home: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (data.error) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -390,19 +384,13 @@ const Home: React.FC = () => {
                             alt={skill.name}
                             className="w-6 h-6 mr-3"
                             onError={(e) => {
-                              console.log("Image error for:", skill.icon);
                               const target = e.target as HTMLImageElement;
-                              target.onerror = null;
                               target.style.display = "none";
                               const parent = target.parentNode as HTMLElement;
-
-                              // Create a span element for the fallback icon
                               const fallbackIcon =
                                 document.createElement("span");
                               fallbackIcon.className =
                                 "w-6 h-6 mr-3 text-blue-500 dark:text-blue-400";
-
-                              // Create SVG element
                               const iconSvg = document.createElementNS(
                                 "http://www.w3.org/2000/svg",
                                 "svg"
@@ -415,13 +403,10 @@ const Home: React.FC = () => {
                               iconSvg.setAttribute("stroke-width", "2");
                               iconSvg.setAttribute("stroke-linecap", "round");
                               iconSvg.setAttribute("stroke-linejoin", "round");
-
-                              // Add the code icon path
                               iconSvg.innerHTML = `
                                 <path d="M16 18l6-6-6-6"></path>
                                 <path d="M8 6l-6 6 6 6"></path>
                               `;
-
                               fallbackIcon.appendChild(iconSvg);
                               parent.appendChild(fallbackIcon);
                             }}
