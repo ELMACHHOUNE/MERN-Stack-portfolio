@@ -107,40 +107,6 @@ const SkillsManager: React.FC = () => {
     }
   };
 
-  // Helper function to validate icon URL/data
-  const validateIcon = (icon: string) => {
-    // Check if it's a valid URL
-    try {
-      new URL(icon);
-      return true;
-    } catch (e) {
-      // Check if it's a valid base64 image
-      if (icon.startsWith("data:image/")) {
-        return true;
-      }
-      // Check if it's a relative path from our backend
-      if (icon.startsWith("skill-icons/")) {
-        return true;
-      }
-      return false;
-    }
-  };
-
-  // Helper function to get full icon URL
-  const getFullIconUrl = (iconPath: string) => {
-    if (!iconPath) return "";
-    if (iconPath.startsWith("http")) return iconPath;
-    if (iconPath.startsWith("data:image/")) return iconPath;
-    // If it's a relative path (e.g., skill-icons/...)
-    if (iconPath.includes("skill-icons/")) {
-      // Extract just the relative path if the full URL is present
-      const match = iconPath.match(/skill-icons\/.*$/);
-      const relativePath = match ? match[0] : iconPath;
-      return `${API_URL}/${relativePath}`;
-    }
-    return `${API_URL}/${iconPath}`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -164,36 +130,24 @@ const SkillsManager: React.FC = () => {
         return;
       }
 
-      // Validate icon URL/data
-      if (!validateIcon(formData.icon)) {
-        toast.error("Please enter a valid image URL or base64 data");
-        return;
-      }
-
       // Validate level
       if (formData.level < 1 || formData.level > 10) {
         toast.error("Skill level must be between 1 and 10");
         return;
       }
 
-      // If the icon is a full URL from our backend, extract just the relative path
-      const iconUrl = formData.icon.includes("skill-icons/")
-        ? formData.icon.match(/skill-icons\/.*$/)?.[0] || formData.icon
-        : formData.icon;
-
       const skillData = {
         ...formData,
-        icon: iconUrl,
         order: isEditing ? currentSkill?.order : skills.length,
-        level: Number(formData.level),
+        level: Number(formData.level), // Ensure level is a number
       };
-
-      console.log("Submitting skill data:", skillData);
 
       const url = isEditing
         ? `${API_URL}/api/skills/${currentSkill?._id}`
         : `${API_URL}/api/skills`;
       const method = isEditing ? "PATCH" : "POST";
+
+      console.log("Submitting skill data:", skillData);
 
       const response = await fetch(url, {
         method,
@@ -246,16 +200,11 @@ const SkillsManager: React.FC = () => {
 
   const handleEdit = (skill: Skill) => {
     setCurrentSkill(skill);
-    // For editing, we want to show the relative path if it's a backend-stored image
-    const iconUrl = skill.icon.includes("skill-icons/")
-      ? skill.icon.match(/skill-icons\/.*$/)?.[0] || skill.icon
-      : skill.icon;
-
     setFormData({
       name: skill.name,
       category: skill.category?._id || "",
       level: skill.level,
-      icon: iconUrl,
+      icon: skill.icon,
       order: skill.order,
       isActive: true,
     });
@@ -389,50 +338,20 @@ const SkillsManager: React.FC = () => {
           />
           {formData.icon && (
             <div className="mt-2 flex items-center space-x-2">
-              <div className="w-8 h-8 relative">
-                <img
-                  src={getFullIconUrl(formData.icon)}
-                  alt="Icon preview"
-                  className="h-8 w-8 object-contain"
-                  onError={(e) => {
-                    console.error(
-                      `Failed to load icon preview: ${formData.icon}`
-                    );
-                    e.currentTarget.style.display = "none";
-                    toast.error(
-                      "Failed to load icon preview. Please check the URL."
-                    );
-                  }}
-                  onLoad={(e) => {
-                    e.currentTarget.style.display = "block";
-                  }}
-                />
-              </div>
+              <img
+                src={formData.icon}
+                alt="Icon preview"
+                className="h-8 w-8"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  toast.error("Failed to load icon preview");
+                }}
+              />
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Icon preview
               </span>
             </div>
           )}
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Tips for icons:
-            <br />
-            1. For tech icons, use{" "}
-            <a
-              href="https://devicon.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:text-blue-600 dark:text-blue-400"
-            >
-              devicon.dev
-            </a>
-            <br />
-            Example:
-            https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg
-            <br />
-            2. For other icons, use direct image URLs (PNG, SVG, or JPEG)
-            <br />
-            3. Make sure the icon has a transparent or matching background
-          </p>
         </div>
 
         <div className="flex justify-end space-x-4 pt-4">
@@ -467,15 +386,9 @@ const SkillsManager: React.FC = () => {
               <div className="flex items-center space-x-3 mb-6">
                 {category.icon && (
                   <img
-                    src={getFullIconUrl(category.icon)}
+                    src={category.icon}
                     alt={category.name}
-                    className="h-8 w-8 object-contain"
-                    onError={(e) => {
-                      console.error(
-                        `Failed to load category icon: ${category.name}`
-                      );
-                      e.currentTarget.style.display = "none";
-                    }}
+                    className="h-8 w-8"
                   />
                 )}
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -505,22 +418,11 @@ const SkillsManager: React.FC = () => {
 
                     <div className="flex items-center space-x-4">
                       {skill.icon && (
-                        <div className="w-8 h-8 relative flex items-center justify-center">
-                          <img
-                            src={getFullIconUrl(skill.icon)}
-                            alt={skill.name}
-                            className="h-8 w-8 object-contain"
-                            onError={(e) => {
-                              console.error(
-                                `Failed to load icon for skill: ${skill.name}`
-                              );
-                              e.currentTarget.style.display = "none";
-                            }}
-                            onLoad={(e) => {
-                              e.currentTarget.style.display = "block";
-                            }}
-                          />
-                        </div>
+                        <img
+                          src={skill.icon}
+                          alt={skill.name}
+                          className="h-8 w-8"
+                        />
                       )}
                       <div className="flex-1">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
