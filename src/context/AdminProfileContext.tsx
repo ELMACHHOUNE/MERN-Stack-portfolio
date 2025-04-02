@@ -8,6 +8,16 @@ interface Value {
   description: string;
 }
 
+interface SocialLinks {
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  behance?: string;
+}
+
 interface AdminProfile {
   name: string;
   email: string;
@@ -17,6 +27,7 @@ interface AdminProfile {
   profileImage: string;
   interests: string[];
   values: Value[];
+  socialLinks?: SocialLinks;
 }
 
 interface AdminProfileContextType {

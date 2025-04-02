@@ -165,7 +165,16 @@ router.get("/admin-profile", protect, admin, async (req, res) => {
 // Update admin profile
 router.put("/admin-profile", protect, admin, async (req, res) => {
   try {
-    const { name, email, title, location, bio, interests, values } = req.body;
+    const {
+      name,
+      email,
+      title,
+      location,
+      bio,
+      interests,
+      values,
+      socialLinks,
+    } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -188,6 +197,7 @@ router.put("/admin-profile", protect, admin, async (req, res) => {
     if (bio) user.bio = bio;
     if (interests) user.interests = interests;
     if (values) user.values = values;
+    if (socialLinks) user.socialLinks = socialLinks;
 
     await user.save();
     res.json({ message: "Profile updated successfully", user });

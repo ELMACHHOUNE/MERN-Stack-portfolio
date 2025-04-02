@@ -18,6 +18,7 @@ import ProjectManager from "./components/admin/ProjectManager";
 import ExperienceManager from "./components/admin/ExperienceManager";
 import CategoryManager from "./components/admin/CategoryManager";
 import AboutSettings from "./pages/AboutSettings";
+import AdminSettings from "./pages/AdminSettings";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -108,6 +109,14 @@ const App: React.FC = () => {
                     element={
                       <AdminRoute>
                         <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/settings"
+                    element={
+                      <AdminRoute>
+                        <AdminSettings />
                       </AdminRoute>
                     }
                   />

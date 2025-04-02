@@ -56,6 +56,36 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    socialLinks: {
+      github: {
+        type: String,
+        default: "",
+      },
+      linkedin: {
+        type: String,
+        default: "",
+      },
+      twitter: {
+        type: String,
+        default: "",
+      },
+      facebook: {
+        type: String,
+        default: "",
+      },
+      instagram: {
+        type: String,
+        default: "",
+      },
+      youtube: {
+        type: String,
+        default: "",
+      },
+      behance: {
+        type: String,
+        default: "",
+      },
+    },
     lastLogin: {
       type: Date,
       default: Date.now,
