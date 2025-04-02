@@ -21,7 +21,7 @@ interface AdminProfile {
 
 interface AdminProfileContextType {
   adminProfile: AdminProfile | null;
-  updateAdminProfile: (data: Partial<AdminProfile>) => Promise<void>;
+  updateAdminProfile: (data: Partial<AdminProfile>) => Promise<AdminProfile>;
   isLoading: boolean;
 }
 
@@ -46,40 +46,45 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchAdminProfile = async () => {
+    if (!user?.isAdmin || !token) {
+      setIsLoading(false);
+      return null;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch admin profile");
+      }
+
+      const data = await response.json();
+      setAdminProfile(data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching admin profile:", error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAdminProfile = async () => {
-      if (!user?.isAdmin || !token) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch admin profile");
-        }
-
-        const data = await response.json();
-        setAdminProfile(data);
-      } catch (error) {
-        console.error("Error fetching admin profile:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchAdminProfile();
   }, [user, token]);
 
-  const updateAdminProfile = async (data: Partial<AdminProfile>) => {
-    if (!token) return;
+  const updateAdminProfile = async (
+    data: Partial<AdminProfile>
+  ): Promise<AdminProfile> => {
+    if (!token) throw new Error("No authentication token");
 
     try {
+      console.log("Updating profile with data:", data);
       const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
         method: "PUT",
         headers: {
@@ -94,18 +99,54 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error(errorData.message || "Failed to update admin profile");
       }
 
-      const updatedProfile = await response.json();
-      setAdminProfile(updatedProfile);
+      const responseData = await response.json();
+      console.log("Received response:", responseData);
+
+      // Extract the user data from the response
+      const updatedProfile = responseData.user;
+      if (!updatedProfile) {
+        throw new Error("No user data in response");
+      }
+
+      // Update the state with a complete merge of existing and new data
+      setAdminProfile((prev) => {
+        if (!prev) return updatedProfile;
+
+        // Create a new object with all the data
+        const mergedProfile = {
+          ...prev,
+          ...updatedProfile,
+          // Ensure arrays are properly merged
+          interests: Array.isArray(updatedProfile.interests)
+            ? [...updatedProfile.interests]
+            : prev.interests || [],
+          values: Array.isArray(updatedProfile.values)
+            ? updatedProfile.values.map((value: Value) => ({ ...value }))
+            : prev.values || [],
+        };
+
+        console.log("Merged profile:", mergedProfile);
+        return mergedProfile;
+      });
+
+      return updatedProfile;
     } catch (error) {
       console.error("Error updating admin profile:", error);
       throw error;
     }
   };
 
+  const contextValue = React.useMemo(
+    () => ({
+      adminProfile,
+      updateAdminProfile,
+      isLoading,
+    }),
+    [adminProfile, isLoading]
+  );
+
   return (
-    <AdminProfileContext.Provider
-      value={{ adminProfile, updateAdminProfile, isLoading }}
-    >
+    <AdminProfileContext.Provider value={contextValue}>
       {children}
     </AdminProfileContext.Provider>
   );

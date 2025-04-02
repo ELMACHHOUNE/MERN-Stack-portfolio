@@ -23,81 +23,44 @@ const AboutSettings: React.FC = () => {
   const { adminProfile, updateAdminProfile } = useAdminProfile();
   const { token } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    adminProfile?.profileImage || ""
-  );
-  const [interests, setInterests] = useState<string[]>(
-    adminProfile?.interests || []
-  );
-  const [newInterest, setNewInterest] = useState("");
-  const [values, setValues] = useState<Value[]>(adminProfile?.values || []);
-  const [formData, setFormData] = useState({
-    name: adminProfile?.name || "",
-    title: adminProfile?.title || "",
-    location: adminProfile?.location || "",
-    bio: adminProfile?.bio || "",
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Draft state for form data
+  const [draftData, setDraftData] = useState({
+    profileImage: "",
+    interests: [] as string[],
+    values: [] as Value[],
+    formData: {
+      name: "",
+      title: "",
+      location: "",
+      bio: "",
+    },
   });
 
+  const [newInterest, setNewInterest] = useState("");
+
+  // Initialize or update draft data when adminProfile changes
   useEffect(() => {
     if (adminProfile) {
-      setFormData({
-        name: adminProfile.name || "",
-        title: adminProfile.title || "",
-        location: adminProfile.location || "",
-        bio: adminProfile.bio || "",
-      });
-      setInterests(adminProfile.interests || []);
-      setValues(adminProfile.values || []);
-    }
-  }, [adminProfile]);
-
-  const defaultValues = [
-    {
-      icon: "User",
-      title: "Clean Code",
-      description:
-        "Writing maintainable and efficient code that follows best practices.",
-    },
-    {
-      icon: "Code",
-      title: "Problem Solving",
-      description:
-        "Finding innovative solutions to complex technical challenges.",
-    },
-    {
-      icon: "Server",
-      title: "User Experience",
-      description:
-        "Creating intuitive and accessible applications that users love.",
-    },
-    {
-      icon: "Database",
-      title: "Continuous Learning",
-      description:
-        "Staying updated with the latest technologies and industry trends.",
-    },
-  ];
-
-  const defaultInterests = [
-    "Web Development",
-    "Software Architecture",
-    "UI/UX Design",
-    "Cloud Computing",
-  ];
-
-  // Initialize with defaults if no values exist
-  useEffect(() => {
-    if (
-      adminProfile &&
-      (!adminProfile.values || adminProfile.values.length === 0)
-    ) {
-      setValues(defaultValues);
-    }
-    if (
-      adminProfile &&
-      (!adminProfile.interests || adminProfile.interests.length === 0)
-    ) {
-      setInterests(defaultInterests);
+      console.log("Admin profile changed, updating draft data:", adminProfile);
+      const newDraftData = {
+        profileImage: adminProfile.profileImage || "",
+        interests: Array.isArray(adminProfile.interests)
+          ? [...adminProfile.interests]
+          : [],
+        values: Array.isArray(adminProfile.values)
+          ? adminProfile.values.map((v) => ({ ...v }))
+          : [],
+        formData: {
+          name: adminProfile.name || "",
+          title: adminProfile.title || "",
+          location: adminProfile.location || "",
+          bio: adminProfile.bio || "",
+        },
+      };
+      console.log("Setting new draft data:", newDraftData);
+      setDraftData(newDraftData);
     }
   }, [adminProfile]);
 
@@ -105,9 +68,12 @@ const AboutSettings: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setDraftData((prev) => ({
       ...prev,
-      [name]: value,
+      formData: {
+        ...prev.formData,
+        [name]: value,
+      },
     }));
   };
 
@@ -134,7 +100,10 @@ const AboutSettings: React.FC = () => {
       }
 
       const data = await response.json();
-      setProfileImage(data.profileImage);
+      setDraftData((prev) => ({
+        ...prev,
+        profileImage: data.profileImage,
+      }));
       await updateAdminProfile({ profileImage: data.profileImage });
       toast.success("Profile image updated successfully");
     } catch (error) {
@@ -147,52 +116,20 @@ const AboutSettings: React.FC = () => {
     }
   };
 
-  const handleAddInterest = () => {
-    if (newInterest.trim() && !interests.includes(newInterest.trim())) {
-      setInterests([...interests, newInterest.trim()]);
-      setNewInterest("");
-    }
-  };
-
-  const handleRemoveInterest = (interestToRemove: string) => {
-    setInterests(interests.filter((interest) => interest !== interestToRemove));
-  };
-
-  const handleValueChange = (
-    index: number,
-    field: keyof Value,
-    value: string
-  ) => {
-    const newValues = [...values];
-    newValues[index] = { ...newValues[index], [field]: value };
-    setValues(newValues);
-  };
-
-  const handleAddValue = () => {
-    setValues([
-      ...values,
-      {
-        icon: "User",
-        title: "New Value",
-        description: "Description for the new value",
-      },
-    ]);
-  };
-
-  const handleRemoveValue = (index: number) => {
-    setValues(values.filter((_, i) => i !== index));
-  };
-
   const handleAboutUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = {
-      ...formData,
-      interests: interests.length > 0 ? interests : defaultInterests,
-      values: values.length > 0 ? values : defaultValues,
-    };
+    setIsSaving(true);
 
     try {
-      await updateAdminProfile(data);
+      // Prepare update data from draft
+      const updateData = {
+        ...draftData.formData,
+        interests: draftData.interests,
+        values: draftData.values,
+        profileImage: draftData.profileImage,
+      };
+
+      await updateAdminProfile(updateData);
       toast.success("About page content updated successfully");
     } catch (error) {
       console.error("About page update error:", error);
@@ -201,7 +138,63 @@ const AboutSettings: React.FC = () => {
           ? error.message
           : "Failed to update about page content"
       );
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleAddValue = () => {
+    const newValue = {
+      icon: "https://cdn-icons-png.flaticon.com/512/1785/1785210.png",
+      title: "New Value",
+      description: "Description for the new value",
+    };
+    setDraftData((prev) => ({
+      ...prev,
+      values: [...prev.values, newValue],
+    }));
+  };
+
+  const handleRemoveValue = (index: number) => {
+    setDraftData((prev) => ({
+      ...prev,
+      values: prev.values.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddInterest = () => {
+    if (
+      newInterest.trim() &&
+      !draftData.interests.includes(newInterest.trim())
+    ) {
+      setDraftData((prev) => ({
+        ...prev,
+        interests: [...prev.interests, newInterest.trim()],
+      }));
+      setNewInterest("");
+    }
+  };
+
+  const handleRemoveInterest = (interestToRemove: string) => {
+    setDraftData((prev) => ({
+      ...prev,
+      interests: prev.interests.filter(
+        (interest) => interest !== interestToRemove
+      ),
+    }));
+  };
+
+  const handleValueChange = (
+    index: number,
+    field: keyof Value,
+    value: string
+  ) => {
+    setDraftData((prev) => ({
+      ...prev,
+      values: prev.values.map((v, i) =>
+        i === index ? { ...v, [field]: value } : v
+      ),
+    }));
   };
 
   return (
@@ -224,9 +217,9 @@ const AboutSettings: React.FC = () => {
               </label>
               <div className="mt-1 flex items-center">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                  {profileImage ? (
+                  {draftData.profileImage ? (
                     <img
-                      src={`${API_URL}${profileImage}`}
+                      src={`${API_URL}${draftData.profileImage}`}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -267,7 +260,7 @@ const AboutSettings: React.FC = () => {
                 type="text"
                 name="name"
                 id="name"
-                value={formData.name}
+                value={draftData.formData.name}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
@@ -284,7 +277,7 @@ const AboutSettings: React.FC = () => {
                 type="text"
                 name="title"
                 id="title"
-                value={formData.title}
+                value={draftData.formData.title}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
@@ -301,7 +294,7 @@ const AboutSettings: React.FC = () => {
                 type="text"
                 name="location"
                 id="location"
-                value={formData.location}
+                value={draftData.formData.location}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
@@ -318,7 +311,7 @@ const AboutSettings: React.FC = () => {
                 name="bio"
                 id="bio"
                 rows={4}
-                value={formData.bio}
+                value={draftData.formData.bio}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
@@ -342,7 +335,7 @@ const AboutSettings: React.FC = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {values.map((value, index) => (
+            {draftData.values.map((value, index) => (
               <div
                 key={index}
                 className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
@@ -359,24 +352,34 @@ const AboutSettings: React.FC = () => {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Icon
+                      Icon URL
                     </label>
-                    <select
+                    <input
+                      type="url"
                       value={value.icon}
                       onChange={(e) =>
                         handleValueChange(index, "icon", e.target.value)
                       }
+                      placeholder="Enter icon URL (e.g., https://example.com/icon.png)"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                      <option value="User">User</option>
-                      <option value="Code">Code</option>
-                      <option value="Server">Server</option>
-                      <option value="Database">Database</option>
-                      <option value="Wrench">Wrench</option>
-                    </select>
+                    />
+                    {value.icon && (
+                      <div className="mt-2">
+                        <img
+                          src={value.icon}
+                          alt={`Preview for ${value.title}`}
+                          className="w-8 h-8 object-contain"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.src =
+                              "https://via.placeholder.com/32?text=Error";
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -395,12 +398,12 @@ const AboutSettings: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Description
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={value.description}
                       onChange={(e) =>
                         handleValueChange(index, "description", e.target.value)
                       }
+                      rows={3}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                   </div>
@@ -433,7 +436,7 @@ const AboutSettings: React.FC = () => {
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {interests.map((interest) => (
+              {draftData.interests.map((interest) => (
                 <span
                   key={interest}
                   className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
@@ -455,9 +458,10 @@ const AboutSettings: React.FC = () => {
         <div>
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isSaving}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            Save Changes
+            {isSaving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>
