@@ -108,7 +108,7 @@ const Contact: React.FC = () => {
         throw new Error(data.message || t("contact.error.sendFailed"));
       }
 
-      toast.success(t("contact.success"));
+      toast.success(t("contact.success.messageSent"));
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       toast.error(
