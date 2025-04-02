@@ -17,6 +17,8 @@ import {
   Instagram,
   Youtube,
   Camera,
+  Mail,
+  MessageCircle,
 } from "lucide-react";
 
 interface Value {
@@ -33,6 +35,8 @@ interface SocialLinks {
   instagram: string;
   youtube: string;
   behance: string;
+  gmail: string;
+  whatsapp: string;
 }
 
 const AdminSettings: React.FC = () => {
@@ -54,6 +58,8 @@ const AdminSettings: React.FC = () => {
     instagram: adminProfile?.socialLinks?.instagram || "",
     youtube: adminProfile?.socialLinks?.youtube || "",
     behance: adminProfile?.socialLinks?.behance || "",
+    gmail: adminProfile?.socialLinks?.gmail || "",
+    whatsapp: adminProfile?.socialLinks?.whatsapp || "",
   });
   const [values, setValues] = useState<Value[]>(
     adminProfile?.values || [
@@ -250,24 +256,28 @@ const AdminSettings: React.FC = () => {
                         label: "Name",
                         type: "text",
                         placeholder: "Your full name",
+                        value: adminProfile?.name || "",
                       },
                       {
                         id: "email",
                         label: "Email",
                         type: "email",
                         placeholder: "your.email@example.com",
+                        value: adminProfile?.email || "",
                       },
                       {
                         id: "title",
                         label: "Title",
                         type: "text",
                         placeholder: "e.g. Full Stack Developer",
+                        value: adminProfile?.title || "",
                       },
                       {
                         id: "location",
                         label: "Location",
                         type: "text",
                         placeholder: "e.g. New York, USA",
+                        value: adminProfile?.location || "",
                       },
                     ].map((field) => (
                       <div key={field.id}>
@@ -281,11 +291,7 @@ const AdminSettings: React.FC = () => {
                           type={field.type}
                           id={field.id}
                           name={field.id}
-                          defaultValue={
-                            adminProfile?.[
-                              field.id as keyof typeof adminProfile
-                            ]
-                          }
+                          defaultValue={field.value}
                           className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                           placeholder={field.placeholder}
                         />
@@ -319,6 +325,8 @@ const AdminSettings: React.FC = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
+                  { id: "gmail", icon: Mail, label: "Gmail" },
+                  { id: "whatsapp", icon: MessageCircle, label: "WhatsApp" },
                   { id: "github", icon: Github, label: "GitHub" },
                   { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
                   { id: "twitter", icon: Twitter, label: "Twitter" },
@@ -351,7 +359,13 @@ const AdminSettings: React.FC = () => {
                           e.target.value
                         )
                       }
-                      placeholder={`https://${platform.id}.com/yourusername`}
+                      placeholder={
+                        platform.id === "gmail"
+                          ? "mailto:your.email@gmail.com"
+                          : platform.id === "whatsapp"
+                          ? "https://wa.me/1234567890"
+                          : `https://${platform.id}.com/yourusername`
+                      }
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     />
                   </div>

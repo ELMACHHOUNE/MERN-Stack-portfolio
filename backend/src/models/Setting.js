@@ -33,6 +33,11 @@ const settingSchema = new mongoose.Schema(
       linkedin: String,
       twitter: String,
       facebook: String,
+      instagram: String,
+      youtube: String,
+      behance: String,
+      gmail: String,
+      whatsapp: String,
     },
     isActive: {
       type: Boolean,

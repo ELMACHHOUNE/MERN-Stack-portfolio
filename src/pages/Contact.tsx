@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useAdminProfile } from "../context/AdminProfileContext";
 
 interface ContactForm {
   name: string;
@@ -16,6 +17,7 @@ interface ValidationError {
 }
 
 const Contact: React.FC = () => {
+  const { adminProfile } = useAdminProfile();
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
     email: "",
@@ -145,40 +147,88 @@ const Contact: React.FC = () => {
               Contact Information
             </h2>
             <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Email
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    business.elmachhoune@gmail.com
-                  </p>
+              {/* Gmail */}
+              {adminProfile?.socialLinks?.gmail && (
+                <div className="flex items-start space-x-4">
+                  <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Email
+                    </h3>
+                    <a
+                      href={adminProfile.socialLinks.gmail}
+                      className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    >
+                      {adminProfile.socialLinks.gmail.replace("mailto:", "")}
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <Phone className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Phone
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    +1 (555) 123-4567
-                  </p>
+              )}
+
+              {/* WhatsApp */}
+              {adminProfile?.socialLinks?.whatsapp && (
+                <div className="flex items-start space-x-4">
+                  <MessageCircle className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      WhatsApp
+                    </h3>
+                    <a
+                      href={adminProfile.socialLinks.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    >
+                      {adminProfile.socialLinks.whatsapp
+                        .replace("https://wa.me/", "+")
+                        .replace("/", "")}
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <MapPin className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Location
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Kenitra, Morocco
-                  </p>
+              )}
+
+              {/* Location */}
+              {adminProfile?.location && (
+                <div className="flex items-start space-x-4">
+                  <MapPin className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Location
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {adminProfile.location}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+
+            {/* Social Media Links */}
+            {adminProfile?.socialLinks && (
+              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Connect With Me
+                </h3>
+                <div className="flex flex-wrap gap-4">
+                  {Object.entries(adminProfile.socialLinks)
+                    .filter(
+                      ([key, value]) =>
+                        value && key !== "gmail" && key !== "whatsapp"
+                    )
+                    .map(([platform, url]) => (
+                      <a
+                        key={platform}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      >
+                        <span className="capitalize">{platform}</span>
+                      </a>
+                    ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Contact Form */}

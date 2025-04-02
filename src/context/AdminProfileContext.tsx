@@ -16,6 +16,8 @@ interface SocialLinks {
   instagram?: string;
   youtube?: string;
   behance?: string;
+  gmail?: string;
+  whatsapp?: string;
 }
 
 interface AdminProfile {

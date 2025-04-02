@@ -12,6 +12,7 @@ import {
   Youtube,
   MapPin,
   Mail,
+  MessageCircle,
   Calendar,
 } from "lucide-react";
 
@@ -66,6 +67,16 @@ const About: React.FC = () => {
         ),
         url: adminProfile?.socialLinks?.behance,
         label: "Behance",
+      },
+      {
+        icon: <Mail className="w-5 h-5" />,
+        url: adminProfile?.socialLinks?.gmail,
+        label: "Gmail",
+      },
+      {
+        icon: <MessageCircle className="w-5 h-5" />,
+        url: adminProfile?.socialLinks?.whatsapp,
+        label: "WhatsApp",
       },
     ];
 

@@ -85,6 +85,14 @@ const userSchema = new mongoose.Schema(
         type: String,
         default: "",
       },
+      gmail: {
+        type: String,
+        default: "",
+      },
+      whatsapp: {
+        type: String,
+        default: "",
+      },
     },
     lastLogin: {
       type: Date,
