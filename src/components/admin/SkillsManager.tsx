@@ -107,6 +107,40 @@ const SkillsManager: React.FC = () => {
     }
   };
 
+  // Helper function to validate icon URL/data
+  const validateIcon = (icon: string) => {
+    // Check if it's a valid URL
+    try {
+      new URL(icon);
+      return true;
+    } catch (e) {
+      // Check if it's a valid base64 image
+      if (icon.startsWith("data:image/")) {
+        return true;
+      }
+      // Check if it's a relative path from our backend
+      if (icon.startsWith("skill-icons/")) {
+        return true;
+      }
+      return false;
+    }
+  };
+
+  // Helper function to get full icon URL
+  const getFullIconUrl = (iconPath: string) => {
+    if (!iconPath) return "";
+    if (iconPath.startsWith("http")) return iconPath;
+    if (iconPath.startsWith("data:image/")) return iconPath;
+    // If it's a relative path (e.g., skill-icons/...)
+    if (iconPath.includes("skill-icons/")) {
+      // Extract just the relative path if the full URL is present
+      const match = iconPath.match(/skill-icons\/.*$/);
+      const relativePath = match ? match[0] : iconPath;
+      return `${API_URL}/${relativePath}`;
+    }
+    return `${API_URL}/${iconPath}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -130,24 +164,36 @@ const SkillsManager: React.FC = () => {
         return;
       }
 
+      // Validate icon URL/data
+      if (!validateIcon(formData.icon)) {
+        toast.error("Please enter a valid image URL or base64 data");
+        return;
+      }
+
       // Validate level
       if (formData.level < 1 || formData.level > 10) {
         toast.error("Skill level must be between 1 and 10");
         return;
       }
 
+      // If the icon is a full URL from our backend, extract just the relative path
+      const iconUrl = formData.icon.includes("skill-icons/")
+        ? formData.icon.match(/skill-icons\/.*$/)?.[0] || formData.icon
+        : formData.icon;
+
       const skillData = {
         ...formData,
+        icon: iconUrl,
         order: isEditing ? currentSkill?.order : skills.length,
-        level: Number(formData.level), // Ensure level is a number
+        level: Number(formData.level),
       };
+
+      console.log("Submitting skill data:", skillData);
 
       const url = isEditing
         ? `${API_URL}/api/skills/${currentSkill?._id}`
         : `${API_URL}/api/skills`;
       const method = isEditing ? "PATCH" : "POST";
-
-      console.log("Submitting skill data:", skillData);
 
       const response = await fetch(url, {
         method,
@@ -200,11 +246,16 @@ const SkillsManager: React.FC = () => {
 
   const handleEdit = (skill: Skill) => {
     setCurrentSkill(skill);
+    // For editing, we want to show the relative path if it's a backend-stored image
+    const iconUrl = skill.icon.includes("skill-icons/")
+      ? skill.icon.match(/skill-icons\/.*$/)?.[0] || skill.icon
+      : skill.icon;
+
     setFormData({
       name: skill.name,
       category: skill.category?._id || "",
       level: skill.level,
-      icon: skill.icon,
+      icon: iconUrl,
       order: skill.order,
       isActive: true,
     });
@@ -234,27 +285,27 @@ const SkillsManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
           Skills
         </h2>
         <button
           onClick={resetForm}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
         >
-          <Plus className="h-5 w-5 mr-2" />
+          <Plus className="w-5 h-5" />
           Add Skill
         </button>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
+        className="bg-gradient-to-br from-white/50 to-white/30 dark:from-[#1B2333]/50 dark:to-[#1B2333]/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-800/50 space-y-6"
       >
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Skill Name
           </label>
@@ -263,7 +314,7 @@ const SkillsManager: React.FC = () => {
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             required
           />
         </div>
@@ -271,7 +322,7 @@ const SkillsManager: React.FC = () => {
         <div>
           <label
             htmlFor="category"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Category
           </label>
@@ -282,7 +333,7 @@ const SkillsManager: React.FC = () => {
               console.log("Selected category:", e.target.value);
               setFormData({ ...formData, category: e.target.value });
             }}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             required
           >
             <option value="">Select a category</option>
@@ -302,7 +353,7 @@ const SkillsManager: React.FC = () => {
         <div>
           <label
             htmlFor="level"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Skill Level (1-10)
           </label>
@@ -315,7 +366,7 @@ const SkillsManager: React.FC = () => {
             onChange={(e) =>
               setFormData({ ...formData, level: parseInt(e.target.value) })
             }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             required
           />
         </div>
@@ -323,7 +374,7 @@ const SkillsManager: React.FC = () => {
         <div>
           <label
             htmlFor="icon"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Icon URL
           </label>
@@ -332,41 +383,71 @@ const SkillsManager: React.FC = () => {
             id="icon"
             value={formData.icon}
             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             placeholder="Enter icon URL (e.g., from devicons.dev)"
             required
           />
           {formData.icon && (
             <div className="mt-2 flex items-center space-x-2">
-              <img
-                src={formData.icon}
-                alt="Icon preview"
-                className="h-8 w-8"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  toast.error("Failed to load icon preview");
-                }}
-              />
+              <div className="w-8 h-8 relative">
+                <img
+                  src={getFullIconUrl(formData.icon)}
+                  alt="Icon preview"
+                  className="h-8 w-8 object-contain"
+                  onError={(e) => {
+                    console.error(
+                      `Failed to load icon preview: ${formData.icon}`
+                    );
+                    e.currentTarget.style.display = "none";
+                    toast.error(
+                      "Failed to load icon preview. Please check the URL."
+                    );
+                  }}
+                  onLoad={(e) => {
+                    e.currentTarget.style.display = "block";
+                  }}
+                />
+              </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Icon preview
               </span>
             </div>
           )}
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Tips for icons:
+            <br />
+            1. For tech icons, use{" "}
+            <a
+              href="https://devicon.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-600 dark:text-blue-400"
+            >
+              devicon.dev
+            </a>
+            <br />
+            Example:
+            https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg
+            <br />
+            2. For other icons, use direct image URLs (PNG, SVG, or JPEG)
+            <br />
+            3. Make sure the icon has a transparent or matching background
+          </p>
         </div>
 
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end space-x-4 pt-4">
           {isEditing && (
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1E2A3B] hover:bg-gray-50 dark:hover:bg-[#242E42] transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
               Cancel
             </button>
           )}
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
           >
             {isEditing ? "Update Skill" : "Add Skill"}
           </button>
@@ -374,7 +455,7 @@ const SkillsManager: React.FC = () => {
       </form>
 
       {/* Skills List */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-[#1B2333]/50 dark:to-[#1B2333]/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-800/50">
         {categories.map((category) => {
           const categorySkills = skills.filter(
             (skill) => skill.category && skill.category._id === category._id
@@ -383,15 +464,21 @@ const SkillsManager: React.FC = () => {
 
           return (
             <div key={category._id} className="mb-8 last:mb-0">
-              <div className="flex items-center space-x-2 mb-4">
+              <div className="flex items-center space-x-3 mb-6">
                 {category.icon && (
                   <img
-                    src={category.icon}
+                    src={getFullIconUrl(category.icon)}
                     alt={category.name}
-                    className="h-6 w-6"
+                    className="h-8 w-8 object-contain"
+                    onError={(e) => {
+                      console.error(
+                        `Failed to load category icon: ${category.name}`
+                      );
+                      e.currentTarget.style.display = "none";
+                    }}
                   />
                 )}
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   {category.name}
                 </h3>
               </div>
@@ -399,46 +486,58 @@ const SkillsManager: React.FC = () => {
                 {categorySkills.map((skill) => (
                   <div
                     key={skill._id}
-                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                    className="group relative bg-white dark:bg-[#1E2A3B] rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 hover:-translate-y-1 transform"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity space-x-2">
+                      <button
+                        onClick={() => handleEdit(skill)}
+                        className="p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors hover:scale-110 transform inline-flex"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(skill._id)}
+                        className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors hover:scale-110 transform inline-flex"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
                       {skill.icon && (
-                        <img
-                          src={skill.icon}
-                          alt={skill.name}
-                          className="h-6 w-6"
-                        />
+                        <div className="w-8 h-8 relative flex items-center justify-center">
+                          <img
+                            src={getFullIconUrl(skill.icon)}
+                            alt={skill.name}
+                            className="h-8 w-8 object-contain"
+                            onError={(e) => {
+                              console.error(
+                                `Failed to load icon for skill: ${skill.name}`
+                              );
+                              e.currentTarget.style.display = "none";
+                            }}
+                            onLoad={(e) => {
+                              e.currentTarget.style.display = "block";
+                            }}
+                          />
+                        </div>
                       )}
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                           {skill.name}
                         </h4>
                         <div className="flex items-center space-x-2">
-                          <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                          <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-blue-600 rounded-full"
+                              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
                               style={{ width: `${(skill.level / 10) * 100}%` }}
                             />
                           </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 min-w-[2.5rem] text-right">
                             {skill.level}/10
                           </span>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(skill)}
-                        className="p-1 text-gray-400 hover:text-blue-500 focus:outline-none"
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(skill._id)}
-                        className="p-1 text-gray-400 hover:text-red-500 focus:outline-none"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
                     </div>
                   </div>
                 ))}
