@@ -33,11 +33,7 @@ const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {t("admin.dashboard.title")}
-          </h1>
-        </div>
+  
       </header>
 
       {/* Main Content */}

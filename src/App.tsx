@@ -27,7 +27,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AdminProfileProvider } from "./context/AdminProfileContext";
 import { LanguageProvider } from "./context/LanguageContext";
-import LanguageToggle from "./components/LanguageToggle";
 
 const App: React.FC = () => {
   return (
@@ -38,9 +37,6 @@ const App: React.FC = () => {
             <Router>
               <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <Navbar />
-                <div className="fixed top-4 right-4 z-50">
-                  <LanguageToggle />
-                </div>
                 <main>
                   <Routes>
                     {/* Public routes */}
@@ -81,18 +77,18 @@ const App: React.FC = () => {
                       }
                     />
                     <Route
-                      path="/admin/skills"
-                      element={
-                        <AdminRoute>
-                          <SkillsManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
                       path="/admin/projects"
                       element={
                         <AdminRoute>
                           <ProjectManager />
+                        </AdminRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/skills"
+                      element={
+                        <AdminRoute>
+                          <SkillsManager />
                         </AdminRoute>
                       }
                     />
@@ -113,7 +109,7 @@ const App: React.FC = () => {
                       }
                     />
                     <Route
-                      path="/admin/messages"
+                      path="/admin/contact"
                       element={
                         <AdminRoute>
                           <ContactManager />
@@ -124,7 +120,7 @@ const App: React.FC = () => {
                       path="/admin/about"
                       element={
                         <AdminRoute>
-                          <AdminDashboard />
+                          <AboutSettings />
                         </AdminRoute>
                       }
                     />
@@ -137,7 +133,7 @@ const App: React.FC = () => {
                       }
                     />
 
-                    {/* Catch all route for 404 */}
+                    {/* 404 route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

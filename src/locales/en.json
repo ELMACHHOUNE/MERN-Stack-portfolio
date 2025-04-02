@@ -162,6 +162,7 @@
       "level": "Skill Level",
       "icon": "Icon URL",
       "order": "Display Order",
+      "iconPlaceholder": "Enter icon URL (e.g., {example})",
       "actions": {
         "addSuccess": "Skill added successfully",
         "updateSuccess": "Skill updated successfully",
@@ -344,32 +345,19 @@
       "subtitle": "Fill out the form below and I'll get back to you as soon as possible."
     },
     "management": {
-      "title": "Contact Management",
+      "title": "Contact Messages",
       "messages": {
-        "messageCount": "{{count}} message",
-        "messageCount_plural": "{{count}} messages",
+        "messageCount": "{count} messages",
         "noMessages": "No messages found",
-        "loading": "Loading messages...",
-        "error": "Error loading messages",
-        "deleteSuccess": "Message deleted successfully",
-        "deleteError": "Error deleting message",
+        "error": "Failed to load messages",
+        "markReadError": "Failed to mark message as read",
         "markReadSuccess": "Message marked as read",
-        "markReadError": "Error marking message as read",
-        "markUnreadSuccess": "Message marked as unread",
-        "markUnreadError": "Error marking message as unread",
+        "deleteError": "Failed to delete message",
+        "deleteSuccess": "Message deleted successfully",
         "confirmDelete": "Are you sure you want to delete this message?"
       },
-      "table": {
-        "name": "Name",
-        "email": "Email",
-        "subject": "Subject",
-        "message": "Message",
-        "date": "Date",
-        "status": "Status",
-        "actions": "Actions"
-      },
       "status": {
-        "read": "Read",
+        "read": "Mark as read",
         "unread": "Unread"
       }
     }

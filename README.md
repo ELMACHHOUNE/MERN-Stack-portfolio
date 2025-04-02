@@ -1,44 +1,36 @@
 # MERN Stack Portfolio
 
-A modern, responsive portfolio website built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring a dark mode, admin dashboard, and dynamic content management.
+A modern, responsive portfolio website built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring a beautiful UI, dark mode support, and multilingual capabilities.
 
 ## Features
 
-- 🌙 Dark/Light Mode Toggle
-- 📱 Fully Responsive Design
-- 🔐 Secure Authentication System
-- 👨‍💼 Admin Dashboard
-- 📊 Dynamic Content Management
-- 🎨 Modern UI with Tailwind CSS
-- ⚡ Fast Performance
-- 🔒 Protected Admin Routes
-- 📝 Contact Form
-- 🎯 Skills Management
-- 📁 Project Management
-- 📚 Experience Management
-- 📋 Category Management
+- 🌐 **Multilingual Support**: Built-in translation system supporting English and French
+- 🌓 **Dark Mode**: Seamless dark/light theme switching
+- 📱 **Responsive Design**: Fully responsive layout for all devices
+- 🔒 **Authentication**: Secure user authentication with JWT
+- 👑 **Admin Dashboard**: Comprehensive admin panel for content management
+- 📬 **Contact Form**: Interactive contact form with email notifications
+- 🎨 **Modern UI**: Beautiful and intuitive user interface
+- ⚡ **Performance Optimized**: Fast loading times and smooth transitions
 
 ## Tech Stack
 
 ### Frontend
 
-- React.js
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- React Router
-- Context API
-- Axios
+- React.js with TypeScript
+- Tailwind CSS for styling
+- Framer Motion for animations
+- React Router for navigation
+- Context API for state management
+- i18n for internationalization
 
 ### Backend
 
-- Node.js
-- Express.js
-- MongoDB
-- JWT Authentication
-- Mongoose
-- CORS
-- Express Validator
+- Node.js with Express
+- MongoDB with Mongoose
+- JWT for authentication
+- Nodemailer for email notifications
+- Nodemon for development
 
 ## Getting Started
 
@@ -47,111 +39,100 @@ A modern, responsive portfolio website built with the MERN stack (MongoDB, Expre
 - Node.js (v14 or higher)
 - MongoDB
 - npm or yarn
+- nodemon (for development)
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/yourusername/MERN-Stack-portfolio.git
 cd MERN-Stack-portfolio
 ```
 
-2. Install dependencies
+2. Install dependencies:
 
 ```bash
 # Install frontend dependencies
-cd frontend
+cd client
 npm install
 
 # Install backend dependencies
-cd ../backend
+cd ../server
 npm install
+
+# Install nodemon globally (if not already installed)
+npm install -g nodemon
 ```
 
-3. Set up environment variables
+3. Set up environment variables:
+   Create a `.env` file in the server directory with the following variables:
 
-```bash
-# Frontend (.env)
-VITE_API_URL=http://localhost:5000
-
-# Backend (.env)
-PORT=5000
+```env
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
+EMAIL_USER=your_email
+EMAIL_PASS=your_email_password
 ```
 
-4. Start the development servers
+4. Start the development servers:
 
 ```bash
-# Start backend server
-cd backend
-npm run dev
+# Start backend server with nodemon (in one terminal)
+cd server
+nodemon
 
-# Start frontend server
-cd frontend
+# Start frontend server (in another terminal)
+cd client
 npm run dev
 ```
+
+The application will be available at:
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5000
 
 ## Project Structure
 
 ```
 MERN-Stack-portfolio/
-├── frontend/
+├── client/                 # Frontend React application
 │   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── types/
-│   │   └── utils/
-│   ├── public/
-│   └── package.json
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   └── utils/
-│   └── package.json
-└── README.md
+│   │   ├── components/    # Reusable components
+│   │   ├── context/       # React context providers
+│   │   ├── locales/       # Translation files
+│   │   ├── pages/         # Page components
+│   │   └── utils/         # Utility functions
+│   └── public/            # Static assets
+└── server/                # Backend Node.js application
+    ├── controllers/       # Route controllers
+    ├── models/           # MongoDB models
+    ├── routes/           # API routes
+    └── middleware/       # Custom middleware
 ```
 
-## API Endpoints
+## Translation System
 
-### Authentication
+The application uses a custom translation system built with React Context. Translation files are located in `src/locales/`:
 
-- POST /api/auth/register - Register a new user
-- POST /api/auth/login - Login user
-- GET /api/auth/me - Get current user
-- POST /api/auth/logout - Logout user
+- `en.json`: English translations
+- `fr.json`: French translations
 
-### Admin
+To add new translations:
 
-- GET /api/auth/admin/users - Get all users
-- PUT /api/auth/admin/users/:id - Update user
-- DELETE /api/auth/admin/users/:id - Delete user
+1. Add the translation key to both language files
+2. Use the `useLanguage` hook in your components:
 
-### Skills
+```typescript
+const { t } = useLanguage();
+t("your.translation.key");
+```
 
-- GET /api/skills - Get all skills
-- POST /api/skills - Create new skill
-- PUT /api/skills/:id - Update skill
-- DELETE /api/skills/:id - Delete skill
+For interpolation:
 
-### Projects
-
-- GET /api/projects - Get all projects
-- POST /api/projects - Create new project
-- PUT /api/projects/:id - Update project
-- DELETE /api/projects/:id - Delete project
-
-### Categories
-
-- GET /api/categories - Get all categories
-- POST /api/categories - Create new category
-- PUT /api/categories/:id - Update category
-- DELETE /api/categories/:id - Delete category
+```typescript
+t("your.translation.key", { variable: "value" });
+```
 
 ## Contributing
 
@@ -169,9 +150,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [Framer Motion](https://www.framer.com/motion/)
 - [MongoDB](https://www.mongodb.com/)
 - [Express.js](https://expressjs.com/)
-- [Node.js](https://nodejs.org/)
+- [Nodemon](https://nodemon.io/)
 
 ## Contact
 

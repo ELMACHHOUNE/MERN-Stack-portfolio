@@ -18,6 +18,7 @@ import {
   Sun,
   Moon,
   Settings,
+  Globe,
 } from "lucide-react";
 
 const Navbar: React.FC = () => {
@@ -26,7 +27,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
@@ -69,6 +70,10 @@ const Navbar: React.FC = () => {
     return location.pathname.startsWith(path);
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "fr" : "en");
+  };
+
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -89,7 +94,7 @@ const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -127,6 +132,18 @@ const Navbar: React.FC = () => {
                 {t("navbar.menu.dashboard")}
               </Link>
             )}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={`${t("language.switchTo")} ${
+                language === "en" ? t("language.french") : t("language.english")
+              }`}
+            >
+              <Globe className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                {language.toUpperCase()}
+              </span>
+            </button>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -211,7 +228,19 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden items-center space-x-4">
+          <div className="flex items-center space-x-2 md:hidden">
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={`${t("language.switchTo")} ${
+                language === "en" ? t("language.french") : t("language.english")
+              }`}
+            >
+              <Globe className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                {language.toUpperCase()}
+              </span>
+            </button>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -275,48 +304,25 @@ const Navbar: React.FC = () => {
                 </Link>
               )}
               {user ? (
-                <div className="px-3 py-2">
-                  <div className="flex items-center space-x-3 mb-3">
-                    {user.profileImage ? (
-                      <img
-                        className="h-8 w-8 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700"
-                        src={`${API_URL}${user.profileImage}`}
-                        alt={user.name}
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
-                        <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {user.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Link
-                      to="/profile"
-                      className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Settings className="w-5 h-5" />
-                      <span>{t("navbar.profile.settings")}</span>
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setIsOpen(false);
-                        handleLogout();
-                      }}
-                      className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span>{t("navbar.profile.signOut")}</span>
-                    </button>
-                  </div>
+                <div className="space-y-1">
+                  <Link
+                    to="/profile"
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span>{t("navbar.profile.settings")}</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>{t("navbar.profile.signOut")}</span>
+                  </button>
                 </div>
               ) : (
                 <Link

@@ -272,7 +272,7 @@ const Contact: React.FC = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder={t("contact.namePlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("name")
                       ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
@@ -299,7 +299,7 @@ const Contact: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder={t("contact.emailPlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("email")
                       ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
@@ -326,7 +326,7 @@ const Contact: React.FC = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   placeholder={t("contact.subjectPlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("subject")
                       ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"
@@ -353,7 +353,7 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   placeholder={t("contact.messagePlaceholder")}
                   rows={4}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("message")
                       ? "border-red-500 dark:border-red-400"
                       : "border-gray-300 dark:border-gray-600"

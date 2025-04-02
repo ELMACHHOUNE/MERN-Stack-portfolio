@@ -7,7 +7,7 @@ type Language = "en" | "fr";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -31,7 +31,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("language", language);
   }, [language]);
 
-  const t = (key: string): string => {
+  const t = (key: string, values?: Record<string, string | number>): string => {
     const keys = key.split(".");
     let value: any = translations[language];
 
@@ -41,6 +41,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
         console.warn(`Translation key not found: ${key}`);
         return key;
       }
+    }
+
+    if (values) {
+      return value.replace(/\{(\w+)\}/g, (match: string, key: string) => {
+        return values[key]?.toString() || match;
+      });
     }
 
     return value;

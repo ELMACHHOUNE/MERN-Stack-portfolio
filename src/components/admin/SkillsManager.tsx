@@ -319,7 +319,9 @@ const SkillsManager: React.FC = () => {
             value={formData.icon}
             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder={t("skills.management.iconPlaceholder")}
+            placeholder={t("skills.management.iconPlaceholder", {
+              example: "https://example.com/icons/skill.png",
+            })}
             required
           />
           {formData.icon && (

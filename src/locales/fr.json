@@ -206,6 +206,7 @@
       "level": "Niveau de compétence",
       "icon": "URL de l'icône",
       "order": "Ordre d'affichage",
+      "iconPlaceholder": "Entrez l'URL de l'icône (ex., {example})",
       "actions": {
         "addSuccess": "Compétence ajoutée avec succès",
         "updateSuccess": "Compétence mise à jour avec succès",
@@ -397,29 +398,19 @@
       "subtitle": "Remplissez le formulaire ci-dessous et je vous répondrai dans les plus brefs délais."
     },
     "management": {
-      "title": "Gestion des Contacts",
+      "title": "Messages de Contact",
       "messages": {
+        "messageCount": "{count} messages",
         "noMessages": "Aucun message trouvé",
-        "loading": "Chargement des messages...",
-        "error": "Erreur lors du chargement des messages",
-        "deleteSuccess": "Message supprimé avec succès",
-        "deleteError": "Erreur lors de la suppression du message",
+        "error": "Échec du chargement des messages",
+        "markReadError": "Échec du marquage du message comme lu",
         "markReadSuccess": "Message marqué comme lu",
-        "markReadError": "Erreur lors du marquage du message comme lu",
-        "markUnreadSuccess": "Message marqué comme non lu",
-        "markUnreadError": "Erreur lors du marquage du message comme non lu"
-      },
-      "table": {
-        "name": "Nom",
-        "email": "Email",
-        "subject": "Sujet",
-        "message": "Message",
-        "date": "Date",
-        "status": "Statut",
-        "actions": "Actions"
+        "deleteError": "Échec de la suppression du message",
+        "deleteSuccess": "Message supprimé avec succès",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce message ?"
       },
       "status": {
-        "read": "Lu",
+        "read": "Marquer comme lu",
         "unread": "Non lu"
       }
     }
