@@ -207,4 +207,36 @@ router.put("/admin-profile", protect, admin, async (req, res) => {
   }
 });
 
+// Get public admin profile
+router.get("/public-profile", async (req, res) => {
+  try {
+    // Find the admin user with all necessary fields
+    const adminUser = await User.findOne({ isAdmin: true })
+      .select("-password -__v -createdAt -updatedAt")
+      .lean();
+
+    if (!adminUser) {
+      return res.status(404).json({ message: "Admin profile not found" });
+    }
+
+    // Ensure all required fields have default values if not set
+    const publicProfile = {
+      name: adminUser.name || "Admin User",
+      email: adminUser.email || "",
+      title: adminUser.title || "Full Stack Developer",
+      location: adminUser.location || "Location not specified",
+      bio: adminUser.bio || "No bio available",
+      profileImage: adminUser.profileImage || null,
+      interests: adminUser.interests || [],
+      values: adminUser.values || [],
+      socialLinks: adminUser.socialLinks || {},
+    };
+
+    res.json(publicProfile);
+  } catch (error) {
+    console.error("Error fetching public admin profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

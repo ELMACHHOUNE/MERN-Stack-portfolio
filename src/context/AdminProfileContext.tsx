@@ -60,27 +60,44 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchAdminProfile = async () => {
-    if (!user?.isAdmin || !token) {
-      setIsLoading(false);
-      return null;
-    }
-
     try {
-      const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("token");
+      const headers: HeadersInit = {};
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch admin profile");
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
 
-      const data = await response.json();
-      setAdminProfile(data);
-      return data;
+      // If user is logged in as admin, fetch their profile
+      if (user?.isAdmin && token) {
+        const response = await fetch(`${API_URL}/api/settings/profile`, {
+          headers,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch admin profile");
+        }
+
+        const data = await response.json();
+        setAdminProfile(data);
+        return data;
+      }
+      // If user is logged in but not admin, or not logged in at all, fetch public admin profile
+      else {
+        const response = await fetch(`${API_URL}/api/settings/public-profile`, {
+          headers,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch public admin profile");
+        }
+
+        const data = await response.json();
+        setAdminProfile(data);
+        return data;
+      }
     } catch (error) {
-      console.error("Error fetching admin profile:", error);
+      console.error("Error fetching profile:", error);
       return null;
     } finally {
       setIsLoading(false);

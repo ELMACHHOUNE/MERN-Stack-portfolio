@@ -298,7 +298,14 @@
         "imageUrl": "URL de l'image du projet",
         "githubUrl": "URL du dépôt GitHub",
         "liveUrl": "URL du projet en ligne",
-        "featured": "Projet mis en avant"
+        "features": "Fonctionnalités du projet",
+        "featuresPlaceholder": "Entrez les fonctionnalités (ex: Authentification utilisateur, Chat en temps réel)",
+        "category": "Catégorie du projet",
+        "selectCategory": "Sélectionner une catégorie",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "isActive": "Projet actif",
+        "order": "Ordre d'affichage"
       },
       "actions": {
         "addSuccess": "Projet ajouté avec succès",

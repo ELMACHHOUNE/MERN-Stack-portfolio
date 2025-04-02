@@ -245,7 +245,14 @@
         "imageUrl": "Project Image URL",
         "githubUrl": "GitHub Repository URL",
         "liveUrl": "Live Project URL",
-        "featured": "Featured Project"
+        "features": "Project Features",
+        "featuresPlaceholder": "Enter features (e.g., User Authentication, Real-time Chat)",
+        "category": "Project Category",
+        "selectCategory": "Select a category",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "isActive": "Active Project",
+        "order": "Display Order"
       },
       "actions": {
         "addSuccess": "Project added successfully",
