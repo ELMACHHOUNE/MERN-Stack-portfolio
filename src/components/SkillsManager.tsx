@@ -10,6 +10,8 @@ interface Skill {
   category: string;
   order: number;
   isActive: boolean;
+  level: number;
+  icon: string;
 }
 
 const SkillsManager: React.FC = () => {
@@ -18,11 +20,20 @@ const SkillsManager: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    category: string;
+    level: number;
+    icon: string;
+    order: number;
+    isActive: boolean;
+  }>({
     name: "",
     category: "frontend",
     level: 50,
     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+    order: 0,
+    isActive: true,
   });
 
   const fetchSkills = async () => {
@@ -122,8 +133,12 @@ const SkillsManager: React.FC = () => {
     setFormData({
       name: skill.name,
       category: skill.category,
-      level: 50,
-      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+      level: skill.level,
+      icon:
+        skill.icon ||
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+      order: skill.order,
+      isActive: true,
     });
     setShowForm(true);
   };
@@ -135,6 +150,8 @@ const SkillsManager: React.FC = () => {
       category: "frontend",
       level: 50,
       icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+      order: 0,
+      isActive: true,
     });
     setShowForm(false);
   };
