@@ -159,6 +159,7 @@
       "name": "Skill Name",
       "category": "Category",
       "selectSkillsCategory": "Select Skills Category",
+      "noCategories": "No categories available. Please add categories first.",
       "level": "Skill Level",
       "icon": "Icon URL",
       "order": "Display Order",
@@ -231,6 +232,9 @@
     "loading": "Loading projects...",
     "error": "Failed to load projects",
     "noProjects": "No projects found",
+    "categories": {
+      "category": "Categories"
+    },
     "management": {
       "title": "Project Management",
       "addProject": "Add New Project",

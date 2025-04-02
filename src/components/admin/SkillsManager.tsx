@@ -105,6 +105,21 @@ const SkillsManager: React.FC = () => {
     }
   };
 
+  const convertToCDNUrl = (iconUrl: string) => {
+    // If it's already a CDN URL, return as is
+    if (iconUrl.startsWith("http")) {
+      return iconUrl;
+    }
+
+    // If it's a local path, convert it to the full CDN URL
+    if (iconUrl.startsWith("skill-icons/")) {
+      return `${API_URL}/uploads/${iconUrl}`;
+    }
+
+    // Default to Devicon CDN if no URL is provided
+    return "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -128,6 +143,9 @@ const SkillsManager: React.FC = () => {
         ...formData,
         order: isEditing ? currentSkill?.order : skills.length,
         level: Number(formData.level),
+        icon: formData.icon.startsWith("http")
+          ? formData.icon
+          : `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formData.name.toLowerCase()}/${formData.name.toLowerCase()}-original.svg`,
       };
 
       const url = isEditing
@@ -189,7 +207,9 @@ const SkillsManager: React.FC = () => {
       name: skill.name,
       category: skill.category?._id || "",
       level: skill.level,
-      icon: skill.icon,
+      icon: skill.icon.startsWith("http")
+        ? skill.icon
+        : `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.name.toLowerCase()}/${skill.name.toLowerCase()}-original.svg`,
       order: skill.order,
       isActive: true,
     });
@@ -201,7 +221,7 @@ const SkillsManager: React.FC = () => {
       name: "",
       category: "",
       level: 5,
-      icon: "",
+      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
       order: 0,
       isActive: true,
     });
@@ -313,41 +333,49 @@ const SkillsManager: React.FC = () => {
           >
             {t("skills.management.icon")}
           </label>
-          <input
-            type="text"
-            id="icon"
-            value={formData.icon}
-            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder={t("skills.management.iconPlaceholder", {
-              example: "https://example.com/icons/skill.png",
-            })}
-            required
-          />
-          {formData.icon && (
-            <div className="mt-2 flex items-center space-x-2">
-              <div className="relative w-8 h-8">
-                <img
-                  src={formData.icon}
-                  alt={t("skills.management.iconPreview")}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                    const parent = target.parentNode as HTMLElement;
-                    const fallback = document.createElement("div");
-                    fallback.className =
-                      "w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded";
-                    fallback.innerHTML = `<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
-                    parent.appendChild(fallback);
-                  }}
-                />
+          <div className="space-y-2">
+            <input
+              type="text"
+              id="icon"
+              value={formData.icon}
+              onChange={(e) =>
+                setFormData({ ...formData, icon: e.target.value })
+              }
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+              placeholder="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+              required
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("skills.management.iconPlaceholder", {
+                example:
+                  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+              })}
+            </p>
+            {formData.icon && (
+              <div className="mt-2 flex items-center space-x-4">
+                <div className="relative w-8 h-8">
+                  <img
+                    src={formData.icon}
+                    alt="Icon preview"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                      const parent = target.parentNode as HTMLElement;
+                      const fallback = document.createElement("div");
+                      fallback.className =
+                        "w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded";
+                      fallback.innerHTML = `<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
+                      parent.appendChild(fallback);
+                    }}
+                  />
+                </div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("skills.management.iconPreview")}
+                </span>
               </div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {t("skills.management.iconPreview")}
-              </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="flex justify-end space-x-4 pt-4">

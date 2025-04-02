@@ -203,6 +203,7 @@
       "name": "Nom de la compétence",
       "category": "Catégorie",
       "selectSkillsCategory": "Sélectionner la catégorie de compétences",
+      "noCategories": "Aucune catégorie disponible. Veuillez d'abord ajouter des catégories.",
       "level": "Niveau de compétence",
       "icon": "URL de l'icône",
       "order": "Ordre d'affichage",
@@ -284,6 +285,9 @@
     "loading": "Chargement des projets...",
     "error": "Échec du chargement des projets",
     "noProjects": "Aucun projet trouvé",
+    "categories": {
+      "category": "Catégories"
+    },
     "management": {
       "title": "Gestion des projets",
       "addProject": "Ajouter un nouveau projet",
