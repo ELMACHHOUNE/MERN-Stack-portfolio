@@ -189,73 +189,87 @@ const CategoryManager: React.FC = () => {
             {/* Add Category Form */}
             <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                Add New Category
+                {isEditing ? "Edit Category" : "Add New Category"}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    htmlFor="categoryName"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Category Name
-                  </label>
-                  <input
-                    type="text"
-                    id="categoryName"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter category name"
-                  />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      htmlFor="categoryName"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Category Name
+                    </label>
+                    <input
+                      type="text"
+                      id="categoryName"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter category name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="categoryIcon"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Icon URL
+                    </label>
+                    <input
+                      type="url"
+                      id="categoryIcon"
+                      value={formData.icon}
+                      onChange={(e) =>
+                        setFormData({ ...formData, icon: e.target.value })
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter icon URL"
+                      required
+                    />
+                  </div>
                 </div>
                 <div>
                   <label
-                    htmlFor="categoryIcon"
+                    htmlFor="categoryDescription"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Icon URL
+                    Description
                   </label>
-                  <input
-                    type="url"
-                    id="categoryIcon"
-                    value={formData.icon}
+                  <textarea
+                    id="categoryDescription"
+                    value={formData.description}
                     onChange={(e) =>
-                      setFormData({ ...formData, icon: e.target.value })
+                      setFormData({ ...formData, description: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter icon URL"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    placeholder="Enter category description"
+                    required
                   />
                 </div>
-              </div>
-              <div className="mt-6">
-                <label
-                  htmlFor="categoryDescription"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="categoryDescription"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                  placeholder="Enter category description"
-                />
-              </div>
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  {isEditing ? "Update Category" : "Add Category"}
-                </button>
-              </div>
+                <div className="flex justify-end gap-4">
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    {isEditing ? "Update Category" : "Add Category"}
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Categories List */}

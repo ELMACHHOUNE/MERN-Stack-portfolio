@@ -16,8 +16,25 @@ import {
   Github,
   Linkedin,
   Mail,
+  LucideIcon,
+  Server,
+  Globe,
+  Layout,
+  Cpu,
+  Smartphone,
+  Code2,
+  Box,
+  Layers,
+  Settings,
+  Monitor,
 } from "lucide-react";
 import { ArrowRight } from "lucide-react";
+
+interface SocialLink {
+  icon: LucideIcon;
+  url: string;
+  label: string;
+}
 
 interface AdminProfile {
   name: string;
@@ -28,6 +45,25 @@ interface AdminProfile {
   bio?: string;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+  description: string;
+  icon: string;
+  order: number;
+  isActive: boolean;
+}
+
+interface Skill {
+  _id: string;
+  name: string;
+  level: number;
+  category: Category;
+  icon?: string;
+  order?: number;
+  isActive: boolean;
+}
+
 const defaultProfile = {
   name: "Your Name",
   title: "Full Stack Developer",
@@ -36,9 +72,38 @@ const defaultProfile = {
   and cloud architecture. Let's build something amazing together.`,
 };
 
+const defaultSocialLinks: SocialLink[] = [
+  {
+    icon: Github,
+    url: "https://github.com/yourusername",
+    label: "GitHub",
+  },
+  {
+    icon: Linkedin,
+    url: "https://linkedin.com/in/yourusername",
+    label: "LinkedIn",
+  },
+  {
+    icon: Mail,
+    url: "mailto:youremail@example.com",
+    label: "Email",
+  },
+];
+
+const getSkillLevel = (level: number): string => {
+  if (level >= 90) return "Expert";
+  if (level >= 75) return "Advanced";
+  if (level >= 50) return "Intermediate";
+  if (level >= 25) return "Basic";
+  return "Beginner";
+};
+
 const Home: React.FC = () => {
-  const { user } = useAuth();
-  const { adminProfile, loading, error } = useAdminProfile();
+  const { adminProfile } = useAdminProfile();
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
@@ -48,24 +113,102 @@ const Home: React.FC = () => {
     setIsVisible(true);
   }, []);
 
-  const technologies = [
-    {
-      name: "Frontend",
-      icon: Laptop,
-      items: ["React", "TypeScript", "Tailwind CSS"],
-    },
-    {
-      name: "Backend",
-      icon: Terminal,
-      items: ["Node.js", "Express", "MongoDB"],
-    },
-    { name: "Cloud", icon: Cloud, items: ["AWS", "Docker", "CI/CD"] },
-    {
-      name: "Database",
-      icon: Database,
-      items: ["MongoDB", "PostgreSQL", "Redis"],
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories first
+        const categoriesResponse = await fetch(
+          "http://localhost:5000/api/categories"
+        );
+        if (!categoriesResponse.ok) {
+          throw new Error(
+            `Failed to fetch categories: ${categoriesResponse.status}`
+          );
+        }
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
+
+        // Then fetch skills
+        const skillsResponse = await fetch("http://localhost:5000/api/skills");
+        if (!skillsResponse.ok) {
+          throw new Error(`Failed to fetch skills: ${skillsResponse.status}`);
+        }
+        const skillsData = await skillsResponse.json();
+        console.log("Raw skills data:", skillsData);
+
+        // Filter active skills and normalize the data
+        const activeSkills = skillsData
+          .filter((skill: Skill) => skill.isActive)
+          .map((skill: Skill) => ({
+            ...skill,
+            // Multiply by 10 if the level is less than 10 (assuming it's in 0-10 scale)
+            level: skill.level < 10 ? skill.level * 10 : skill.level,
+            // Ensure icon path is absolute and handle both full URLs and relative paths
+            icon: skill.icon
+              ? skill.icon.startsWith("http")
+                ? skill.icon
+                : `http://localhost:5000/uploads/${skill.icon.replace(
+                    /^\/+/,
+                    ""
+                  )}`
+              : null,
+          }))
+          .sort((a: Skill, b: Skill) => (a.order || 0) - (b.order || 0));
+
+        console.log("Processed active skills:", activeSkills);
+        setSkills(activeSkills);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Map icon strings to actual icon components
+  const getIconComponent = (category: Category) => {
+    const iconMap: { [key: string]: any } = {
+      frontend: Layout,
+      backend: Server,
+      database: Database,
+      cloud: Cloud,
+      mobile: Smartphone,
+      tools: Settings,
+      testing: Code2,
+      devops: Cloud,
+      "tools & others": Settings,
+      default: Code,
+    };
+
+    // Try to match by category name
+    const icon = iconMap[category.name.toLowerCase()] || iconMap.default;
+    return icon;
+  };
+
+  // Group skills by category
+  const getSkillsByCategory = () => {
+    if (!Array.isArray(skills) || !Array.isArray(categories)) return [];
+
+    return categories
+      .filter((category) => category.isActive)
+      .map((category) => ({
+        category,
+        skills: skills
+          .filter(
+            (skill) =>
+              skill.isActive &&
+              skill.category &&
+              skill.category._id === category._id
+          )
+          .sort((a, b) => (a.order || 0) - (b.order || 0)),
+      }))
+      .filter((group) => group.skills.length > 0);
+  };
 
   const personalInfo = {
     name: adminProfile?.name || defaultProfile.name,
@@ -98,23 +241,20 @@ const Home: React.FC = () => {
           "Pushing boundaries with cutting-edge technologies and approaches.",
       },
     ],
-    socialLinks: [
-      {
-        icon: Github,
-        url: "https://github.com/yourusername",
-        label: "GitHub",
-      },
-      {
-        icon: Linkedin,
-        url: "https://linkedin.com/in/yourusername",
-        label: "LinkedIn",
-      },
-      {
-        icon: Mail,
-        url: "https://twitter.com/yourusername",
-        label: "Twitter",
-      },
-    ],
+    socialLinks: Array.isArray(adminProfile?.socialLinks)
+      ? adminProfile.socialLinks.map((link: any) => ({
+          icon:
+            link.platform === "github"
+              ? Github
+              : link.platform === "linkedin"
+              ? Linkedin
+              : link.platform === "email"
+              ? Mail
+              : Github,
+          url: link.url || "#",
+          label: link.platform || "Social Link",
+        }))
+      : defaultSocialLinks,
   };
 
   return (
@@ -198,33 +338,172 @@ const Home: React.FC = () => {
               Modern tools for modern solutions
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {technologies.map((tech, index) => (
-              <motion.div
-                key={tech.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
-              >
-                <tech.icon className="h-12 w-12 text-blue-500 dark:text-blue-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  {tech.name}
-                </h3>
-                <ul className="space-y-2">
-                  {tech.items.map((item) => (
-                    <li
-                      key={item}
-                      className="text-gray-600 dark:text-gray-300 flex items-center"
-                    >
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              // Loading skeleton
+              [...Array(3)].map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 animate-pulse"
+                >
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={`item-${i}`}
+                        className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"
+                      ></div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : error ? (
+              <div className="col-span-3 text-center text-red-500">{error}</div>
+            ) : skills.length === 0 ? (
+              <div className="col-span-3 text-center text-gray-500 dark:text-gray-400">
+                No skills found
+              </div>
+            ) : (
+              getSkillsByCategory().map(({ category, skills }, index) => {
+                const IconComponent = getIconComponent(category);
+
+                return (
+                  <motion.div
+                    key={category._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                  >
+                    <IconComponent className="h-12 w-12 text-blue-500 dark:text-blue-400 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 capitalize">
+                      {category.name}
+                    </h3>
+                    <div className="space-y-6">
+                      {skills.map((skill) => (
+                        <div key={skill._id} className="group">
+                          <div className="flex justify-between items-center text-sm mb-2">
+                            <div className="flex items-center space-x-2">
+                              {skill.icon ? (
+                                <img
+                                  src={skill.icon}
+                                  alt={skill.name}
+                                  className="w-5 h-5 object-contain"
+                                  onError={(e) => {
+                                    console.log(
+                                      "Image failed to load:",
+                                      skill.icon
+                                    );
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.style.display = "none";
+                                    const parent =
+                                      target.parentNode as HTMLElement;
+
+                                    // Use category-specific icon as fallback
+                                    const IconComponent = getIconComponent(
+                                      skill.category
+                                    );
+                                    const fallbackIcon =
+                                      document.createElement("span");
+                                    fallbackIcon.className =
+                                      "w-5 h-5 text-blue-500 dark:text-blue-400";
+
+                                    // Create SVG element using the category icon
+                                    const iconSvg = document.createElementNS(
+                                      "http://www.w3.org/2000/svg",
+                                      "svg"
+                                    );
+                                    iconSvg.setAttribute(
+                                      "viewBox",
+                                      "0 0 24 24"
+                                    );
+                                    iconSvg.setAttribute("width", "20");
+                                    iconSvg.setAttribute("height", "20");
+                                    iconSvg.setAttribute("fill", "none");
+                                    iconSvg.setAttribute(
+                                      "stroke",
+                                      "currentColor"
+                                    );
+                                    iconSvg.setAttribute("stroke-width", "2");
+                                    iconSvg.setAttribute(
+                                      "stroke-linecap",
+                                      "round"
+                                    );
+                                    iconSvg.setAttribute(
+                                      "stroke-linejoin",
+                                      "round"
+                                    );
+
+                                    // Use a simple code icon path as fallback
+                                    iconSvg.innerHTML = `
+                                      <path d="M16 18l6-6-6-6"></path>
+                                      <path d="M8 6l-6 6 6 6"></path>
+                                    `;
+
+                                    fallbackIcon.appendChild(iconSvg);
+                                    parent.appendChild(fallbackIcon);
+                                  }}
+                                />
+                              ) : (
+                                <span className="w-5 h-5 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-md">
+                                  <Code2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                                </span>
+                              )}
+                              <span className="text-gray-700 dark:text-gray-200 font-medium">
+                                {skill.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="relative">
+                                <motion.span
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-blue-500 dark:bg-blue-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                >
+                                  {skill.level}%
+                                </motion.span>
+                                <span className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-400/20 dark:to-purple-400/20 text-blue-600 dark:text-blue-400 rounded-full font-medium text-xs">
+                                  {getSkillLevel(skill.level)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="relative h-2.5 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-xl">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${skill.level}%` }}
+                              transition={{
+                                duration: 1.5,
+                                ease: [0.4, 0, 0.2, 1],
+                                delay: 0.2,
+                              }}
+                              className="absolute top-0 left-0 h-full rounded-full"
+                            >
+                              <div className="relative w-full h-full">
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-purple-500 dark:from-blue-400 dark:via-blue-300 dark:to-purple-400 animate-gradient" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" />
+                              </div>
+                            </motion.div>
+                            <div className="absolute inset-0 flex justify-between px-1">
+                              {[25, 50, 75].map((marker) => (
+                                <div
+                                  key={marker}
+                                  className="w-px h-full bg-gray-200 dark:bg-gray-600/50"
+                                  style={{ left: `${marker}%` }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
           </div>
         </div>
       </section>
