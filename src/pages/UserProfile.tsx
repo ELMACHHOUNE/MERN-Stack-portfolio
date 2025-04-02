@@ -3,7 +3,17 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { toast } from "react-toastify";
 import { API_URL } from "../config";
-import { User, Mail, Lock, Save, AlertCircle, Eye, EyeOff } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  Save,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Camera,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ProfileFormData {
   name: string;
@@ -155,301 +165,213 @@ const UserProfile: React.FC = () => {
   };
 
   return (
-    <div
-      className={`min-h-screen py-8 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
-      }`}
-    >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          className={`rounded-lg shadow p-6 ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1120] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800"
         >
-          <h2
-            className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent mb-8">
             Profile Settings
           </h2>
 
           {/* Profile Image Section */}
-          <div className="mb-8 flex items-center">
-            <div className="relative">
-              <div
-                className={`w-24 h-24 rounded-full overflow-hidden ${
-                  isDarkMode ? "bg-gray-700" : "bg-gray-100"
-                }`}
-              >
-                {profileImage ? (
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <User className="h-5 w-5" />
-                  </div>
-                )}
+          <div className="mb-8">
+            <div className="flex items-center space-x-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
+                      <User className="w-16 h-16 text-blue-500 dark:text-blue-400" />
+                    </div>
+                  )}
+                  <label
+                    htmlFor="profile-image"
+                    className="absolute bottom-2 right-2 bg-white dark:bg-[#1B2333] p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#242E42] transition-colors border border-gray-200 dark:border-gray-700"
+                  >
+                    <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    <input
+                      type="file"
+                      id="profile-image"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                    />
+                  </label>
+                </div>
               </div>
-              <label
-                htmlFor="profile-image"
-                className="absolute bottom-0 right-0 bg-indigo-600 rounded-full p-2 cursor-pointer hover:bg-indigo-700 transition-colors duration-200"
-              >
-                <Save className="w-4 h-4 text-white" />
-                <input
-                  type="file"
-                  id="profile-image"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUploading}
-                />
-              </label>
-            </div>
-            <div className="ml-6">
-              <h3
-                className={`text-lg font-medium ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {user?.name}
-              </h3>
-              <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                {user?.email}
-              </p>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {user?.name}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {user?.email}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                  Update your profile picture and personal details here
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Profile Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="name"
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Name
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5" />
-                </div>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`pl-10 block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Email
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`pl-10 block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label
-                htmlFor="current-password"
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Current Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock
-                    className={`h-5 w-5 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Your full name"
                   />
                 </div>
-                <input
-                  type={showCurrentPassword ? "text" : "password"}
-                  name="currentPassword"
-                  id="current-password"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  className={`pl-10 pr-10 block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showCurrentPassword ? (
-                    <EyeOff
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  ) : (
-                    <Eye
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  )}
-                </button>
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="new-password"
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                New Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock
-                    className={`h-5 w-5 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="your.email@example.com"
                   />
                 </div>
-                <input
-                  type={showNewPassword ? "text" : "password"}
-                  name="newPassword"
-                  id="new-password"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  className={`pl-10 pr-10 block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showNewPassword ? (
-                    <EyeOff
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  ) : (
-                    <Eye
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  )}
-                </button>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="confirm-password"
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Confirm New Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock
-                    className={`h-5 w-5 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+            <div className="bg-gray-50 dark:bg-[#1B2333]/50 rounded-2xl p-6 space-y-6 border border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Change Password
+              </h3>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Current Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type={showCurrentPassword ? "text" : "password"}
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter current password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  >
+                    {showCurrentPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    )}
+                  </button>
                 </div>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  id="confirm-password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`pl-10 pr-10 block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  ) : (
-                    <Eye
-                      className={`h-5 w-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    />
-                  )}
-                </button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  New Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter new password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  >
+                    {showNewPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Confirm New Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Confirm new password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div>
+            <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                  isDarkMode ? "focus:ring-offset-gray-800" : ""
-                }`}
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                Update Profile
+                Save Changes
+                <Save className="w-5 h-5" />
               </button>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

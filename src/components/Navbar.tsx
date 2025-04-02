@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md"
+          ? "bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md shadow-lg"
           : "bg-transparent"
       }`}
     >
@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
               Portfolio
             </span>
           </Link>
@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-2 text-sm font-medium transition-all duration-200 ${
                     isActive(item.path)
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
             {user?.isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200"
               >
                 <LayoutDashboard className="h-5 w-5 mr-1" />
                 Dashboard
@@ -105,7 +105,7 @@ const Navbar: React.FC = () => {
             )}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -119,54 +119,64 @@ const Navbar: React.FC = () => {
                   <div>
                     <button
                       onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                      className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="flex text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
                     >
                       <span className="sr-only">Open user menu</span>
                       {user.profileImage ? (
                         <img
-                          className="h-8 w-8 rounded-full object-cover"
+                          className="h-8 w-8 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700"
                           src={`${API_URL}${user.profileImage}`}
                           alt={user.name}
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <User className="h-5 w-5 text-indigo-600" />
+                        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
+                          <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                         </div>
                       )}
                     </button>
                   </div>
-                  {isProfileMenuOpen && (
-                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-gray-500 text-xs">{user.email}</p>
-                      </div>
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                        onClick={() => setIsProfileMenuOpen(false)}
+                  <AnimatePresence>
+                    {isProfileMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-xl py-2 bg-white dark:bg-[#1B2333] ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700"
                       >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Profile Settings
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                      >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Sign out
-                      </button>
-                    </div>
-                  )}
+                        <div className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs">
+                            {user.email}
+                          </p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] flex items-center transition-colors duration-200"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Profile Settings
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] flex items-center transition-colors duration-200"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             ) : (
               <Link
                 to="/login"
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200"
               >
                 Login
               </Link>
@@ -177,7 +187,7 @@ const Navbar: React.FC = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-2"
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200 mr-2"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-gray-300" />
@@ -187,7 +197,7 @@ const Navbar: React.FC = () => {
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1B2333] transition-all duration-200"
             >
               {isOpen ? (
                 <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
@@ -207,19 +217,19 @@ const Navbar: React.FC = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-white border-t border-gray-200"
+            className="md:hidden bg-white dark:bg-[#0B1120] border-t border-gray-200 dark:border-gray-800"
           >
-            <div className="container mx-auto px-4 py-4 space-y-4">
+            <div className="container mx-auto px-4 py-4 space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive(item.path)
-                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20"
-                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-[#1B2333] dark:hover:text-blue-400"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
@@ -231,7 +241,7 @@ const Navbar: React.FC = () => {
               {user?.isAdmin && (
                 <Link
                   to="/admin"
-                  className="flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                  className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-[#1B2333] dark:hover:text-blue-400 transition-all duration-200"
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="w-5 h-5 mr-2" />
@@ -239,59 +249,54 @@ const Navbar: React.FC = () => {
                 </Link>
               )}
               {user ? (
-                <div className="flex items-center">
-                  <div className="ml-3 relative">
-                    <div>
-                      <button
-                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                        className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        <span className="sr-only">Open user menu</span>
-                        {user.profileImage ? (
-                          <img
-                            className="h-8 w-8 rounded-full object-cover"
-                            src={`${API_URL}${user.profileImage}`}
-                            alt={user.name}
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <User className="h-5 w-5 text-indigo-600" />
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                    {isProfileMenuOpen && (
-                      <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-gray-500 text-xs">{user.email}</p>
-                        </div>
-                        <Link
-                          to="/profile"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                        >
-                          <Settings className="h-4 w-4 mr-2" />
-                          Profile Settings
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setIsProfileMenuOpen(false);
-                            handleLogout();
-                          }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                        >
-                          <LogOut className="h-4 w-4 mr-2" />
-                          Sign out
-                        </button>
+                <div className="px-4 py-3">
+                  <div className="flex items-center space-x-3">
+                    {user.profileImage ? (
+                      <img
+                        className="h-8 w-8 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700"
+                        src={`${API_URL}${user.profileImage}`}
+                        alt={user.name}
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
+                        <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                       </div>
                     )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 space-y-1">
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1B2333] rounded-lg transition-all duration-200"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Profile Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1B2333] rounded-lg transition-all duration-200"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign out
+                    </button>
                   </div>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="block px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  className="block px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-all duration-200"
+                  onClick={() => setIsOpen(false)}
                 >
                   Login
                 </Link>
