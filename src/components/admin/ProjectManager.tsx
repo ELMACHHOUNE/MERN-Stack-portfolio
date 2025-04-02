@@ -11,20 +11,35 @@ import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "../../context/LanguageContext";
 
+interface Category {
+  _id: string;
+  name: string;
+  description: string;
+  icon: string;
+  order: number;
+  isActive: boolean;
+}
+
 interface Project {
   _id: string;
   title: string;
   description: string;
   technologies: string[];
-  imageUrl: string;
+  image: string;
   githubUrl: string;
   liveUrl: string;
-  featured: boolean;
+  features: string[];
+  category: string | { _id: string; name: string };
+  order: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
 }
 
 const ProjectManager: React.FC = () => {
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
@@ -32,15 +47,39 @@ const ProjectManager: React.FC = () => {
     title: "",
     description: "",
     technologies: "",
-    imageUrl: "",
+    image: "",
     githubUrl: "",
     liveUrl: "",
-    featured: false,
+    features: "",
+    category: "",
+    order: 0,
+    startDate: "",
+    endDate: "",
+    isActive: true,
   });
 
   useEffect(() => {
     fetchProjects();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}/api/categories/admin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok)
+        throw new Error(t("categories.management.errors.fetchFailed"));
+      const data = await response.json();
+      setCategories(data.filter((cat: Category) => cat.isActive));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error(t("categories.management.errors.fetchFailed"));
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -72,12 +111,16 @@ const ProjectManager: React.FC = () => {
         technologies: formData.technologies
           .split(",")
           .map((tech) => tech.trim()),
+        features: formData.features.split(",").map((feature) => feature.trim()),
+        startDate: new Date(formData.startDate),
+        endDate: new Date(formData.endDate),
+        order: Number(formData.order),
       };
 
       const url = isEditing
         ? `${API_URL}/api/projects/${currentProject?._id}`
         : `${API_URL}/api/projects`;
-      const method = isEditing ? "PUT" : "POST";
+      const method = isEditing ? "PATCH" : "POST";
 
       const response = await fetch(url, {
         method,
@@ -88,8 +131,12 @@ const ProjectManager: React.FC = () => {
         body: JSON.stringify(projectData),
       });
 
-      if (!response.ok)
-        throw new Error(t("projects.management.errors.saveFailed"));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || t("projects.management.errors.saveFailed")
+        );
+      }
 
       toast.success(
         isEditing
@@ -98,9 +145,9 @@ const ProjectManager: React.FC = () => {
       );
       resetForm();
       fetchProjects();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving project:", error);
-      toast.error(t("projects.management.errors.saveFailed"));
+      toast.error(error.message || t("projects.management.errors.saveFailed"));
     }
   };
 
@@ -133,10 +180,18 @@ const ProjectManager: React.FC = () => {
       title: project.title,
       description: project.description,
       technologies: project.technologies.join(", "),
-      imageUrl: project.imageUrl,
+      image: project.image,
       githubUrl: project.githubUrl,
       liveUrl: project.liveUrl,
-      featured: project.featured,
+      features: project.features.join(", "),
+      category:
+        typeof project.category === "string"
+          ? project.category
+          : project.category._id,
+      order: project.order,
+      startDate: project.startDate.split("T")[0],
+      endDate: project.endDate.split("T")[0],
+      isActive: project.isActive,
     });
     setIsEditing(true);
   };
@@ -146,10 +201,15 @@ const ProjectManager: React.FC = () => {
       title: "",
       description: "",
       technologies: "",
-      imageUrl: "",
+      image: "",
       githubUrl: "",
       liveUrl: "",
-      featured: false,
+      features: "",
+      category: "",
+      order: 0,
+      startDate: "",
+      endDate: "",
+      isActive: true,
     });
     setCurrentProject(null);
     setIsEditing(false);
@@ -242,19 +302,124 @@ const ProjectManager: React.FC = () => {
 
         <div>
           <label
-            htmlFor="imageUrl"
+            htmlFor="image"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             {t("projects.management.form.imageUrl")}
           </label>
           <input
-            type="url"
-            id="imageUrl"
-            value={formData.imageUrl}
+            type="text"
+            id="image"
+            value={formData.image}
             onChange={(e) =>
-              setFormData({ ...formData, imageUrl: e.target.value })
+              setFormData({ ...formData, image: e.target.value })
             }
             className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="features"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            {t("projects.management.form.features")}
+          </label>
+          <input
+            type="text"
+            id="features"
+            value={formData.features}
+            onChange={(e) =>
+              setFormData({ ...formData, features: e.target.value })
+            }
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+            placeholder={t("projects.management.form.featuresPlaceholder")}
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            {t("projects.management.form.category")}
+          </label>
+          <select
+            id="category"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+            required
+          >
+            <option value="">
+              {t("projects.management.form.selectCategory")}
+            </option>
+            {categories.map((category) => (
+              <option key={category._id} value={category._id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="order"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            {t("projects.management.form.order")}
+          </label>
+          <input
+            type="number"
+            id="order"
+            value={formData.order}
+            onChange={(e) =>
+              setFormData({ ...formData, order: Number(e.target.value) })
+            }
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+            min="0"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="startDate"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            {t("projects.management.form.startDate")}
+          </label>
+          <input
+            type="date"
+            id="startDate"
+            value={formData.startDate}
+            onChange={(e) =>
+              setFormData({ ...formData, startDate: e.target.value })
+            }
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="endDate"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            {t("projects.management.form.endDate")}
+          </label>
+          <input
+            type="date"
+            id="endDate"
+            value={formData.endDate}
+            onChange={(e) =>
+              setFormData({ ...formData, endDate: e.target.value })
+            }
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
             required
           />
         </div>
@@ -300,38 +465,34 @@ const ProjectManager: React.FC = () => {
         <div className="flex items-center">
           <input
             type="checkbox"
-            id="featured"
-            checked={formData.featured}
+            id="isActive"
+            checked={formData.isActive}
             onChange={(e) =>
-              setFormData({ ...formData, featured: e.target.checked })
+              setFormData({ ...formData, isActive: e.target.checked })
             }
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-[#1E2A3B] dark:checked:bg-blue-500"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
           <label
-            htmlFor="featured"
-            className="ml-2 text-sm text-gray-700 dark:text-gray-300"
+            htmlFor="isActive"
+            className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
           >
-            {t("projects.management.form.featured")}
+            {t("projects.management.form.isActive")}
           </label>
         </div>
 
-        <div className="flex justify-end space-x-4 pt-4">
-          {isEditing && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1E2A3B] hover:bg-gray-50 dark:hover:bg-[#242E42] transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
-            >
-              {t("common.cancel")}
-            </button>
-          )}
+        <div className="flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={resetForm}
+            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+          >
+            {t("common.cancel")}
+          </button>
           <button
             type="submit"
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium transition-all duration-200 hover:bg-blue-700"
           >
-            {isEditing
-              ? t("projects.management.editProject")
-              : t("projects.management.addProject")}
+            {isEditing ? t("common.save") : t("projects.management.addProject")}
           </button>
         </div>
       </form>
@@ -346,7 +507,7 @@ const ProjectManager: React.FC = () => {
               key={project._id}
               className="group relative bg-gradient-to-br from-white to-white/80 dark:from-[#1E2A3B] dark:to-[#1E2A3B]/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 hover:-translate-y-1 transform"
             >
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity space-x-2">
+              <div className="absolute top-4 right-4 space-x-2">
                 <button
                   onClick={() => handleEdit(project)}
                   className="p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors hover:scale-110 transform inline-flex"
@@ -361,9 +522,12 @@ const ProjectManager: React.FC = () => {
                 </button>
               </div>
 
-              <div className="aspect-w-16 aspect-h-9 mb-4 rounded-lg overflow-hidden">
+              <div
+                className="aspect-w-16 aspect-h-9 mb-4 rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => handleEdit(project)}
+              >
                 <img
-                  src={project.imageUrl}
+                  src={project.image}
                   alt={project.title}
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-200"
                 />
@@ -388,24 +552,42 @@ const ProjectManager: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                >
-                  <Github className="w-4 h-4" />
-                  {t("projects.management.actions.viewGitHub")}
-                </a>
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  {t("projects.management.actions.viewDemo")}
-                </a>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEdit(project)}
+                    className="p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors hover:scale-110 transform inline-flex"
+                    title="Edit Project"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project._id)}
+                    className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors hover:scale-110 transform inline-flex"
+                    title="Delete Project"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-4">
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                  >
+                    <Github className="w-4 h-4" />
+                    {t("projects.management.actions.viewGitHub")}
+                  </a>
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {t("projects.management.actions.viewDemo")}
+                  </a>
+                </div>
               </div>
             </div>
           ))}
