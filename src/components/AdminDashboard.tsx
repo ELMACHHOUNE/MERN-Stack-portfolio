@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Users,
   Mail,
@@ -11,9 +11,15 @@ import {
   BarChart3,
   Wrench,
   Briefcase,
+  FolderKanban,
+  User,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
+import CategoryManager from "../components/admin/CategoryManager";
+import ProjectManager from "../components/admin/ProjectManager";
+import { useTheme } from "../context/ThemeContext";
+import { useAdminProfile } from "../context/AdminProfileContext";
 
 interface User {
   _id: string;
@@ -26,9 +32,19 @@ interface User {
 const AdminDashboard: React.FC = () => {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isDarkMode } = useTheme();
+  const { adminProfile } = useAdminProfile();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => {
+    const path = location.pathname;
+    if (path.includes("/skills")) return "skills";
+    if (path.includes("/categories")) return "categories";
+    if (path.includes("/projects")) return "projects";
+    if (path.includes("/experience")) return "experience";
+    return "skills";
+  });
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -74,7 +90,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
       <motion.div
         initial={{ x: -300 }}
@@ -114,6 +130,24 @@ const AdminDashboard: React.FC = () => {
             Skills
           </button>
           <button
+            onClick={() => setActiveTab("categories")}
+            className={`flex items-center w-full px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 ${
+              activeTab === "categories" ? "bg-blue-50 text-blue-600" : ""
+            }`}
+          >
+            <FolderKanban className="w-5 h-5 mr-3" />
+            Categories
+          </button>
+          <button
+            onClick={() => setActiveTab("projects")}
+            className={`flex items-center w-full px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 ${
+              activeTab === "projects" ? "bg-blue-50 text-blue-600" : ""
+            }`}
+          >
+            <User className="w-5 h-5 mr-3" />
+            Projects
+          </button>
+          <button
             onClick={() => setActiveTab("experience")}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
               activeTab === "experience"
@@ -121,8 +155,8 @@ const AdminDashboard: React.FC = () => {
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            <Briefcase className="w-5 h-5" />
-            <span>Experience</span>
+            <Settings className="w-5 h-5" />
+            Experience
           </button>
           <button
             onClick={() => setActiveTab("analytics")}
@@ -259,6 +293,22 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow">
               <div className="p-6">
                 <SkillsManager />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "categories" && (
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <CategoryManager />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "projects" && (
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <ProjectManager />
               </div>
             </div>
           )}

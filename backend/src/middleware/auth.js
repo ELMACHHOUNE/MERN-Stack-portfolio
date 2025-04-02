@@ -12,16 +12,13 @@ const protect = async (req, res, next) => {
     }
 
     if (!token) {
-      console.log("No token found in request");
+      console.log("No token found in request headers:", req.headers);
       return res.status(401).json({ message: "Not authorized, no token" });
     }
 
     try {
       // Verify token
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET || "your-secret-key"
-      );
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log("Token verified, decoded:", decoded);
 
       // Get user from token
@@ -43,6 +40,7 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.log("Token verification failed:", error.message);
+      console.log("Token used:", token.substring(0, 10) + "...");
       return res.status(401).json({ message: "Not authorized, token failed" });
     }
   } catch (error) {
@@ -53,8 +51,12 @@ const protect = async (req, res, next) => {
 
 const admin = async (req, res, next) => {
   try {
-    if (!req.user || !req.user.isAdmin) {
-      console.log("User not admin:", req.user);
+    if (!req.user) {
+      console.log("No user found in request");
+      return res.status(401).json({ message: "Not authorized, no user" });
+    }
+    if (!req.user.isAdmin) {
+      console.log("User is not admin:", req.user);
       return res.status(403).json({ message: "Not authorized as admin" });
     }
     next();

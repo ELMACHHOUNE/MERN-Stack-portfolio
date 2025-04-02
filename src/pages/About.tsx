@@ -48,8 +48,21 @@ const About: React.FC = () => {
       return null;
     }
 
-    const imageUrl = `${API_URL}${adminProfile.profileImage}`;
-    return imageUrl;
+    // If it's already a full URL, return it
+    if (
+      adminProfile.profileImage.startsWith("http://") ||
+      adminProfile.profileImage.startsWith("https://")
+    ) {
+      return adminProfile.profileImage;
+    }
+
+    // Remove any leading slashes and 'uploads/' prefix to prevent double paths
+    const cleanPath = adminProfile.profileImage
+      .replace(/^\/+/, "")
+      .replace(/^uploads\//, "");
+
+    // Construct the URL with the correct path
+    return `${API_URL}/uploads/${cleanPath}`;
   };
 
   const getFallbackAvatarUrl = () => {

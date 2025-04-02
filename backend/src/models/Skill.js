@@ -9,10 +9,9 @@ const skillSchema = new mongoose.Schema(
       maxlength: [50, "Skill name cannot be more than 50 characters"],
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Category is required"],
-      enum: ["Frontend", "Backend", "Database", "DevOps", "Other"],
-      default: "Frontend",
     },
     level: {
       type: Number,
@@ -43,6 +42,4 @@ const skillSchema = new mongoose.Schema(
 // Add index for efficient querying
 skillSchema.index({ category: 1, order: 1 });
 
-const Skill = mongoose.model("Skill", skillSchema);
-
-module.exports = Skill;
+module.exports = mongoose.model("Skill", skillSchema);

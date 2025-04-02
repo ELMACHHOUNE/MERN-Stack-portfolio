@@ -3,10 +3,11 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
-import { User, Settings } from "lucide-react";
+import { User, Settings, FolderTree } from "lucide-react";
 import SkillsManager from "../components/admin/SkillsManager";
 import ProjectManager from "../components/admin/ProjectManager";
 import ExperienceManager from "../components/admin/ExperienceManager";
+import CategoryManager from "../components/admin/CategoryManager";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/skills")) return "skills";
     if (path.includes("/projects")) return "projects";
     if (path.includes("/experience")) return "experience";
+    if (path.includes("/categories")) return "categories";
     return "skills";
   });
 
@@ -69,6 +71,16 @@ const AdminDashboard: React.FC = () => {
             >
               Experience
             </button>
+            <button
+              onClick={() => setActiveTab("categories")}
+              className={`${
+                activeTab === "categories"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Categories
+            </button>
           </nav>
         </div>
 
@@ -77,6 +89,7 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "skills" && <SkillsManager />}
           {activeTab === "projects" && <ProjectManager />}
           {activeTab === "experience" && <ExperienceManager />}
+          {activeTab === "categories" && <CategoryManager />}
         </div>
       </main>
     </div>

@@ -76,6 +76,12 @@ const Dashboard: React.FC = () => {
               Add Experience
             </Link>
             <Link
+              to="/admin/categories"
+              className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            >
+              Manage Categories
+            </Link>
+            <Link
               to="/admin/about/edit"
               className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
             >

@@ -10,12 +10,13 @@ const morgan = require("morgan");
 const contactRouter = require("./routes/contact");
 const authRouter = require("./routes/auth");
 const skillsRouter = require("./routes/skills");
+const categoriesRouter = require("./routes/categories");
 const experienceRouter = require("./routes/experience");
 const projectsRouter = require("./routes/projects");
 const settingsRouter = require("./routes/settings");
 const xss = require("xss-clean");
 const hpp = require("hpp");
-const connectDB = require("./config/db");
+const loadModels = require("./models");
 const errorHandler = require("./middleware/error");
 
 // Load environment variables
@@ -44,7 +45,10 @@ app.use(hpp());
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "http://localhost:5173",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -81,14 +85,19 @@ app.use(compression());
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// Connect to MongoDB
+// Connect to MongoDB and load models
 mongoose
   .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/portfolio", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
+  .then(async () => {
     console.log("Connected to MongoDB");
+
+    // Load models
+    await loadModels();
+    console.log("Models loaded successfully");
+
     // Create uploads directory if it doesn't exist
     const fs = require("fs");
     const uploadsDir = path.join(__dirname, "../uploads/profiles");
@@ -96,12 +105,16 @@ mongoose
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
   })
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // Routes
 app.use("/api/contact", contactRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/skills", skillsRouter);
+app.use("/api/categories", categoriesRouter);
 app.use("/api/experience", experienceRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);

@@ -15,6 +15,7 @@ import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SkillsManager from "./components/admin/SkillsManager";
 import ExperienceManager from "./components/admin/ExperienceManager";
+import CategoryManager from "./components/admin/CategoryManager";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -81,6 +82,14 @@ const App: React.FC = () => {
                     element={
                       <AdminRoute>
                         <ExperienceManager />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/categories"
+                    element={
+                      <AdminRoute>
+                        <CategoryManager />
                       </AdminRoute>
                     }
                   />
