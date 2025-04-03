@@ -128,6 +128,20 @@ const About: React.FC = () => {
                         src={`${API_URL}${adminProfile.profileImage}`}
                         alt={adminProfile.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const parent = target.parentElement;
+                          if (parent) {
+                            const fallbackIcon = document.createElement("div");
+                            fallbackIcon.className =
+                              "w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 flex items-center justify-center";
+                            fallbackIcon.innerHTML =
+                              '<svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>';
+                            parent.appendChild(fallbackIcon);
+                          }
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 flex items-center justify-center">
@@ -202,6 +216,21 @@ const About: React.FC = () => {
                             src={value.icon}
                             alt={value.title}
                             className="w-6 h-6 object-contain"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                              const parent = target.parentElement;
+                              if (parent) {
+                                const fallbackIcon =
+                                  document.createElement("div");
+                                fallbackIcon.className =
+                                  "w-6 h-6 text-indigo-500 dark:text-indigo-400";
+                                fallbackIcon.innerHTML =
+                                  '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+                                parent.appendChild(fallbackIcon);
+                              }
+                            }}
                           />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">

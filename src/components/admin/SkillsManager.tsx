@@ -343,6 +343,7 @@ const SkillsManager: React.FC = () => {
                     src={formData.icon}
                     alt="Icon preview"
                     className="w-full h-full object-contain"
+                    loading="lazy"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = "none";
@@ -400,6 +401,7 @@ const SkillsManager: React.FC = () => {
                     src={category.icon}
                     alt={category.name}
                     className="h-8 w-8"
+                    loading="lazy"
                   />
                 )}
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -433,6 +435,7 @@ const SkillsManager: React.FC = () => {
                           src={skill.icon}
                           alt={skill.name}
                           className="h-8 w-8"
+                          loading="lazy"
                         />
                       )}
                       <div className="flex-1">

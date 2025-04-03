@@ -17,12 +17,17 @@ import {
   Menu,
   X,
   Layout,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
 import CategoryManager from "../components/admin/CategoryManager";
 import ProjectManager from "../components/admin/ProjectManager";
 import ContactManager from "../components/admin/ContactManager";
+import AnalyticsManager from "./admin/AnalyticsManager";
+import AdminSettings from "../pages/AdminSettings";
+import { toast } from "react-hot-toast";
 
 interface User {
   _id: string;
@@ -32,6 +37,99 @@ interface User {
   lastLogin: string;
 }
 
+interface EditUserModalProps {
+  user: User | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (userData: Partial<User>) => Promise<void>;
+}
+
+const EditUserModal: React.FC<EditUserModalProps> = ({
+  user,
+  isOpen,
+  onClose,
+  onSave,
+}) => {
+  const { t } = useLanguage();
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+    }
+  }, [user]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await onSave({ name, email });
+      onClose();
+    } catch (error) {
+      console.error("Error saving user:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+          {t("admin.editUser")}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("admin.name")}
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("auth.email")}
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              required
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? t("common.saving") : t("common.save")}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const AdminDashboard: React.FC = () => {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
@@ -39,46 +137,62 @@ const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
+    if (path.includes("/users")) return "users";
     if (path.includes("/skills")) return "skills";
     if (path.includes("/categories")) return "categories";
     if (path.includes("/projects")) return "projects";
     if (path.includes("/experience")) return "experience";
+    if (path.includes("/analytics")) return "analytics";
     if (path.includes("/messages")) return "messages";
-    return "skills";
+    if (path.includes("/settings")) return "settings";
+    return "overview";
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!user?.isAdmin) {
-      navigate("/");
+    // Check if user is authenticated and is admin
+    if (!user || !user.isAdmin) {
+      console.log("User not authenticated or not admin, redirecting to login");
+      navigate("/login");
       return;
     }
 
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/admin/users",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Set loading to false once we've checked authentication
+    setLoading(false);
 
-    fetchUsers();
-  }, [user, token, navigate]);
+    // Fetch users if on users tab
+    if (activeTab === "users") {
+      fetchUsers();
+    }
+  }, [user, navigate, activeTab]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/auth/admin/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error(t("admin.errors.fetchUsersFailed"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -90,8 +204,70 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleTabClick = (tab: string) => {
+    console.log("Tab clicked:", tab);
     setActiveTab(tab);
     setIsSidebarOpen(false); // Close sidebar on mobile when tab is clicked
+    navigate(`/admin/${tab === "overview" ? "" : tab}`);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm(t("admin.confirmDeleteUser"))) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/admin/users/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      toast.success(t("admin.userDeleteSuccess"));
+      fetchUsers(); // Refresh the users list
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error(t("admin.errors.deleteUserFailed"));
+    }
+  };
+
+  const handleSaveUser = async (userData: Partial<User>) => {
+    if (!editingUser) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/admin/users/${editingUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update user");
+      }
+
+      toast.success(t("admin.userUpdateSuccess"));
+      fetchUsers(); // Refresh the users list
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error(t("admin.errors.updateUserFailed"));
+    }
   };
 
   if (loading) {
@@ -128,7 +304,7 @@ const AdminDashboard: React.FC = () => {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  {t("admin.dashboard")}
+                  {t("admin.dashboard.title")}
                 </h2>
                 <button
                   onClick={toggleSidebar}
@@ -243,7 +419,7 @@ const AdminDashboard: React.FC = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-6 py-3 text-red-600 hover:bg-red-50 mt-4"
+                className="flex items-center w-full px-6 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-500"
               >
                 <LogOut className="w-5 h-5 mr-3" />
                 {t("auth.logout")}
@@ -254,175 +430,126 @@ const AdminDashboard: React.FC = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex-1 p-4 md:p-8 overflow-x-hidden"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                {t("admin.totalUsers")}
-              </h3>
-              <p className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">
-                {users.length}
-              </p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                {t("admin.adminUsers")}
-              </h3>
-              <p className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
-                {users.filter((u) => u.isAdmin).length}
-              </p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                {t("admin.regularUsers")}
-              </h3>
-              <p className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400 mt-2">
-                {users.filter((u) => !u.isAdmin).length}
-              </p>
+      <div className="flex-1 p-8 md:ml-64">
+        {activeTab === "overview" && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+              {t("admin.overview")}
+            </h2>
+            {/* Overview content */}
+          </div>
+        )}
+
+        {activeTab === "users" && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+              {t("admin.userManagement")}
+            </h2>
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        {t("admin.name")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        {t("auth.email")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        {t("admin.lastLogin")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        {t("common.actions")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {users.map((user) => (
+                      <tr key={user._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {user.name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {user.email}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {new Date(user.lastLogin).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex space-x-2">
+                            {!user.isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => handleEditUser(user)}
+                                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteUser(user._id)}
+                                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {loading && (
+                <div className="flex justify-center p-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              )}
+              {!loading && users.length === 0 && (
+                <div className="text-center p-4 text-gray-500 dark:text-gray-400">
+                  {t("common.noResults")}
+                </div>
+              )}
             </div>
           </div>
+        )}
 
-          {activeTab === "users" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-              <div className="p-4 md:p-6">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                  {t("admin.userManagement")}
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead>
-                      <tr>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("admin.name")}
-                        </th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("auth.email")}
-                        </th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("admin.role")}
-                        </th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("admin.lastLogin")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                      {users.map((user) => (
-                        <tr key={user._id}>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {user.name}
-                            </div>
-                          </td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {user.email}
-                            </div>
-                          </td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                user.isAdmin
-                                  ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                                  : "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
-                              }`}
-                            >
-                              {user.isAdmin
-                                ? t("admin.admin")
-                                : t("admin.user")}
-                            </span>
-                          </td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {new Date(user.lastLogin).toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
+        {activeTab === "skills" && <SkillsManager />}
+        {activeTab === "categories" && <CategoryManager />}
+        {activeTab === "projects" && <ProjectManager />}
+        {activeTab === "experience" && <ExperienceManager />}
+        {activeTab === "analytics" && <AnalyticsManager />}
+        {activeTab === "messages" && <ContactManager />}
+        {activeTab === "settings" && <AdminSettings />}
+      </div>
 
-          {activeTab === "skills" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-4 md:p-6">
-                <SkillsManager />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "categories" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-4 md:p-6">
-                <CategoryManager />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "projects" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-4 md:p-6">
-                <ProjectManager />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "experience" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-4 md:p-6">
-                <ExperienceManager />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "overview" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                {t("admin.dashboard")} {t("admin.overview")}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t("admin.overviewDescription")}
-              </p>
-            </div>
-          )}
-
-          {activeTab === "analytics" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                {t("admin.analytics")}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t("admin.analyticsComingSoon")}
-              </p>
-            </div>
-          )}
-
-          {activeTab === "messages" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-4 md:p-6">
-                <ContactManager />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                {t("admin.settings")}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t("admin.settingsComingSoon")}
-              </p>
-            </div>
-          )}
-        </div>
-      </motion.div>
+      {/* Edit User Modal */}
+      <EditUserModal
+        user={editingUser}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingUser(null);
+        }}
+        onSave={handleSaveUser}
+      />
     </div>
   );
 };

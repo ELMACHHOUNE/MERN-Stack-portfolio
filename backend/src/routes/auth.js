@@ -127,11 +127,61 @@ router.get("/admin/check", protect, admin, async (req, res) => {
 // Get all users (admin only)
 router.get("/admin/users", protect, admin, async (req, res) => {
   try {
-    const users = await User.find({}).select("-password");
+    const users = await User.find().select("-password");
     res.json(users);
   } catch (error) {
-    console.error("Get users error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
+// Update user (admin only)
+router.put("/admin/users/:id", protect, admin, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent updating admin user
+    if (user.isAdmin) {
+      return res.status(403).json({ message: "Cannot modify admin user" });
+    }
+
+    // Update user fields
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    await user.save();
+    res.json({ message: "User updated successfully" });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+// Delete user (admin only)
+router.delete("/admin/users/:id", protect, admin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent deleting admin user
+    if (user.isAdmin) {
+      return res.status(403).json({ message: "Cannot delete admin user" });
+    }
+
+    // Use deleteOne instead of remove
+    await User.deleteOne({ _id: req.params.id });
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Error deleting user" });
   }
 });
 

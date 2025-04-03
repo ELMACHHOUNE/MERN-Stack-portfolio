@@ -298,6 +298,7 @@ const CategoryManager: React.FC = () => {
                                 src={category.icon}
                                 alt={`${category.name} icon`}
                                 className="w-6 h-6 object-contain"
+                                loading="lazy"
                               />
                             ) : (
                               <Folder className="w-6 h-6 text-blue-500 dark:text-blue-400" />

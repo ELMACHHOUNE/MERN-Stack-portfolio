@@ -9,7 +9,9 @@
     "edit": "Edit",
     "add": "Add",
     "search": "Search",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "actions": "Actions",
+    "saving": "Saving..."
   },
   "auth": {
     "login": "Login",
@@ -73,6 +75,7 @@
     "analytics": "Analytics",
     "messages": "Messages",
     "settings": "Settings",
+    "logout": "Logout",
     "totalUsers": "Total Users",
     "adminUsers": "Admin Users",
     "regularUsers": "Regular Users",
@@ -90,8 +93,35 @@
       "projects": "Projects",
       "experience": "Experience",
       "categories": "Categories",
+      "analytics": "Analytics",
       "messages": "Messages",
       "settings": "Settings"
+    },
+    "uniqueVisitors": "Unique Visitors",
+    "pageViews": "Page Views",
+    "contactSubmissions": "Contact Submissions",
+    "resumeDownloads": "Resume Downloads",
+    "topLocations": "Top Locations",
+    "topProjects": "Most Viewed Projects",
+    "topSkills": "Most Viewed Skills",
+    "timeSpent": "Time Spent",
+    "averageTime": "Average Time",
+    "totalTime": "Total Time",
+    "minutes": "minutes",
+    "hours": "hours",
+    "day": "Today",
+    "week": "This Week",
+    "month": "This Month",
+    "year": "This Year",
+    "editUser": "Edit User",
+    "isAdmin": "Is Administrator",
+    "confirmDeleteUser": "Are you sure you want to delete this user?",
+    "userDeleteSuccess": "User deleted successfully",
+    "userUpdateSuccess": "User updated successfully",
+    "errors": {
+      "fetchUsersFailed": "Failed to fetch users list",
+      "deleteUserFailed": "Failed to delete user",
+      "updateUserFailed": "Failed to update user"
     }
   },
   "about": {

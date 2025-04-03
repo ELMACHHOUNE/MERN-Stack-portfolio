@@ -12,7 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserProfile from "./pages/UserProfile";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./components/AdminDashboard";
 import SkillsManager from "./components/admin/SkillsManager";
 import ProjectManager from "./components/admin/ProjectManager";
 import ExperienceManager from "./components/admin/ExperienceManager";
@@ -69,66 +69,10 @@ const App: React.FC = () => {
 
                     {/* Admin routes */}
                     <Route
-                      path="/admin"
+                      path="/admin/*"
                       element={
                         <AdminRoute>
                           <AdminDashboard />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/projects"
-                      element={
-                        <AdminRoute>
-                          <ProjectManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/skills"
-                      element={
-                        <AdminRoute>
-                          <SkillsManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/experience"
-                      element={
-                        <AdminRoute>
-                          <ExperienceManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/categories"
-                      element={
-                        <AdminRoute>
-                          <CategoryManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/contact"
-                      element={
-                        <AdminRoute>
-                          <ContactManager />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/about"
-                      element={
-                        <AdminRoute>
-                          <AboutSettings />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/settings"
-                      element={
-                        <AdminRoute>
-                          <AdminSettings />
                         </AdminRoute>
                       }
                     />

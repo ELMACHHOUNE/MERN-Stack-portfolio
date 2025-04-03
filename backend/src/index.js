@@ -14,6 +14,7 @@ const categoriesRouter = require("./routes/categories");
 const experienceRouter = require("./routes/experience");
 const projectsRouter = require("./routes/projects");
 const settingsRouter = require("./routes/settings");
+const analyticsRouter = require("./routes/analytics");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const loadModels = require("./models");
@@ -104,6 +105,7 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/experience", experienceRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);
+app.use("/api/analytics", analyticsRouter);
 
 // Error handling middleware
 app.use(errorHandler);

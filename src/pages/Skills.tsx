@@ -261,6 +261,7 @@ const Skills: React.FC = () => {
                         src={getImageUrl(category.icon)}
                         alt={category.name}
                         className="w-8 h-8"
+                        loading="lazy"
                         onError={handleImageError}
                       />
                     ) : (
@@ -287,6 +288,7 @@ const Skills: React.FC = () => {
                               src={getImageUrl(skill.icon)}
                               alt={skill.name}
                               className="w-6 h-6 mr-3"
+                              loading="lazy"
                               onError={handleImageError}
                             />
                           ) : (

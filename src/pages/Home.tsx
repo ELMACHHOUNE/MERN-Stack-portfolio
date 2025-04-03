@@ -17,6 +17,7 @@ import {
   Smartphone,
   Code2,
   Settings,
+  Star,
 } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 
@@ -409,38 +410,24 @@ const Home: React.FC = () => {
                             src={skill.icon}
                             alt={skill.name}
                             className="w-6 h-6 mr-3"
+                            loading="lazy"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = "none";
-                              const parent = target.parentNode as HTMLElement;
-                              const fallbackIcon =
-                                document.createElement("span");
-                              fallbackIcon.className =
-                                "w-6 h-6 mr-3 text-blue-500 dark:text-blue-400";
-                              const iconSvg = document.createElementNS(
-                                "http://www.w3.org/2000/svg",
-                                "svg"
-                              );
-                              iconSvg.setAttribute("viewBox", "0 0 24 24");
-                              iconSvg.setAttribute("width", "24");
-                              iconSvg.setAttribute("height", "24");
-                              iconSvg.setAttribute("fill", "none");
-                              iconSvg.setAttribute("stroke", "currentColor");
-                              iconSvg.setAttribute("stroke-width", "2");
-                              iconSvg.setAttribute("stroke-linecap", "round");
-                              iconSvg.setAttribute("stroke-linejoin", "round");
-                              iconSvg.innerHTML = `
-                                <path d="M16 18l6-6-6-6"></path>
-                                <path d="M8 6l-6 6 6 6"></path>
-                              `;
-                              fallbackIcon.appendChild(iconSvg);
-                              parent.appendChild(fallbackIcon);
+                              const parent = target.parentElement;
+                              if (parent) {
+                                const fallbackIcon =
+                                  document.createElement("div");
+                                fallbackIcon.className =
+                                  "text-gray-500 dark:text-gray-400";
+                                fallbackIcon.innerHTML =
+                                  '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+                                parent.appendChild(fallbackIcon);
+                              }
                             }}
                           />
                         ) : (
-                          <span className="w-6 h-6 mr-3 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-md">
-                            <Code2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                          </span>
+                          <Star className="w-6 h-6 text-yellow-400 mr-3" />
                         )}
                         <span className="text-gray-700 dark:text-gray-300">
                           {skill.name}
