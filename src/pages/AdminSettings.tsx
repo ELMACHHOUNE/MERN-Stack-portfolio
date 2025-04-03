@@ -21,6 +21,14 @@ import {
   Mail,
   MessageCircle,
 } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "../components/ui/Card";
+import Button from "../components/ui/Button";
 
 interface Value {
   icon: string;
@@ -200,58 +208,58 @@ const AdminSettings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#1F2937] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
               {t("settings.profile.title")}
-            </h2>
-          </div>
-
-          <form onSubmit={handleProfileUpdate} className="space-y-8">
-            <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                {t("settings.profile.title")}
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="relative">
-                    <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
-                      {profileImage ? (
-                        <img
-                          src={`${API_URL}${profileImage}`}
-                          alt={t("settings.profile.imageAlt")}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
-                          <User className="w-16 h-16 text-blue-500 dark:text-blue-400" />
-                        </div>
-                      )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleProfileUpdate} className="space-y-8">
+              {/* Profile Image Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("settings.profile.title")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="relative">
+                      <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
+                        {profileImage ? (
+                          <img
+                            src={`${API_URL}${profileImage}`}
+                            alt={t("settings.profile.imageAlt")}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                            <User className="w-16 h-16 text-primary-600 dark:text-primary-400" />
+                          </div>
+                        )}
+                      </div>
+                      <label
+                        htmlFor="profileImage"
+                        className="absolute bottom-0 right-0 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+                      >
+                        <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                      </label>
+                      <input
+                        type="file"
+                        id="profileImage"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                        className="hidden"
+                      />
                     </div>
-                    <label
-                      htmlFor="profileImage"
-                      className="absolute bottom-0 right-0 bg-white dark:bg-[#1B2333] p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#242E42] transition-colors border border-gray-200 dark:border-gray-700"
-                    >
-                      <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    </label>
-                    <input
-                      type="file"
-                      id="profileImage"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                    />
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t("settings.profile.description")}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t("settings.profile.description")}
-                  </p>
-                </div>
 
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
                     {[
                       {
                         id: "name",
@@ -283,10 +291,7 @@ const AdminSettings: React.FC = () => {
                       },
                     ].map((field) => (
                       <div key={field.id}>
-                        <label
-                          htmlFor={field.id}
-                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                        >
+                        <label htmlFor={field.id} className="label">
                           {field.label}
                         </label>
                         <input
@@ -294,18 +299,15 @@ const AdminSettings: React.FC = () => {
                           id={field.id}
                           name={field.id}
                           defaultValue={field.value}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="input"
                           placeholder={field.placeholder}
                         />
                       </div>
                     ))}
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="bio"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
+                  <div className="mt-6">
+                    <label htmlFor="bio" className="label">
                       {t("about.bio")}
                     </label>
                     <textarea
@@ -313,297 +315,248 @@ const AdminSettings: React.FC = () => {
                       name="bio"
                       rows={4}
                       defaultValue={adminProfile?.bio}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                      className="input resize-none"
                       placeholder={t("home.defaultProfile.bio")}
                     />
                   </div>
-                </div>
-              </div>
-            </div>
+                </CardContent>
+              </Card>
 
-            <div className="bg-white/50 dark:bg-[#1B2333]/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-800">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                {t("about.socialLinks.title")}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  {
-                    id: "gmail",
-                    icon: Mail,
-                    label: t("about.socialLinks.gmail"),
-                  },
-                  {
-                    id: "whatsapp",
-                    icon: MessageCircle,
-                    label: t("about.socialLinks.whatsapp"),
-                  },
-                  {
-                    id: "github",
-                    icon: Github,
-                    label: t("about.socialLinks.github"),
-                  },
-                  {
-                    id: "linkedin",
-                    icon: Linkedin,
-                    label: t("about.socialLinks.linkedin"),
-                  },
-                  {
-                    id: "twitter",
-                    icon: Twitter,
-                    label: t("about.socialLinks.twitter"),
-                  },
-                  {
-                    id: "facebook",
-                    icon: Facebook,
-                    label: t("about.socialLinks.facebook"),
-                  },
-                  {
-                    id: "instagram",
-                    icon: Instagram,
-                    label: t("about.socialLinks.instagram"),
-                  },
-                  {
-                    id: "youtube",
-                    icon: Youtube,
-                    label: t("about.socialLinks.youtube"),
-                  },
-                  {
-                    id: "behance",
-                    icon: (props: any) => (
-                      <svg viewBox="0 0 24 24" {...props} fill="currentColor">
-                        <path d="M22 7h-7V2H9v5H2v15h20V7zM9 13.47c0 .43-.15.77-.46 1.03-.31.25-.75.38-1.32.38H5.94V12h1.31c.54 0 .96.12 1.27.37.3.25.46.58.46.99l.02.11zm6.31.03c0 .42-.14.76-.41 1.05-.28.28-.65.42-1.12.42-.48 0-.87-.15-1.16-.45-.29-.31-.44-.7-.44-1.18 0-.47.15-.85.46-1.15.31-.31.71-.46 1.21-.46.46 0 .83.14 1.09.42.27.28.4.63.4 1.06l-.03.29zm-6.31-3.93c0 .42-.15.75-.45 1-.3.25-.72.37-1.27.37H5.94V8.43h1.31c.54 0 .97.13 1.28.38.31.25.46.59.46 1l.02.11zm6.31-.08c0 .36-.11.66-.34.89-.23.23-.55.34-.96.34-.42 0-.75-.12-1-.37-.25-.25-.38-.57-.38-.97 0-.41.13-.74.4-1 .27-.26.62-.39 1.05-.39.41 0 .74.12.99.36.24.24.36.55.36.92l-.12.22z" />
-                      </svg>
-                    ),
-                    label: t("about.socialLinks.behance"),
-                  },
-                ].map((platform) => (
-                  <div key={platform.id}>
-                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <platform.icon className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
-                      {platform.label}
-                    </label>
-                    <input
-                      type="url"
-                      value={
-                        socialLinks[platform.id as keyof typeof socialLinks]
-                      }
-                      onChange={(e) =>
-                        handleSocialLinkChange(
-                          platform.id as keyof SocialLinks,
-                          e.target.value
-                        )
-                      }
-                      placeholder={
-                        platform.id === "gmail"
-                          ? "mailto:your.email@gmail.com"
-                          : platform.id === "whatsapp"
-                          ? "https://wa.me/1234567890"
-                          : `https://${platform.id}.com/yourusername`
-                      }
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-[#1B2333]/50 dark:to-[#1B2333]/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-800/50">
-              <div className="flex justify-between items-center mb-8">
-                <div>
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-                    {t("about.coreValues")}
-                  </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {t("about.coreValues")}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddValue}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
-                >
-                  <Plus className="w-5 h-5" />
-                  {t("common.add")}
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {values.map((value, index) => (
-                  <div
-                    key={index}
-                    className="group relative bg-gradient-to-br from-white to-white/80 dark:from-[#1E2A3B] dark:to-[#1E2A3B]/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 hover:-translate-y-1 transform"
-                  >
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveValue(index)}
-                        className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors hover:scale-110 transform"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center shadow-inner border border-blue-500/20 dark:border-blue-400/20">
-                          {value.icon ? (
-                            <img
-                              src={value.icon}
-                              alt="Value icon"
-                              className="w-6 h-6 object-contain"
-                            />
-                          ) : (
-                            <Code className="w-6 h-6 text-blue-500 dark:text-blue-400" />
-                          )}
-                        </div>
+              {/* Social Links Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("about.socialLinks.title")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[
+                      {
+                        id: "gmail",
+                        icon: Mail,
+                        label: t("about.socialLinks.gmail"),
+                      },
+                      {
+                        id: "whatsapp",
+                        icon: MessageCircle,
+                        label: t("about.socialLinks.whatsapp"),
+                      },
+                      {
+                        id: "github",
+                        icon: Github,
+                        label: t("about.socialLinks.github"),
+                      },
+                      {
+                        id: "linkedin",
+                        icon: Linkedin,
+                        label: t("about.socialLinks.linkedin"),
+                      },
+                      {
+                        id: "twitter",
+                        icon: Twitter,
+                        label: t("about.socialLinks.twitter"),
+                      },
+                      {
+                        id: "facebook",
+                        icon: Facebook,
+                        label: t("about.socialLinks.facebook"),
+                      },
+                      {
+                        id: "instagram",
+                        icon: Instagram,
+                        label: t("about.socialLinks.instagram"),
+                      },
+                      {
+                        id: "youtube",
+                        icon: Youtube,
+                        label: t("about.socialLinks.youtube"),
+                      },
+                    ].map((platform) => (
+                      <div key={platform.id}>
+                        <label className="flex items-center label">
+                          <platform.icon className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
+                          {platform.label}
+                        </label>
+                        <input
+                          type="url"
+                          value={
+                            socialLinks[platform.id as keyof typeof socialLinks]
+                          }
+                          onChange={(e) =>
+                            handleSocialLinkChange(
+                              platform.id as keyof SocialLinks,
+                              e.target.value
+                            )
+                          }
+                          placeholder={
+                            platform.id === "gmail"
+                              ? "mailto:your.email@gmail.com"
+                              : platform.id === "whatsapp"
+                              ? "https://wa.me/1234567890"
+                              : `https://${platform.id}.com/yourusername`
+                          }
+                          className="input"
+                        />
                       </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-                      <div className="flex-1 space-y-4">
-                        {[
-                          {
-                            id: "title",
-                            label: t("about.coreValues"),
-                            type: "text",
-                            placeholder: t("about.coreValues"),
-                          },
-                          {
-                            id: "icon",
-                            label: t("skills.management.icon"),
-                            type: "url",
-                            placeholder: t("skills.management.icon"),
-                          },
-                        ].map((field) => (
-                          <div key={field.id}>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              {field.label}
-                            </label>
-                            <input
-                              type={field.type}
-                              value={value[field.id as keyof typeof value]}
-                              onChange={(e) =>
-                                handleValueChange(
-                                  index,
-                                  field.id as keyof Value,
-                                  e.target.value
-                                )
-                              }
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#242E42] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm hover:border-blue-500/50"
-                              placeholder={field.placeholder}
-                            />
+              {/* Core Values Section */}
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>{t("about.coreValues")}</CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {t("about.coreValues")}
+                      </p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      leftIcon={<Plus className="w-5 h-5" />}
+                      onClick={handleAddValue}
+                    >
+                      {t("common.add")}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {values.map((value, index) => (
+                      <Card key={index} hover>
+                        <CardContent>
+                          <div className="flex items-start space-x-4">
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                                {value.icon ? (
+                                  <img
+                                    src={value.icon}
+                                    alt="Value icon"
+                                    className="w-6 h-6 object-contain"
+                                  />
+                                ) : (
+                                  <Code className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="space-y-4">
+                                {[
+                                  {
+                                    id: "title",
+                                    label: t("about.coreValues"),
+                                    type: "text",
+                                    placeholder: t("about.coreValues"),
+                                  },
+                                  {
+                                    id: "icon",
+                                    label: t("skills.management.icon"),
+                                    type: "url",
+                                    placeholder: t("skills.management.icon"),
+                                  },
+                                ].map((field) => (
+                                  <div key={field.id}>
+                                    <label className="label">
+                                      {field.label}
+                                    </label>
+                                    <input
+                                      type={field.type}
+                                      value={
+                                        value[field.id as keyof typeof value]
+                                      }
+                                      onChange={(e) =>
+                                        handleValueChange(
+                                          index,
+                                          field.id as keyof Value,
+                                          e.target.value
+                                        )
+                                      }
+                                      className="input"
+                                      placeholder={field.placeholder}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveValue(index)}
+                              className="text-gray-400 hover:text-error-600 dark:hover:text-error-400"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </Button>
                           </div>
-                        ))}
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            {t("about.bio")}
-                          </label>
-                          <textarea
-                            value={value.description}
-                            onChange={(e) =>
-                              handleValueChange(
-                                index,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                            rows={2}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#242E42] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm resize-none hover:border-blue-500/50"
-                            placeholder={t("about.bio")}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </CardContent>
+              </Card>
 
-            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-[#1B2333]/50 dark:to-[#1B2333]/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-800/50">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div>
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
-                    {t("about.interests")}
-                  </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {t("about.interests")}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <input
-                    type="text"
-                    value={newInterest}
-                    onChange={(e) => setNewInterest(e.target.value)}
-                    placeholder={t("about.interests")}
-                    className="w-full sm:w-64 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddInterest}
-                    className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 hover:scale-105 transform"
-                  >
-                    <Plus className="w-5 h-5" />
-                    {t("common.add")}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {interests.map((interest, index) => (
-                  <div
-                    key={index}
-                    className="group relative bg-gradient-to-br from-white to-white/80 dark:from-[#1E2A3B] dark:to-[#1E2A3B]/80 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 hover:-translate-y-1 transform"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-900 dark:text-gray-200 font-medium">
-                        {interest}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveInterest(interest)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 hover:scale-110 transform"
+              {/* Interests Section */}
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <CardTitle>{t("about.interests")}</CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {t("about.interests")}
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                      <input
+                        type="text"
+                        value={newInterest}
+                        onChange={(e) => setNewInterest(e.target.value)}
+                        placeholder={t("about.interests")}
+                        className="input w-full sm:w-64"
+                      />
+                      <Button
+                        variant="primary"
+                        leftIcon={<Plus className="w-5 h-5" />}
+                        onClick={handleAddInterest}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        {t("common.add")}
+                      </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {interests.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border border-blue-500/20 dark:border-blue-400/20">
-                    <Plus className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {interests.map((interest, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 rounded-full"
+                      >
+                        <span>{interest}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveInterest(interest)}
+                          className="text-primary-600 dark:text-primary-400 hover:text-error-600 dark:hover:text-error-400"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    {t("about.interests")}
-                  </p>
-                </div>
-              )}
-            </div>
+                </CardContent>
+              </Card>
 
-            <div className="flex justify-end pt-6">
-              <button
-                type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {t("settings.profile.saveChanges")}
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <CardFooter>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="w-full sm:w-auto"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </button>
-            </div>
-          </form>
-        </div>
+                  {t("settings.profile.saveChanges")}
+                </Button>
+              </CardFooter>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
