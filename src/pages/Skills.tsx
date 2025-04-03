@@ -255,15 +255,22 @@ const Skills: React.FC = () => {
                   transition={{ duration: 0.5 }}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
                 >
-                  <div className="flex items-center mb-4">
-                    {getDefaultIcon(category.name)}
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-3">
-                      {t(
-                        `skills.categories.${category.name
-                          .toLowerCase()
-                          .replace(/\s+/g, "")}`
-                      )}
-                    </h2>
+                  <div className="flex items-center space-x-3 mb-6">
+                    {category.icon ? (
+                      <img
+                        src={getImageUrl(category.icon)}
+                        alt={category.name}
+                        className="w-8 h-8"
+                        onError={handleImageError}
+                      />
+                    ) : (
+                      <div className="w-8 h-8 text-gray-500 dark:text-gray-400">
+                        <Cpu className="w-8 h-8" />
+                      </div>
+                    )}
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {category.name}
+                    </h3>
                   </div>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     {category.description}

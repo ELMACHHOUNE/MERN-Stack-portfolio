@@ -384,19 +384,17 @@ const Home: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
               >
-                <div className="flex items-center mb-4">
-                  {(() => {
-                    const IconComponent = getIconComponent(group.category);
-                    return (
-                      <IconComponent className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-3" />
-                    );
-                  })()}
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white ml-3">
-                    {t(
-                      `skills.categories.${group.category.name
-                        .toLowerCase()
-                        .replace(/\s+/g, "")}`
-                    )}
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-8 h-8">
+                    {(() => {
+                      const IconComponent = getIconComponent(group.category);
+                      return (
+                        <IconComponent className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                      );
+                    })()}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {group.category.name}
                   </h3>
                 </div>
                 <div className="space-y-4">
