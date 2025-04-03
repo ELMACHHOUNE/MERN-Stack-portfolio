@@ -570,6 +570,7 @@
     },
     "profile": {
       "title": "Paramètres du profil",
+      "pageTitle": "Paramètres du profil",
       "description": "Mettez à jour votre photo de profil et vos informations personnelles ici",
       "imageAlt": "Profil",
       "fullName": "Nom",

@@ -576,6 +576,7 @@
       "password": "Change Password"
     },
     "profile": {
+      "title": "Profile Settings",
       "pageTitle": "Profile Settings",
       "pageDescription": "Update your profile information",
       "fullName": "Full Name",
