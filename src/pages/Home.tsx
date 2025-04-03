@@ -18,6 +18,7 @@ import {
   Code2,
   Settings,
   Star,
+  Twitter,
 } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 
@@ -56,10 +57,12 @@ interface AdminProfile {
     title: string;
     description: string;
   }>;
-  socialLinks: Array<{
-    platform: string;
-    url: string;
-  }>;
+  socialLinks: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    gmail?: string;
+  };
 }
 
 const defaultProfile = {
@@ -181,25 +184,45 @@ const Home: React.FC = () => {
   }, []);
 
   const getSocialLinks = () => {
-    if (
-      !adminProfile?.socialLinks ||
-      !Array.isArray(adminProfile.socialLinks)
-    ) {
+    if (!adminProfile?.socialLinks) {
       return defaultSocialLinks;
     }
 
-    return adminProfile.socialLinks.map((link) => ({
-      icon:
-        link.platform === "github"
-          ? Github
-          : link.platform === "linkedin"
-          ? Linkedin
-          : link.platform === "email"
-          ? Mail
-          : Github,
-      url: link.url || "#",
-      label: link.platform || "Social Link",
-    }));
+    const socialLinks = [];
+
+    if (adminProfile.socialLinks.github) {
+      socialLinks.push({
+        icon: Github,
+        url: adminProfile.socialLinks.github,
+        label: t("about.socialLinks.github"),
+      });
+    }
+
+    if (adminProfile.socialLinks.linkedin) {
+      socialLinks.push({
+        icon: Linkedin,
+        url: adminProfile.socialLinks.linkedin,
+        label: t("about.socialLinks.linkedin"),
+      });
+    }
+
+    if (adminProfile.socialLinks.twitter) {
+      socialLinks.push({
+        icon: Twitter,
+        url: adminProfile.socialLinks.twitter,
+        label: t("about.socialLinks.twitter"),
+      });
+    }
+
+    if (adminProfile.socialLinks.gmail) {
+      socialLinks.push({
+        icon: Mail,
+        url: adminProfile.socialLinks.gmail,
+        label: t("about.socialLinks.gmail"),
+      });
+    }
+
+    return socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
   };
 
   // Map icon strings to actual icon components
