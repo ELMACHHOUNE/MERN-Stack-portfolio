@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import debounce from "lodash/debounce";
 import { useLanguage } from "../context/LanguageContext";
+import { trackContactSubmission } from "../services/analytics";
 
 interface FormData {
   name: string;
@@ -68,6 +69,9 @@ const Contact: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.message || t("contact.errors.sendFailed"));
       }
+
+      // Track the contact submission
+      await trackContactSubmission();
 
       setStatus({
         type: "success",

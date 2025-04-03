@@ -66,7 +66,6 @@
         "editAbout": "Edit About Section"
       }
     },
-    "overview": "Overview",
     "users": "Users",
     "skills": "Skills",
     "categories": "Categories",
@@ -492,7 +491,30 @@
     "updateSuccess": "Profile updated successfully",
     "updateError": "Failed to update profile",
     "save": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "settings": {
+      "pageTitle": "Profile Settings",
+      "pageDescription": "Update your profile information",
+      "fullName": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "professionalTitle": "Professional Title",
+      "titlePlaceholder": "e.g. Full Stack Developer",
+      "location": "Location",
+      "locationPlaceholder": "e.g. New York, USA",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "interests": "Interests",
+      "interestPlaceholder": "Add a new interest",
+      "addInterest": "Add",
+      "socialLinks": "Social Links",
+      "save": "Save Changes",
+      "success": "Profile updated successfully",
+      "error": "Failed to update profile",
+      "imageAlt": "Profile Image",
+      "upload": "Upload a new profile image"
+    }
   },
   "footer": {
     "copyright": "All rights reserved.",
@@ -554,35 +576,40 @@
       "password": "Change Password"
     },
     "profile": {
-      "title": "Profile Settings",
-      "description": "Update your profile picture and personal details here",
-      "imageAlt": "Profile",
-      "fullName": "Name",
-      "email": "Email",
-      "namePlaceholder": "Your full name",
-      "emailPlaceholder": "your.email@example.com",
-      "saveChanges": "Save Changes",
+      "pageTitle": "Profile Settings",
+      "pageDescription": "Update your profile information",
+      "fullName": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "professionalTitle": "Professional Title",
+      "titlePlaceholder": "e.g. Full Stack Developer",
+      "location": "Location",
+      "locationPlaceholder": "e.g. New York, USA",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "interests": "Interests",
+      "interestPlaceholder": "Add a new interest",
+      "addInterest": "Add",
+      "socialLinks": "Social Links",
+      "save": "Save Changes",
+      "success": "Profile updated successfully",
       "error": "Failed to update profile",
-      "success": "Profile updated successfully"
+      "imageAlt": "Profile Image",
+      "upload": "Upload a new profile image"
     },
     "password": {
       "title": "Change Password",
-      "currentPassword": "Current Password",
-      "newPassword": "New Password",
-      "confirmPassword": "Confirm New Password",
-      "currentPasswordPlaceholder": "Enter current password",
-      "newPasswordPlaceholder": "Enter new password",
-      "confirmPasswordPlaceholder": "Confirm new password",
-      "updatePassword": "Update Password",
-      "error": "Failed to update password",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm Password",
+      "mismatch": "New passwords do not match",
       "success": "Password updated successfully",
-      "mismatch": "New passwords do not match"
+      "error": "Failed to update password"
     },
     "image": {
-      "error": "Failed to upload image",
       "success": "Profile image updated successfully",
-      "invalidType": "Please upload a valid image file (JPEG, JPG, PNG, or GIF)",
-      "sizeLimit": "Image size should be less than 5MB"
+      "error": "Failed to update profile image"
     }
   },
   "notFound": {

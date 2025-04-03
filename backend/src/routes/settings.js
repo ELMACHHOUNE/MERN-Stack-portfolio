@@ -71,7 +71,18 @@ router.get("/profile", protect, async (req, res) => {
 // Update current user's profile
 router.put("/profile", protect, async (req, res) => {
   try {
-    const { name, email, currentPassword, newPassword } = req.body;
+    const {
+      name,
+      email,
+      currentPassword,
+      newPassword,
+      title,
+      location,
+      bio,
+      interests,
+      socialLinks,
+    } = req.body;
+
     const user = await User.findById(req.user._id).select("+password");
 
     if (!user) {
@@ -100,9 +111,19 @@ router.put("/profile", protect, async (req, res) => {
     // Update other fields
     if (name) user.name = name;
     if (email) user.email = email;
+    if (title) user.title = title;
+    if (location) user.location = location;
+    if (bio) user.bio = bio;
+    if (interests) user.interests = interests;
+    if (socialLinks) user.socialLinks = socialLinks;
 
     await user.save();
-    res.json({ message: "Profile updated successfully", user });
+
+    // Remove password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.json({ message: "Profile updated successfully", user: userResponse });
   } catch (error) {
     console.error("Profile update error:", error);
     res.status(500).json({ message: "Server error" });

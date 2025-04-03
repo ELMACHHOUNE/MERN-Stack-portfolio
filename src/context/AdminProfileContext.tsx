@@ -62,7 +62,9 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchAdminProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const headers: HeadersInit = {};
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
 
       if (token) {
         headers.Authorization = `Bearer ${token}`;
@@ -70,7 +72,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // If user is logged in as admin, fetch their profile
       if (user?.isAdmin && token) {
-        const response = await fetch(`${API_URL}/api/settings/profile`, {
+        const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
           headers,
         });
 
@@ -79,8 +81,20 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         const data = await response.json();
-        setAdminProfile(data);
-        return data;
+        // Ensure all required fields have default values
+        const profile = {
+          name: data.name || "",
+          email: data.email || "",
+          title: data.title || "",
+          location: data.location || "",
+          bio: data.bio || "",
+          profileImage: data.profileImage || "",
+          interests: data.interests || [],
+          values: data.values || [],
+          socialLinks: data.socialLinks || {},
+        };
+        setAdminProfile(profile);
+        return profile;
       }
       // If user is logged in but not admin, or not logged in at all, fetch public admin profile
       else {

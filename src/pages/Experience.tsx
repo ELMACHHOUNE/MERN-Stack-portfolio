@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Calendar, MapPin } from "lucide-react";
 import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
+import { trackPageView } from "../services/analytics";
 
 interface Experience {
   _id: string;
@@ -41,6 +42,10 @@ const Experience: React.FC = () => {
 
     fetchExperiences();
   }, [t]);
+
+  useEffect(() => {
+    trackPageView("/experience");
+  }, []);
 
   if (loading) {
     return (

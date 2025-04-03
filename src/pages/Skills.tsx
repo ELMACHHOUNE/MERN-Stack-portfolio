@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
+import { trackPageView, trackSkillView } from "../services/analytics";
 
 interface Skill {
   _id: string;
@@ -77,6 +78,10 @@ const Skills: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    trackPageView("/skills");
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -191,6 +196,11 @@ const Skills: React.FC = () => {
 
     // For any local images (including skill icons)
     return `${API_URL}/uploads/${url}`;
+  };
+
+  // Add tracking when a skill is viewed
+  const handleSkillView = (skillId: string) => {
+    trackSkillView(skillId);
   };
 
   if (loading) {

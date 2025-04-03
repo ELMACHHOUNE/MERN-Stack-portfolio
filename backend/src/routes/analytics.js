@@ -31,32 +31,32 @@ router.get("/", protect, admin, async (req, res) => {
 
     // Get unique visitors
     const uniqueVisitors = await Analytics.distinct("visitorId", {
-      timestamp: { $gte: startDate },
+      createdAt: { $gte: startDate },
     });
 
     // Get page views
     const pageViews = await Analytics.countDocuments({
       type: "pageView",
-      timestamp: { $gte: startDate },
+      createdAt: { $gte: startDate },
     });
 
     // Get contact submissions
     const contactSubmissions = await Analytics.countDocuments({
       type: "contactSubmission",
-      timestamp: { $gte: startDate },
+      createdAt: { $gte: startDate },
     });
 
     // Get resume downloads
     const resumeDownloads = await Analytics.countDocuments({
       type: "resumeDownload",
-      timestamp: { $gte: startDate },
+      createdAt: { $gte: startDate },
     });
 
     // Get top locations
     const topLocations = await Analytics.aggregate([
       {
         $match: {
-          timestamp: { $gte: startDate },
+          createdAt: { $gte: startDate },
         },
       },
       {
@@ -85,7 +85,7 @@ router.get("/", protect, admin, async (req, res) => {
       {
         $match: {
           type: "projectView",
-          timestamp: { $gte: startDate },
+          createdAt: { $gte: startDate },
         },
       },
       {
@@ -125,7 +125,7 @@ router.get("/", protect, admin, async (req, res) => {
       {
         $match: {
           type: "skillView",
-          timestamp: { $gte: startDate },
+          createdAt: { $gte: startDate },
         },
       },
       {
@@ -165,7 +165,7 @@ router.get("/", protect, admin, async (req, res) => {
       {
         $match: {
           type: "pageView",
-          timestamp: { $gte: startDate },
+          createdAt: { $gte: startDate },
           timeSpent: { $gt: 0 },
         },
       },

@@ -150,7 +150,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/messages")) return "messages";
     if (path.includes("/settings")) return "settings";
-    return "overview";
+    return "";
   });
 
   useEffect(() => {
@@ -207,7 +207,7 @@ const AdminDashboard: React.FC = () => {
     console.log("Tab clicked:", tab);
     setActiveTab(tab);
     setIsSidebarOpen(false); // Close sidebar on mobile when tab is clicked
-    navigate(`/admin/${tab === "overview" ? "" : tab}`);
+    navigate(`/admin/${tab === "" ? "" : tab}`);
   };
 
   const handleEditUser = (user: User) => {
@@ -319,15 +319,15 @@ const AdminDashboard: React.FC = () => {
             </div>
             <nav className="mt-6">
               <button
-                onClick={() => handleTabClick("overview")}
+                onClick={() => handleTabClick("")}
                 className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "overview"
+                  activeTab === ""
                     ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                     : ""
                 }`}
               >
                 <LayoutDashboard className="w-5 h-5 mr-3" />
-                {t("admin.overview")}
+                {t("admin.")}
               </button>
               <button
                 onClick={() => handleTabClick("users")}
@@ -431,12 +431,12 @@ const AdminDashboard: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-8 md:ml-64">
-        {activeTab === "overview" && (
+        {activeTab === "" && (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-              {t("admin.overview")}
+              {t("admin.")}
             </h2>
-            {/* Overview content */}
+            {/*  content */}
           </div>
         )}
 

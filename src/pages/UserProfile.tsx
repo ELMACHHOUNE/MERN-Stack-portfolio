@@ -3,10 +3,10 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
 import { API_URL } from "../config";
-import { User, Mail, Lock, Save, Eye, EyeOff, Camera } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface ProfileFormData {
+interface FormData {
   name: string;
   email: string;
   currentPassword: string;
@@ -17,14 +17,15 @@ interface ProfileFormData {
 const UserProfile: React.FC = () => {
   const { t } = useLanguage();
   const { user, token, setUser } = useAuth();
-  const [profileImage, setProfileImage] = useState<string | null>(
-    user?.profileImage ? `${API_URL}${user.profileImage}` : null
-  );
-  const [isUploading, setIsUploading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState<ProfileFormData>({
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user?.profileImage ? `${API_URL}${user.profileImage}` : null
+  );
+  const [formData, setFormData] = useState<FormData>({
     name: user?.name || "",
     email: user?.email || "",
     currentPassword: "",
@@ -32,18 +33,43 @@ const UserProfile: React.FC = () => {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    if (user) {
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/settings/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+
+      const data = await response.json();
+
       setFormData((prev) => ({
         ...prev,
-        name: user.name || "",
-        email: user.email || "",
+        name: data.name || "",
+        email: data.email || "",
       }));
+
       setProfileImage(
-        user.profileImage ? `${API_URL}${user.profileImage}` : null
+        data.profileImage ? `${API_URL}${data.profileImage}` : null
       );
+      setUser(data); // Update the global user state
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error(t("settings.profile.fetchError"));
+    } finally {
+      setIsLoading(false);
     }
-  }, [user]);
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchUserProfile();
+    }
+  }, [token]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -114,8 +140,8 @@ const UserProfile: React.FC = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
+          currentPassword: formData.currentPassword || undefined,
+          newPassword: formData.newPassword || undefined,
         }),
       });
 
@@ -137,8 +163,7 @@ const UserProfile: React.FC = () => {
 
       // Update user state with new data
       if (data.user) {
-        const { password, ...userData } = data.user;
-        setUser(userData);
+        setUser(data.user);
       }
     } catch (error) {
       console.error("Profile update error:", error);
@@ -149,223 +174,216 @@ const UserProfile: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#1F2937] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-md mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800"
         >
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent mb-8">
-            {t("settings.profile.title")}
-          </h2>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent mb-8">
+                {t("settings.profile.title")}
+              </h2>
 
-          {/* Profile Image Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-6">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
-                  {profileImage ? (
-                    <img
-                      src={profileImage}
-                      alt={t("settings.profile.imageAlt")}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
-                      <User className="w-16 h-16 text-blue-500 dark:text-blue-400" />
-                    </div>
-                  )}
-                  <label
-                    htmlFor="profile-image"
-                    className="absolute bottom-2 right-2 bg-white dark:bg-[#1B2333] p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#242E42] transition-colors border border-gray-200 dark:border-gray-700"
-                  >
-                    <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    <input
-                      type="file"
-                      id="profile-image"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                    />
+              {/* Profile Image */}
+              <div className="flex justify-center mb-8">
+                <div className="relative">
+                  <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt={t("settings.profile.imageAlt")}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
+                        <User className="w-16 h-16 text-blue-500 dark:text-blue-400" />
+                      </div>
+                    )}
+                    <label
+                      htmlFor="profile-image"
+                      className="absolute bottom-2 right-2 bg-white dark:bg-[#1B2333] p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#242E42] transition-colors border border-gray-200 dark:border-gray-700"
+                    >
+                      <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                      <input
+                        type="file"
+                        id="profile-image"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Basic Information */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t("settings.profile.fullName")}
                   </label>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {user?.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {user?.email}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                  {t("settings.profile.description")}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Profile Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.fullName")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder={t("settings.profile.namePlaceholder")}
+                    />
                   </div>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.namePlaceholder")}
-                  />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.email")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t("settings.profile.email")}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder={t("settings.profile.emailPlaceholder")}
+                    />
                   </div>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.emailPlaceholder")}
-                  />
                 </div>
-              </div>
-            </div>
 
-            <div className="bg-gray-50 dark:bg-[#1B2333]/50 rounded-2xl p-6 space-y-6 border border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {t("settings.password.title")}
-              </h3>
+                {/* Password Change */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    {t("settings.password.title")}
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t("settings.password.current")}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
+                          name="currentPassword"
+                          value={formData.currentPassword}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-12 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        >
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.password.currentPassword")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t("settings.password.new")}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          name="newPassword"
+                          value={formData.newPassword}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-12 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t("settings.password.confirm")}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          value={formData.confirmPassword}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-12 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t(
-                      "settings.password.currentPasswordPlaceholder"
-                    )}
-                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-end pt-6">
                   <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                    type="submit"
+                    className="px-6 py-3 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-colors"
                   >
-                    {showCurrentPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    )}
+                    {t("settings.profile.save")}
                   </button>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.password.newPassword")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.password.newPasswordPlaceholder")}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                  >
-                    {showNewPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.password.confirmPassword")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-11 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t(
-                      "settings.password.confirmPasswordPlaceholder"
-                    )}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-6">
-              <button
-                type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {t("settings.profile.saveChanges")}
-                <Save className="w-5 h-5" />
-              </button>
-            </div>
-          </form>
+              </form>
+            </>
+          )}
         </motion.div>
       </div>
     </div>
