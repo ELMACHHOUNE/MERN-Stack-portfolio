@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
+import Navbar from "./Navbar";
 import {
   Users,
   Mail,
@@ -149,6 +150,15 @@ const AdminDashboard: React.FC = () => {
     return "";
   });
 
+  const navItems = [
+    { path: "/", label: t("navbar.menu.home") },
+    { path: "/about", label: t("navbar.menu.about") },
+    { path: "/projects", label: t("navbar.menu.projects") },
+    { path: "/experience", label: t("navbar.menu.experience") },
+    { path: "/skills", label: t("navbar.menu.skills") },
+    { path: "/contact", label: t("navbar.menu.contact") },
+  ];
+
   useEffect(() => {
     // Check if user is authenticated and is admin
     if (!user || !user.isAdmin) {
@@ -262,6 +272,31 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleSidebarToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        // For large screens, always show sidebar
+        setIsSidebarOpen(true);
+      } else {
+        // For small screens, hide sidebar by default
+        setIsSidebarOpen(false);
+      }
+    };
+
+    // Initial call
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -271,135 +306,112 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1121] flex">
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#1B2333] transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 lg:static shadow-lg lg:shadow-none border-r border-gray-200 dark:border-gray-800`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-                <LayoutDashboard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                  {t("admin.dashboard.title")}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {user?.email}
-                </p>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1121]">
+      <Navbar isAdmin onSidebarToggle={handleSidebarToggle} />
+
+      <div className="flex pt-16">
+        {/* Sidebar with overlay on mobile */}
+        <>
+          {/* Backdrop overlay for mobile - only shown when sidebar is open */}
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
+
+          {/* Sidebar */}
+          <div
+            className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)] ${
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            <div className="flex flex-col h-full">
+              {/* Navigation Links */}
+              <nav className="flex-1 px-4 py-4 space-y-1">
+                {[
+                  {
+                    label: t("admin.tabs.skills"),
+                    icon: <Wrench className="w-5 h-5" />,
+                    tab: "skills",
+                  },
+                  {
+                    label: t("admin.tabs.projects"),
+                    icon: <FolderKanban className="w-5 h-5" />,
+                    tab: "projects",
+                  },
+                  {
+                    label: t("admin.tabs.experience"),
+                    icon: <Briefcase className="w-5 h-5" />,
+                    tab: "experience",
+                  },
+                  {
+                    label: t("admin.tabs.categories"),
+                    icon: <Users className="w-5 h-5" />,
+                    tab: "categories",
+                  },
+                  {
+                    label: t("admin.tabs.users"),
+                    icon: <User className="w-5 h-5" />,
+                    tab: "users",
+                  },
+                  {
+                    label: t("admin.tabs.analytics"),
+                    icon: <BarChart3 className="w-5 h-5" />,
+                    tab: "analytics",
+                  },
+                  {
+                    label: t("admin.tabs.messages"),
+                    icon: <Mail className="w-5 h-5" />,
+                    tab: "messages",
+                  },
+                  {
+                    label: t("admin.tabs.settings"),
+                    icon: <Settings className="w-5 h-5" />,
+                    tab: "settings",
+                  },
+                ].map(({ label, icon, tab }) => (
+                  <button
+                    key={tab}
+                    onClick={() => handleTabClick(tab)}
+                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
+                      activeTab === tab
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-blue-600 dark:hover:text-blue-400"
+                    }`}
+                  >
+                    <span
+                      className={`mr-3 ${
+                        activeTab === tab
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                      }`}
+                    >
+                      {icon}
+                    </span>
+                    {label}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Sidebar Footer */}
+              <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
+                >
+                  <LogOut className="w-5 h-5 mr-3" />
+                  {t("admin.logout")}
+                </button>
               </div>
             </div>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
+        </>
 
-          {/* Navigation Links */}
-          <nav className="flex-1 px-4 py-4 space-y-1">
-            {[
-              {
-                label: t("admin.tabs.skills"),
-                icon: <Wrench className="w-5 h-5" />,
-                tab: "skills",
-              },
-              {
-                label: t("admin.tabs.projects"),
-                icon: <FolderKanban className="w-5 h-5" />,
-                tab: "projects",
-              },
-              {
-                label: t("admin.tabs.experience"),
-                icon: <Briefcase className="w-5 h-5" />,
-                tab: "experience",
-              },
-              {
-                label: t("admin.tabs.categories"),
-                icon: <Users className="w-5 h-5" />,
-                tab: "categories",
-              },
-              {
-                label: t("admin.tabs.users"),
-                icon: <User className="w-5 h-5" />,
-                tab: "users",
-              },
-              {
-                label: t("admin.tabs.analytics"),
-                icon: <BarChart3 className="w-5 h-5" />,
-                tab: "analytics",
-              },
-              {
-                label: t("admin.tabs.messages"),
-                icon: <Mail className="w-5 h-5" />,
-                tab: "messages",
-              },
-              {
-                label: t("admin.tabs.settings"),
-                icon: <Settings className="w-5 h-5" />,
-                tab: "settings",
-              },
-            ].map(({ label, icon, tab }) => (
-              <button
-                key={tab}
-                onClick={() => handleTabClick(tab)}
-                className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-                  activeTab === tab
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50"
-                }`}
-              >
-                <span
-                  className={`mr-3 ${
-                    activeTab === tab
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400"
-                  }`}
-                >
-                  {icon}
-                </span>
-                {label}
-              </button>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-            <button
-              onClick={handleLogout}
-              className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              {t("admin.logout")}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 lg:ml-64">
-        {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-[#1B2333] border-b border-gray-200 dark:border-gray-800">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-            {t(`admin.tabs.${activeTab}`)}
-          </h1>
-          <div className="w-5" /> {/* Spacer for alignment */}
-        </div>
-
-        {/* Content Area */}
-        <div className="p-6">
+        {/* Main Content with extra padding on mobile when sidebar is open */}
+        <div
+          className={`flex-1 lg:ml-64 p-6 ${isSidebarOpen ? "md:ml-64" : ""}`}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

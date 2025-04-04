@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
+  Outlet,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
@@ -38,6 +39,19 @@ const AnalyticsWrapper: React.FC<{ children: React.ReactNode }> = ({
   return <>{children}</>;
 };
 
+// Layout wrapper for pages that need navbar and footer
+const MainLayout: React.FC = () => {
+  return (
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+      <Navbar />
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   return (
     <ThemeProvider>
@@ -46,32 +60,31 @@ const App: React.FC = () => {
           <AdminProfileProvider>
             <Router>
               <AnalyticsWrapper>
-                <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
-                  <Navbar />
-                  <main className="flex-grow">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/projects" element={<Projects />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/experience" element={<Experience />} />
-                      <Route path="/skills" element={<Skills />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/profile" element={<ProfileSettings />} />
-                      <Route
-                        path="/admin/*"
-                        element={
-                          <AdminRoute>
-                            <AdminDashboard />
-                          </AdminRoute>
-                        }
-                      />
-                    </Routes>
-                  </main>
-                  <Footer />
-                  <Toaster position="bottom-right" />
-                </div>
+                <Routes>
+                  {/* Admin routes without main layout */}
+                  <Route
+                    path="/admin/*"
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+
+                  {/* Main layout routes */}
+                  <Route element={<MainLayout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/experience" element={<Experience />} />
+                    <Route path="/skills" element={<Skills />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/profile" element={<ProfileSettings />} />
+                  </Route>
+                </Routes>
+                <Toaster position="bottom-right" />
               </AnalyticsWrapper>
             </Router>
           </AdminProfileProvider>

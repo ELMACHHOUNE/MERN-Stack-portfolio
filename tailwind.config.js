@@ -70,6 +70,38 @@ export default {
           900: "#7f1d1d",
           950: "#450a0a",
         },
+        light: {
+          bg: {
+            primary: "#ffffff",
+            secondary: "#f3f4f6",
+            tertiary: "#e5e7eb",
+          },
+          text: {
+            primary: "#111827",
+            secondary: "#374151",
+            tertiary: "#6b7280",
+          },
+          border: {
+            primary: "#e5e7eb",
+            secondary: "#d1d5db",
+          },
+        },
+        dark: {
+          bg: {
+            primary: "#0B1121",
+            secondary: "#1B2333",
+            tertiary: "#1f2937",
+          },
+          text: {
+            primary: "#ffffff",
+            secondary: "#e5e7eb",
+            tertiary: "#9ca3af",
+          },
+          border: {
+            primary: "#374151",
+            secondary: "#4b5563",
+          },
+        },
       },
       spacing: {
         18: "4.5rem",
