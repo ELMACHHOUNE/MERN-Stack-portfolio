@@ -633,7 +633,9 @@
     "profile": {
       "openMenu": "Ouvrir le menu utilisateur",
       "settings": "Paramètres du profil",
-      "signOut": "Se déconnecter"
+      "signOut": "Se déconnecter",
+      "manageAccount": "Gérer les paramètres de votre compte",
+      "signOutDesc": "Déconnectez-vous de votre compte"
     },
     "auth": {
       "login": "Connexion"
@@ -648,15 +650,38 @@
     "profile": {
       "title": "Paramètres du profil",
       "pageTitle": "Paramètres du profil",
-      "description": "Mettez à jour vos informations de profil, y compris vos coordonnées personnelles, liens sociaux et centres d'intérêt",
-      "imageAlt": "Profil",
-      "fullName": "Nom",
-      "email": "Email",
-      "namePlaceholder": "Votre nom complet",
+      "description": "Mettez à jour vos informations de profil",
+      "basicInfo": "Informations de base",
+      "fullName": "Nom complet",
+      "email": "Adresse email",
+      "professionalTitle": "Titre professionnel",
+      "location": "Localisation",
+      "bio": "Biographie",
+      "namePlaceholder": "Entrez votre nom complet",
       "emailPlaceholder": "votre.email@exemple.com",
+      "titlePlaceholder": "ex. Ingénieur Logiciel",
+      "locationPlaceholder": "ex. Maroc",
+      "bioPlaceholder": "Parlez-nous de vous...",
+      "interests": "Centres d'intérêt",
+      "interestPlaceholder": "Ajouter un centre d'intérêt",
+      "addInterest": "Ajouter",
+      "socialLinks": "Liens sociaux",
       "saveChanges": "Enregistrer les modifications",
+      "success": "Profil mis à jour avec succès",
       "error": "Échec de la mise à jour du profil",
-      "success": "Profil mis à jour avec succès"
+      "imageAlt": "Photo de profil",
+      "upload": "Télécharger une nouvelle photo de profil",
+      "changePassword": "Changer le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le nouveau mot de passe",
+      "newPasswordPlaceholder": "Entrez votre nouveau mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "currentPasswordPlaceholder": "Entrez votre mot de passe actuel",
+      "updatePassword": "Mettre à jour le mot de passe",
+      "passwordSuccess": "Mot de passe mis à jour avec succès",
+      "passwordError": "Échec de la mise à jour du mot de passe",
+      "passwordMismatch": "Les mots de passe ne correspondent pas"
     },
     "password": {
       "title": "Changer le mot de passe",
@@ -669,7 +694,8 @@
       "updatePassword": "Mettre à jour le mot de passe",
       "error": "Échec de la mise à jour du mot de passe",
       "success": "Mot de passe mis à jour avec succès",
-      "mismatch": "Les nouveaux mots de passe ne correspondent pas"
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas",
+      "changePassword": "Changer le mot de passe"
     },
     "image": {
       "error": "Échec du téléchargement de l'image",
