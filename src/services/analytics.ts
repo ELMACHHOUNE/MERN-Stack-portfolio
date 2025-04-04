@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+
 
 const API_URL = 'http://localhost:5000/api/analytics';
 

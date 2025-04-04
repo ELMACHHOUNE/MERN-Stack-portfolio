@@ -3,7 +3,17 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { Github, Link, ExternalLink } from "lucide-react";
+import {
+  Github,
+  Link,
+  ExternalLink,
+  Code2,
+  FolderGit2,
+  Search,
+  Filter,
+  X,
+} from "lucide-react";
+import { API_URL } from "../config";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -200,10 +210,12 @@ const Projects: React.FC = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
+      <section className="py-24 bg-white dark:bg-[#0B1121]">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          <span className="ml-4 text-gray-400">{t("projects.loading")}</span>
+          <span className="ml-4 text-gray-600 dark:text-gray-400">
+            {t("projects.loading")}
+          </span>
         </div>
       </section>
     );
@@ -211,8 +223,8 @@ const Projects: React.FC = () => {
 
   if (error) {
     return (
-      <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="text-center text-red-500">
+      <section className="py-24 bg-white dark:bg-[#0B1121]">
+        <div className="text-center text-red-600 dark:text-red-400">
           <p>{t("projects.error")}</p>
         </div>
       </section>
@@ -223,27 +235,22 @@ const Projects: React.FC = () => {
     <section
       ref={sectionRef}
       id="projects"
-      className={`py-24 ${
-        isDarkMode
-          ? "bg-gradient-to-b from-gray-900 to-gray-800"
-          : "bg-gradient-to-b from-gray-100 to-white"
-      }`}
+      className="min-h-screen bg-white dark:bg-[#0B1121] py-16 px-4 sm:px-6 lg:px-8"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2
-          ref={titleRef}
-          className={`text-4xl font-bold text-center mb-12 relative ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}
-        >
-          {t("projects.title")}
-          <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></span>
-        </h2>
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
+            {t("projects.title")}
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            {t("projects.description")}
+          </p>
+        </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
-            <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
               placeholder={t("projects.search")}
@@ -251,11 +258,7 @@ const Projects: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
               }
-              className={`w-full pl-10 pr-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1B2333] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent transition-all duration-300"
             />
           </div>
           <button
@@ -265,181 +268,149 @@ const Projects: React.FC = () => {
                 showFilters: !prev.showFilters,
               }))
             }
-            className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors ${
-              isDarkMode
-                ? "bg-gray-800 text-white hover:bg-gray-700"
-                : "bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
-            }`}
+            className="flex items-center justify-center px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1B2333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 gap-2"
           >
-            <Github className="w-5 h-5 mr-2" />
+            <Filter className="w-5 h-5" />
             {t("projects.filter")}
           </button>
         </div>
 
         {/* Filter Panel */}
         {filters.showFilters && (
-          <div
-            className={`rounded-lg p-4 mb-6 ${
-              isDarkMode ? "bg-gray-800" : "bg-white border border-gray-200"
-            }`}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-lg font-semibold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
+          <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("projects.filter")}
               </h3>
               <button
                 onClick={resetFilters}
-                className={`transition-colors ${
-                  isDarkMode
-                    ? "text-gray-400 hover:text-white"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
+                className="p-2 rounded-lg text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all duration-300"
               >
-                <Github className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Categories */}
-            <div className="mb-4">
-              <h4
-                className={`text-sm font-medium mb-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("projects.categories.category")}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  t("projects.all"),
-                  ...new Set(projects.map((p) => p.category)),
-                ].map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      filters.selectedCategory === category
-                        ? "bg-blue-600 text-white"
-                        : isDarkMode
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                  {t("projects.categories.category")}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    t("projects.all"),
+                    ...new Set(projects.map((p) => p.category)),
+                  ].map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryChange(category)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                        filters.selectedCategory === category
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white"
+                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Technologies */}
-            <div className="mb-4">
-              <h4
-                className={`text-sm font-medium mb-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("projects.technologies")}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {allTechnologies.map((tech) => (
-                  <button
-                    key={tech}
-                    onClick={() => toggleTechnology(tech)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      filters.selectedTechnologies.includes(tech)
-                        ? "bg-purple-600 text-white"
-                        : isDarkMode
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {tech}
-                  </button>
-                ))}
+              {/* Technologies */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                  {t("projects.technologies")}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {allTechnologies.map((tech) => (
+                    <button
+                      key={tech}
+                      onClick={() => toggleTechnology(tech)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                        filters.selectedTechnologies.includes(tech)
+                          ? "bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white"
+                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                      }`}
+                    >
+                      {tech}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Sort Options */}
-            <div>
-              <h4
-                className={`text-sm font-medium mb-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("projects.sortBy")}
-              </h4>
-              <div className="flex gap-2">
-                {[
-                  { value: "newest", label: t("projects.newest") },
-                  { value: "oldest", label: t("projects.oldest") },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        sortBy: option.value as "newest" | "oldest" | "name",
-                      }))
-                    }
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      filters.sortBy === option.value
-                        ? "bg-green-600 text-white"
-                        : isDarkMode
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+              {/* Sort Options */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                  {t("projects.sortBy")}
+                </h4>
+                <div className="flex gap-2">
+                  {[
+                    { value: "newest", label: t("projects.newest") },
+                    { value: "oldest", label: t("projects.oldest") },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          sortBy: option.value as "newest" | "oldest" | "name",
+                        }))
+                      }
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                        filters.sortBy === option.value
+                          ? "bg-gradient-to-r from-green-600 to-emerald-600 dark:from-[#059669] dark:to-[#047857] text-white"
+                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* Active Filters */}
-        {(filters.selectedCategory !== "All" ||
+        {(filters.selectedCategory !== t("projects.all") ||
           filters.selectedTechnologies.length > 0 ||
           filters.searchTerm) && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {filters.selectedCategory !== "All" && (
-              <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm flex items-center">
+          <div className="flex flex-wrap gap-2 mb-8">
+            {filters.selectedCategory !== t("projects.all") && (
+              <span className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white rounded-xl text-sm flex items-center gap-2">
                 {filters.selectedCategory}
                 <button
-                  onClick={() => handleCategoryChange("All")}
-                  className="ml-2 hover:text-gray-200"
+                  onClick={() => handleCategoryChange(t("projects.all"))}
+                  className="hover:text-gray-200 transition-colors"
                 >
-                  <Github className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </span>
             )}
             {filters.selectedTechnologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm flex items-center"
+                className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white rounded-xl text-sm flex items-center gap-2"
               >
                 {tech}
                 <button
                   onClick={() => toggleTechnology(tech)}
-                  className="ml-2 hover:text-gray-200"
+                  className="hover:text-gray-200 transition-colors"
                 >
-                  <Github className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </span>
             ))}
             {filters.searchTerm && (
-              <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm flex items-center">
-                Search: {filters.searchTerm}
+              <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-600 to-amber-600 dark:from-[#D97706] dark:to-[#B45309] text-white rounded-xl text-sm flex items-center gap-2">
+                {t("projects.searchResult")}: {filters.searchTerm}
                 <button
                   onClick={() =>
                     setFilters((prev) => ({ ...prev, searchTerm: "" }))
                   }
-                  className="ml-2 hover:text-gray-200"
+                  className="hover:text-gray-200 transition-colors"
                 >
-                  <Github className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </span>
             )}
@@ -447,20 +418,18 @@ const Projects: React.FC = () => {
         )}
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProjects.map((project, index) => (
             <div
               key={project._id}
               ref={(el) => (cardsRef.current[index] = el as HTMLDivElement)}
-              className={`rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300 ${
-                isDarkMode ? "bg-gray-800" : "bg-white border border-gray-200"
-              }`}
+              className="group bg-gray-50 dark:bg-[#1B2333] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
             >
-              <div className="relative h-48 overflow-hidden rounded-t-xl">
+              <div className="relative h-48 overflow-hidden">
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -469,66 +438,63 @@ const Projects: React.FC = () => {
                     if (parent) {
                       const fallbackIcon = document.createElement("div");
                       fallbackIcon.className =
-                        "w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center";
+                        "w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-[#232B3B] dark:to-[#1B2333] flex items-center justify-center";
                       fallbackIcon.innerHTML =
-                        '<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>';
+                        '<div class="p-8 rounded-xl bg-gray-100/50 dark:bg-gray-800/50"><svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>';
                       parent.appendChild(fallbackIcon);
                     }
                   }}
                 />
               </div>
+
               <div className="p-6">
-                <h3
-                  className={`text-xl font-semibold mb-2 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-                >
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-[#4F46E5] transition-colors">
                   {project.title}
                 </h3>
-                <p
-                  className={`mb-4 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
+                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-6">
                   {project.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className={`px-2 py-1 rounded-full text-sm ${
-                        isDarkMode
-                          ? "bg-gray-700 text-gray-300"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
+                      className="px-2.5 py-1 rounded-lg text-sm bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
-                <div className="flex justify-between">
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-400"
-                      title={t("projects.viewCode")}
-                    >
-                      <Github className="h-5 w-5" />
-                    </a>
-                  )}
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-green-500 hover:text-green-400"
-                      title={t("projects.viewProject")}
-                    >
-                      <Link className="h-5 w-5" />
-                    </a>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                    <FolderGit2 className="w-4 h-4" />
+                    <span className="text-sm">
+                      {new Date(project.startDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] transition-colors"
+                        title={t("projects.viewCode")}
+                      >
+                        <Github className="w-5 h-5" />
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
+                        title={t("projects.viewProject")}
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -536,12 +502,13 @@ const Projects: React.FC = () => {
         </div>
 
         {filteredProjects.length === 0 && (
-          <div
-            className={`text-center mt-8 ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {t("projects.noProjects")}
+          <div className="text-center py-16">
+            <div className="mx-auto w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 flex items-center justify-center">
+              <Code2 className="w-10 h-10 text-blue-600 dark:text-[#4F46E5]" />
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {t("projects.noProjects")}
+            </p>
           </div>
         )}
       </div>

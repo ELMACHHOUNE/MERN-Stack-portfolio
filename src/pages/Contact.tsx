@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, MapPin, Send, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Send, MessageCircle, ExternalLink } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
+import { useTheme } from "../context/ThemeContext";
 
 interface ContactForm {
   name: string;
@@ -20,6 +21,7 @@ interface ValidationError {
 const Contact: React.FC = () => {
   const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
     email: "",
@@ -133,18 +135,18 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white dark:bg-[#0B1121] py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
             {t("contact.title")}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             {t("contact.description")}
           </p>
         </motion.div>
@@ -155,23 +157,26 @@ const Contact: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
+            className="bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
           >
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
               {t("contact.info.title")}
             </h2>
-            <div className="space-y-6">
+
+            <div className="space-y-8">
               {/* Gmail */}
               {adminProfile?.socialLinks?.gmail && (
                 <div className="flex items-start space-x-4">
-                  <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div className="p-3 bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 rounded-xl border border-gray-200 dark:border-gray-800">
+                    <Mail className="h-6 w-6 text-blue-600 dark:text-[#4F46E5]" />
+                  </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {t("contact.info.email")}
                     </h3>
                     <a
                       href={adminProfile.socialLinks.gmail}
-                      className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-[#4F46E5] transition-colors"
                     >
                       {adminProfile.socialLinks.gmail.replace("mailto:", "")}
                     </a>
@@ -182,7 +187,9 @@ const Contact: React.FC = () => {
               {/* WhatsApp */}
               {adminProfile?.socialLinks?.whatsapp && (
                 <div className="flex items-start space-x-4">
-                  <MessageCircle className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div className="p-3 bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 rounded-xl border border-gray-200 dark:border-gray-800">
+                    <MessageCircle className="h-6 w-6 text-blue-600 dark:text-[#4F46E5]" />
+                  </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {t("contact.info.whatsapp")}
@@ -191,7 +198,7 @@ const Contact: React.FC = () => {
                       href={adminProfile.socialLinks.whatsapp}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-[#4F46E5] transition-colors"
                     >
                       {adminProfile.socialLinks.whatsapp
                         .replace("https://wa.me/", "+")
@@ -204,12 +211,14 @@ const Contact: React.FC = () => {
               {/* Location */}
               {adminProfile?.location && (
                 <div className="flex items-start space-x-4">
-                  <MapPin className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                  <div className="p-3 bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 rounded-xl border border-gray-200 dark:border-gray-800">
+                    <MapPin className="h-6 w-6 text-blue-600 dark:text-[#4F46E5]" />
+                  </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {t("contact.info.location")}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-gray-600 dark:text-gray-400">
                       {adminProfile.location}
                     </p>
                   </div>
@@ -219,8 +228,8 @@ const Contact: React.FC = () => {
 
             {/* Social Media Links */}
             {adminProfile?.socialLinks && (
-              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                   {t("contact.info.connect")}
                 </h3>
                 <div className="flex flex-wrap gap-4">
@@ -235,11 +244,12 @@ const Contact: React.FC = () => {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-[#4F46E5] transition-all duration-300"
                       >
                         <span className="capitalize">
                           {t(`about.socialLinks.${platform}`)}
                         </span>
+                        <ExternalLink className="w-4 h-4" />
                       </a>
                     ))}
                 </div>
@@ -252,16 +262,16 @@ const Contact: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
+            className="bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
           >
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
               {t("contact.form.title")}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {t("contact.name")}
                 </label>
@@ -272,14 +282,14 @@ const Contact: React.FC = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder={t("contact.namePlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent bg-white dark:bg-[#0B1121] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("name")
                       ? "border-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-gray-600"
+                      : "border-gray-300 dark:border-gray-700"
                   }`}
                 />
                 {getFieldError("name") && (
-                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("name")}
                   </p>
                 )}
@@ -288,7 +298,7 @@ const Contact: React.FC = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {t("contact.email")}
                 </label>
@@ -299,14 +309,14 @@ const Contact: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder={t("contact.emailPlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent bg-white dark:bg-[#0B1121] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("email")
                       ? "border-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-gray-600"
+                      : "border-gray-300 dark:border-gray-700"
                   }`}
                 />
                 {getFieldError("email") && (
-                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("email")}
                   </p>
                 )}
@@ -315,7 +325,7 @@ const Contact: React.FC = () => {
               <div>
                 <label
                   htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {t("contact.subject")}
                 </label>
@@ -326,14 +336,14 @@ const Contact: React.FC = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   placeholder={t("contact.subjectPlaceholder")}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent bg-white dark:bg-[#0B1121] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("subject")
                       ? "border-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-gray-600"
+                      : "border-gray-300 dark:border-gray-700"
                   }`}
                 />
                 {getFieldError("subject") && (
-                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("subject")}
                   </p>
                 )}
@@ -342,7 +352,7 @@ const Contact: React.FC = () => {
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {t("contact.message")}
                 </label>
@@ -353,14 +363,14 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   placeholder={t("contact.messagePlaceholder")}
                   rows={4}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent bg-white dark:bg-[#0B1121] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                     getFieldError("message")
                       ? "border-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-gray-600"
+                      : "border-gray-300 dark:border-gray-700"
                   }`}
                 />
                 {getFieldError("message") && (
-                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                     {getFieldError("message")}
                   </p>
                 )}
@@ -369,7 +379,7 @@ const Contact: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors ${
+                className={`w-full flex items-center justify-center px-6 py-3 rounded-xl text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] dark:focus:ring-offset-[#0B1121] transition-all duration-300 ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >

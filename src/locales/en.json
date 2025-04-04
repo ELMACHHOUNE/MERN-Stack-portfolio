@@ -66,7 +66,29 @@
         "editAbout": "Edit About Section"
       }
     },
-    "users": "Users",
+    "users": {
+      "title": "User Management",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "lastLogin": "Last Login",
+      "actions": "Actions",
+      "admin": "Administrator",
+      "user": "Regular User",
+      "noUsers": "No users found",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this user?",
+      "deleteSuccess": "User deleted successfully",
+      "updateSuccess": "User updated successfully",
+      "createSuccess": "User created successfully",
+      "errors": {
+        "fetchFailed": "Failed to fetch users",
+        "deleteFailed": "Failed to delete user",
+        "updateFailed": "Failed to update user",
+        "createFailed": "Failed to create user"
+      }
+    },
     "skills": "Skills",
     "categories": "Categories",
     "projects": "Projects",
@@ -92,6 +114,7 @@
       "projects": "Projects",
       "experience": "Experience",
       "categories": "Categories",
+      "users": "Users",
       "analytics": "Analytics",
       "messages": "Messages",
       "settings": "Settings"
@@ -399,7 +422,17 @@
       },
       "status": {
         "read": "Mark as read",
-        "unread": "Unread"
+        "unread": "Unread",
+        "unreadCount": "{count} unread"
+      },
+      "filter": {
+        "all": "All",
+        "read": "Read",
+        "unread": "Unread",
+        "date": "Date",
+        "name": "Name",
+        "email": "Email",
+        "subject": "Subject"
       }
     }
   },
@@ -577,41 +610,42 @@
     },
     "profile": {
       "title": "Profile Settings",
-      "pageTitle": "Profile Settings",
-      "pageDescription": "Update your profile information",
-      "description": "Update your profile information, including your personal details, social links, and interests",
+      "description": "Manage your profile information and preferences",
+      "basicInfo": "Basic Information",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "save": "Save Changes",
       "fullName": "Full Name",
-      "namePlaceholder": "Enter your full name",
       "email": "Email Address",
+      "namePlaceholder": "Enter your full name",
       "emailPlaceholder": "Enter your email address",
-      "professionalTitle": "Professional Title",
-      "titlePlaceholder": "e.g. Full Stack Developer",
-      "location": "Location",
-      "locationPlaceholder": "e.g. New York, USA",
-      "bio": "Bio",
-      "bioPlaceholder": "Tell us about yourself...",
+      "titlePlaceholder": "Enter your professional title",
+      "locationPlaceholder": "Enter your location",
+      "bioPlaceholder": "Tell us about yourself",
       "interests": "Interests",
       "interestPlaceholder": "Add a new interest",
-      "addInterest": "Add",
       "socialLinks": "Social Links",
-      "saveChanges": "Save Changes",
-      "success": "Profile updated successfully",
-      "error": "Failed to update profile",
       "imageAlt": "Profile Image",
-      "upload": "Upload a new profile image"
+      "fetchError": "Failed to fetch profile data",
+      "error": "Failed to update profile",
+      "success": "Profile updated successfully"
+    },
+    "image": {
+      "error": "Failed to upload image",
+      "success": "Image uploaded successfully",
+      "invalidType": "Invalid file type. Please upload an image file.",
+      "sizeLimit": "Image size must be less than 5MB"
     },
     "password": {
-      "title": "Change Password",
+      "title": "Password Settings",
       "current": "Current Password",
       "new": "New Password",
       "confirm": "Confirm Password",
       "mismatch": "New passwords do not match",
-      "success": "Password updated successfully",
-      "error": "Failed to update password"
-    },
-    "image": {
-      "success": "Profile image updated successfully",
-      "error": "Failed to update profile image"
+      "error": "Failed to update password",
+      "success": "Password updated successfully"
     }
   },
   "notFound": {

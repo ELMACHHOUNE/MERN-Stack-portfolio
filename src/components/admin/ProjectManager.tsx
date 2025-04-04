@@ -6,6 +6,9 @@ import {
   Github,
   ExternalLink,
   FolderKanban,
+  Calendar,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
@@ -217,334 +220,312 @@ const ProjectManager: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
+    <div className="space-y-8 p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <FolderKanban className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+          </div>
           {t("projects.management.title")}
         </h2>
         <button
           onClick={resetForm}
-          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105 transform"
+          className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           {t("projects.management.addProject")}
         </button>
       </div>
 
+      {/* Form Section */}
       <form
         onSubmit={handleSubmit}
-        className="bg-gradient-to-br from-white/50 to-white/30 dark:from-[#1B2333]/50 dark:to-[#1B2333]/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-800/50 space-y-6"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-6 border border-gray-200 dark:border-gray-700"
       >
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.title")}
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.title")}
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
 
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.description")}
-          </label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            rows={4}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50 resize-none"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="technologies"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.technologies")}
-          </label>
-          <input
-            type="text"
-            id="technologies"
-            value={formData.technologies}
-            onChange={(e) =>
-              setFormData({ ...formData, technologies: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder={t("projects.management.form.technologiesPlaceholder")}
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="image"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.imageUrl")}
-          </label>
-          <input
-            type="text"
-            id="image"
-            value={formData.image}
-            onChange={(e) =>
-              setFormData({ ...formData, image: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="features"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.features")}
-          </label>
-          <input
-            type="text"
-            id="features"
-            value={formData.features}
-            onChange={(e) =>
-              setFormData({ ...formData, features: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            placeholder={t("projects.management.form.featuresPlaceholder")}
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.category")}
-          </label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          >
-            <option value="">
-              {t("projects.management.form.selectCategory")}
-            </option>
-            {categories.map((category) => (
-              <option key={category._id} value={category._id}>
-                {category.name}
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.category")}
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            >
+              <option value="">
+                {t("projects.management.form.selectCategory")}
               </option>
-            ))}
-          </select>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Description */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.description")}
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={4}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+              required
+            />
+          </div>
+
+          {/* Technologies */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.technologies")}
+            </label>
+            <input
+              type="text"
+              value={formData.technologies}
+              onChange={(e) =>
+                setFormData({ ...formData, technologies: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder={t(
+                "projects.management.form.technologiesPlaceholder"
+              )}
+              required
+            />
+          </div>
+
+          {/* Image URL */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.imageUrl")}
+            </label>
+            <input
+              type="text"
+              value={formData.image}
+              onChange={(e) =>
+                setFormData({ ...formData, image: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
+
+          {/* GitHub URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.githubUrl")}
+            </label>
+            <input
+              type="url"
+              value={formData.githubUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, githubUrl: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
+
+          {/* Live URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.liveUrl")}
+            </label>
+            <input
+              type="url"
+              value={formData.liveUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, liveUrl: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
+
+          {/* Start Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.startDate")}
+            </label>
+            <input
+              type="date"
+              value={formData.startDate}
+              onChange={(e) =>
+                setFormData({ ...formData, startDate: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
+
+          {/* End Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.endDate")}
+            </label>
+            <input
+              type="date"
+              value={formData.endDate}
+              onChange={(e) =>
+                setFormData({ ...formData, endDate: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              required
+            />
+          </div>
+
+          {/* Order */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.order")}
+            </label>
+            <input
+              type="number"
+              value={formData.order}
+              onChange={(e) =>
+                setFormData({ ...formData, order: Number(e.target.value) })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              min="0"
+              required
+            />
+          </div>
+
+          {/* Is Active */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={formData.isActive}
+              onChange={(e) =>
+                setFormData({ ...formData, isActive: e.target.checked })
+              }
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="isActive"
+              className="ml-2 text-sm text-gray-700 dark:text-gray-300"
+            >
+              {t("projects.management.form.isActive")}
+            </label>
+          </div>
         </div>
 
-        <div>
-          <label
-            htmlFor="order"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.order")}
-          </label>
-          <input
-            type="number"
-            id="order"
-            value={formData.order}
-            onChange={(e) =>
-              setFormData({ ...formData, order: Number(e.target.value) })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            min="0"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="startDate"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.startDate")}
-          </label>
-          <input
-            type="date"
-            id="startDate"
-            value={formData.startDate}
-            onChange={(e) =>
-              setFormData({ ...formData, startDate: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="endDate"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.endDate")}
-          </label>
-          <input
-            type="date"
-            id="endDate"
-            value={formData.endDate}
-            onChange={(e) =>
-              setFormData({ ...formData, endDate: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="githubUrl"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.githubUrl")}
-          </label>
-          <input
-            type="url"
-            id="githubUrl"
-            value={formData.githubUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, githubUrl: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="liveUrl"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("projects.management.form.liveUrl")}
-          </label>
-          <input
-            type="url"
-            id="liveUrl"
-            value={formData.liveUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, liveUrl: e.target.value })
-            }
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-500/50"
-            required
-          />
-        </div>
-
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isActive"
-            checked={formData.isActive}
-            onChange={(e) =>
-              setFormData({ ...formData, isActive: e.target.checked })
-            }
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label
-            htmlFor="isActive"
-            className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
-          >
-            {t("projects.management.form.isActive")}
-          </label>
-        </div>
-
+        {/* Form Actions */}
         <div className="flex justify-end gap-4">
-          <button
-            type="button"
-            onClick={resetForm}
-            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
-          >
-            {t("common.cancel")}
-          </button>
+          {isEditing && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+            >
+              <X className="w-4 h-4" />
+              {t("common.cancel")}
+            </button>
+          )}
           <button
             type="submit"
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium transition-all duration-200 hover:bg-blue-700"
+            className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
           >
-            {isEditing ? t("common.save") : t("projects.management.addProject")}
+            {isEditing ? (
+              <>
+                <Edit className="w-4 h-4" />
+                {t("common.save")}
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4" />
+                {t("projects.management.addProject")}
+              </>
+            )}
           </button>
         </div>
       </form>
 
-      <div className="mt-8">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+      {/* Project List */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <FolderKanban className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+          </div>
           {t("projects.management.projectList")}
         </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <div
               key={project._id}
-              className="group relative bg-gradient-to-br from-white to-white/80 dark:from-[#1E2A3B] dark:to-[#1E2A3B]/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 hover:-translate-y-1 transform"
+              className="group bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 hover:shadow-md transition-all duration-200"
             >
-              <div className="absolute top-4 right-4 space-x-2">
-                <button
-                  onClick={() => handleEdit(project)}
-                  className="p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors hover:scale-110 transform inline-flex"
-                >
-                  <Edit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDelete(project._id)}
-                  className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors hover:scale-110 transform inline-flex"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div
-                className="aspect-w-16 aspect-h-9 mb-4 rounded-lg overflow-hidden cursor-pointer"
-                onClick={() => handleEdit(project)}
-              >
+              <div className="relative aspect-video mb-4 rounded-lg overflow-hidden">
                 <img
                   src={project.image}
                   alt={project.title}
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-200"
                 />
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={() => handleEdit(project)}
+                    className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-blue-500 hover:text-white transition-colors"
+                    title={t("common.edit")}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project._id)}
+                    className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+                    title={t("common.delete")}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {project.title}
               </h4>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
                 {project.description}
               </p>
 
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-4">
                 {project.technologies.map((tech) => (
                   <span
                     key={tech}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
                   >
                     {tech}
                   </span>
@@ -552,40 +533,28 @@ const ProjectManager: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(project)}
-                    className="p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors hover:scale-110 transform inline-flex"
-                    title="Edit Project"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(project._id)}
-                    className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors hover:scale-110 transform inline-flex"
-                    title="Delete Project"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {new Date(project.startDate).toLocaleDateString()}
+                  </span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <a
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                    className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
                   >
                     <Github className="w-4 h-4" />
-                    {t("projects.management.actions.viewGitHub")}
                   </a>
                   <a
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                    className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    {t("projects.management.actions.viewDemo")}
                   </a>
                 </div>
               </div>
@@ -594,8 +563,8 @@ const ProjectManager: React.FC = () => {
         </div>
 
         {projects.length === 0 && (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border border-blue-500/20 dark:border-blue-400/20">
+          <div className="text-center py-12">
+            <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <FolderKanban className="w-8 h-8 text-blue-500 dark:text-blue-400" />
             </div>
             <p className="text-gray-500 dark:text-gray-400">

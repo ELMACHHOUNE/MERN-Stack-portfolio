@@ -65,14 +65,63 @@
       }
     },
     "overview": "Vue d'ensemble",
-    "users": "Utilisateurs",
+    "users": {
+      "title": "Gestion des utilisateurs",
+      "name": "Nom",
+      "email": "Email",
+      "role": "Rôle",
+      "lastLogin": "Dernière connexion",
+      "actions": "Actions",
+      "admin": "Administrateur",
+      "user": "Utilisateur régulier",
+      "noUsers": "Aucun utilisateur trouvé",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+      "deleteSuccess": "Utilisateur supprimé avec succès",
+      "updateSuccess": "Utilisateur mis à jour avec succès",
+      "createSuccess": "Utilisateur créé avec succès",
+      "errors": {
+        "fetchFailed": "Échec de la récupération des utilisateurs",
+        "deleteFailed": "Échec de la suppression de l'utilisateur",
+        "updateFailed": "Échec de la mise à jour de l'utilisateur",
+        "createFailed": "Échec de la création de l'utilisateur"
+      }
+    },
     "skills": "Compétences",
     "categories": "Catégories",
     "projects": "Projets",
     "experience": "Expérience",
     "analytics": "Analytiques",
-    "messages": "Messages",
+    "messages": {
+      "title": "Gestion des messages",
+      "name": "Nom",
+      "email": "Email",
+      "subject": "Sujet",
+      "message": "Message",
+      "date": "Date",
+      "status": "Statut",
+      "actions": "Actions",
+      "read": "Lu",
+      "unread": "Non lu",
+      "noMessages": "Aucun message trouvé",
+      "view": "Voir",
+      "delete": "Supprimer",
+      "markAsRead": "Marquer comme lu",
+      "markAsUnread": "Marquer comme non lu",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce message ?",
+      "deleteSuccess": "Message supprimé avec succès",
+      "markAsReadSuccess": "Message marqué comme lu",
+      "markAsUnreadSuccess": "Message marqué comme non lu",
+      "errors": {
+        "fetchFailed": "Échec de la récupération des messages",
+        "deleteFailed": "Échec de la suppression du message",
+        "markAsReadFailed": "Échec du marquage du message comme lu",
+        "markAsUnreadFailed": "Échec du marquage du message comme non lu"
+      }
+    },
     "settings": "Paramètres",
+    "logout": "Déconnexion",
     "totalUsers": "Total des utilisateurs",
     "adminUsers": "Utilisateurs administrateurs",
     "regularUsers": "Utilisateurs réguliers",
@@ -90,6 +139,7 @@
       "projects": "Projets",
       "experience": "Expérience",
       "categories": "Catégories",
+      "users": "Utilisateurs",
       "analytics": "Analytiques",
       "messages": "Messages",
       "settings": "Paramètres"
@@ -440,7 +490,34 @@
       },
       "status": {
         "read": "Marquer comme lu",
-        "unread": "Non lu"
+        "unread": "Non lu",
+        "unreadCount": "{count} non lu(s)"
+      },
+      "filter": {
+        "all": "Tous",
+        "read": "Lu",
+        "unread": "Non lu",
+        "date": "Date",
+        "name": "Nom",
+        "email": "Email",
+        "subject": "Sujet"
+      },
+      "actions": {
+        "view": "Voir",
+        "delete": "Supprimer",
+        "markAsRead": "Marquer comme lu",
+        "markAsUnread": "Marquer comme non lu",
+        "reply": "Répondre",
+        "export": "Exporter"
+      },
+      "table": {
+        "name": "Nom",
+        "email": "Email",
+        "subject": "Sujet",
+        "message": "Message",
+        "date": "Date",
+        "status": "Statut",
+        "actions": "Actions"
       }
     }
   },

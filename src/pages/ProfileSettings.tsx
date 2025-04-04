@@ -12,6 +12,14 @@ import {
   Linkedin,
   Twitter,
   Camera,
+  X,
+  Save,
+  Key,
+  Hash,
+  Globe,
+  Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -54,6 +62,9 @@ const ProfileSettings: React.FC = () => {
       twitter: user?.socialLinks?.twitter || "",
     },
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -212,323 +223,336 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#1F2937] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white/80 dark:bg-[#131B2C]/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-gray-200 dark:border-gray-800"
-        >
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent mb-8">
-            {t("settings.profile.title")}
-          </h2>
-
-          {/* Profile Image Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-6">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
-                  {profileImage ? (
-                    <img
-                      src={`${API_URL}${profileImage}`}
-                      alt={t("settings.profile.imageAlt")}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
-                      <User className="w-16 h-16 text-blue-500 dark:text-blue-400" />
-                    </div>
-                  )}
-                  <label
-                    htmlFor="profileImage"
-                    className="absolute bottom-2 right-2 bg-white dark:bg-[#1B2333] p-2 rounded-lg shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#242E42] transition-colors border border-gray-200 dark:border-gray-700"
-                  >
-                    <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  </label>
-                  <input
-                    type="file"
-                    id="profileImage"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={isUploading}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {user?.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {user?.email}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                  {t("settings.profile.description")}
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-white dark:bg-[#0B1121]">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/10 rounded-lg">
+            <User className="w-6 h-6 text-blue-600 dark:text-[#4F46E5]" />
           </div>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {t("settings.profile.title")}
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("settings.profile.description")}
+            </p>
+          </div>
+        </div>
+      </div>
 
-          {/* Profile Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.fullName")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.namePlaceholder")}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.email")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.emailPlaceholder")}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.title")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Briefcase className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.titlePlaceholder")}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t("settings.profile.location")}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder={t("settings.profile.locationPlaceholder")}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("settings.profile.bio")}
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                placeholder={t("settings.profile.bioPlaceholder")}
-              />
-            </div>
-
-            {/* Interests */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("settings.profile.interests")}
-              </label>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {formData.interests.map((interest, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                  >
-                    {interest}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveInterest(interest)}
-                      className="ml-2 inline-flex items-center p-0.5 rounded-full text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800"
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Left Column - Profile Image */}
+          <div className="md:col-span-4">
+            <div className="bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="flex flex-col items-center">
+                <div className="relative group">
+                  <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                    {profileImage ? (
+                      <img
+                        src={`${API_URL}${profileImage}`}
+                        alt={t("settings.profile.imageAlt")}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <User className="w-20 h-20 text-gray-400 dark:text-gray-600" />
+                      </div>
+                    )}
+                    <label
+                      htmlFor="profileImage"
+                      className="absolute bottom-2 right-2 p-2 bg-white dark:bg-gray-800 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 border border-gray-200 dark:border-gray-700 shadow-sm"
                     >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newInterest}
-                  onChange={(e) => setNewInterest(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                  placeholder={t("settings.profile.interestPlaceholder")}
-                  onKeyPress={(e) =>
-                    e.key === "Enter" &&
-                    (e.preventDefault(), handleAddInterest())
-                  }
-                />
-                <button
-                  type="button"
-                  onClick={handleAddInterest}
-                  className="px-4 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-                >
-                  {t("settings.profile.addInterest")}
-                </button>
+                      <Camera className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </label>
+                    <input
+                      type="file"
+                      id="profileImage"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 text-center">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {formData.name}
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {formData.email}
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <div className="mt-6 bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <h3 className="text-base font-medium text-gray-900 dark:text-white mb-4">
                 {t("settings.profile.socialLinks")}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    GitHub
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Github className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      name="socialLinks.github"
-                      value={formData.socialLinks.github}
-                      onChange={handleChange}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                      placeholder="https://github.com/username"
-                    />
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    <Github className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
+                  <input
+                    type="text"
+                    name="socialLinks.github"
+                    value={formData.socialLinks.github}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                    placeholder="github.com/username"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    LinkedIn
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Linkedin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      name="socialLinks.linkedin"
-                      value={formData.socialLinks.linkedin}
-                      onChange={handleChange}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                      placeholder="https://linkedin.com/in/username"
-                    />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    <Linkedin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
+                  <input
+                    type="text"
+                    name="socialLinks.linkedin"
+                    value={formData.socialLinks.linkedin}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                    placeholder="linkedin.com/in/username"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Twitter
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Twitter className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      name="socialLinks.twitter"
-                      value={formData.socialLinks.twitter}
-                      onChange={handleChange}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                      placeholder="https://twitter.com/username"
-                    />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    <Twitter className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
+                  <input
+                    type="text"
+                    name="socialLinks.twitter"
+                    value={formData.socialLinks.twitter}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                    placeholder="twitter.com/username"
+                  />
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Password Change */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {t("settings.password.title")}
+          {/* Right Column - Form */}
+          <div className="md:col-span-8">
+            <div className="bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <h3 className="flex items-center gap-2 text-base font-medium text-gray-900 dark:text-white mb-6">
+                <User className="w-5 h-5 text-blue-600 dark:text-[#4F46E5]" />
+                {t("settings.profile.basicInfo")}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t("settings.password.current")}
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t("settings.password.new")}
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t("settings.password.confirm")}
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2A3B] text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-              >
-                {t("settings.profile.save")}
-              </button>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.namePlaceholder")}
+                    />
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.emailPlaceholder")}
+                    />
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <Briefcase className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.titlePlaceholder")}
+                    />
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.locationPlaceholder")}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm resize-none"
+                    placeholder={t("settings.profile.bioPlaceholder")}
+                  />
+                </div>
+
+                {/* Interests */}
+                <div className="space-y-3">
+                  <h3 className="flex items-center gap-2 text-base font-medium text-gray-900 dark:text-white">
+                    <Hash className="w-5 h-5 text-blue-600 dark:text-[#4F46E5]" />
+                    {t("settings.profile.interests")}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.interests.map((interest, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                      >
+                        {interest}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveInterest(interest)}
+                          className="ml-1.5 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newInterest}
+                      onChange={(e) => setNewInterest(e.target.value)}
+                      className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.interestPlaceholder")}
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), handleAddInterest())
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddInterest}
+                      className="px-4 py-2 bg-blue-600 dark:bg-[#4F46E5] hover:bg-blue-700 dark:hover:bg-[#4338CA] text-white rounded-lg transition-colors text-sm"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* Password Change */}
+                <div className="space-y-3">
+                  <h3 className="flex items-center gap-2 text-base font-medium text-gray-900 dark:text-white">
+                    <Key className="w-5 h-5 text-blue-600 dark:text-[#4F46E5]" />
+                    {t("settings.profile.changePassword")}
+                  </h3>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      name="currentPassword"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.currentPassword")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.newPassword")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                      <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                      placeholder={t("settings.profile.confirmPassword")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-blue-600 dark:bg-[#4F46E5] hover:bg-blue-700 dark:hover:bg-[#4338CA] text-white rounded-lg transition-colors text-sm flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    {t("settings.profile.save")}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );

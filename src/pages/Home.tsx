@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
+import { useTheme } from "../context/ThemeContext";
 import {
   Code,
   ChevronDown,
@@ -19,8 +20,10 @@ import {
   Settings,
   Star,
   Twitter,
+  ArrowRight,
+  Briefcase,
+  Heart,
 } from "lucide-react";
-import { ArrowRight } from "lucide-react";
 
 interface SocialLink {
   icon: LucideIcon;
@@ -100,6 +103,7 @@ const getSkillLevel = (level: number, t: (key: string) => string): string => {
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const { adminProfile } = useAdminProfile() as {
     adminProfile: AdminProfile | null;
   };
@@ -302,8 +306,8 @@ const Home: React.FC = () => {
 
   if (data.loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#0B1121]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 dark:border-[#4F46E5]"></div>
         <span className="ml-4 text-gray-600 dark:text-gray-400">
           {t("home.skills.loading")}
         </span>
@@ -313,7 +317,7 @@ const Home: React.FC = () => {
 
   if (data.error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#0B1121]">
         <div className="text-center">
           <p className="text-red-600 dark:text-red-400 mb-4">
             {t("home.skills.error")}
@@ -324,20 +328,20 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-white dark:bg-[#0B1121]">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <motion.div
           style={{ opacity, y }}
-          className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20"
+          className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10"
         />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative max-w-4xl mx-auto text-center z-10"
+          className="relative max-w-4xl mx-auto text-center z-10 px-4 sm:px-6 lg:px-8"
         >
-          <h1 className="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-6">
+          <h1 className="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-6">
             {personalInfo.name}
           </h1>
           <p className="text-3xl text-gray-700 dark:text-gray-300 mb-4">
@@ -346,17 +350,17 @@ const Home: React.FC = () => {
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
             {personalInfo.bio}
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link
               to="/projects"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transform hover:scale-105 transition-all"
+              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transform hover:scale-105 transition-all duration-300"
             >
               {t("home.cta.viewWork")}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
             <Link
               to="/contact"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 transform hover:scale-105 transition-all"
+              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 dark:hover:border-gray-700 transform hover:scale-105 transition-all duration-300"
             >
               {t("home.cta.getInTouch")}
             </Link>
@@ -369,7 +373,7 @@ const Home: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="p-3 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 rounded-xl"
                 aria-label={link.label}
               >
                 <link.icon className="h-6 w-6" />
@@ -387,33 +391,33 @@ const Home: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* Technologies Section */}
+      {/* Skills Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
               {t("home.skills.title")}
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               {t("home.skills.description")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {getSkillsByCategory().map((group) => (
               <motion.div
                 key={group.category._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+                className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
               >
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-8 h-8">
                     {(() => {
                       const IconComponent = getIconComponent(group.category);
                       return (
-                        <IconComponent className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                        <IconComponent className="w-8 h-8 text-blue-600 dark:text-[#4F46E5]" />
                       );
                     })()}
                   </div>
@@ -456,7 +460,7 @@ const Home: React.FC = () => {
                           {skill.name}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-gray-500 dark:text-gray-400">
                         {getSkillLevel(skill.level, t)}
                       </span>
                     </div>
@@ -469,7 +473,7 @@ const Home: React.FC = () => {
           <div className="text-center mt-12">
             <Link
               to="/skills"
-              className="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors"
+              className="inline-flex items-center px-6 py-3 rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transition-all duration-300"
             >
               {t("home.skills.viewAll")}
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -479,7 +483,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#1B2333]">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -488,10 +492,10 @@ const Home: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
               {t("home.values.sectionTitle")}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               {t("home.values.sectionDescription")}
             </p>
           </motion.div>
@@ -503,19 +507,35 @@ const Home: React.FC = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all transform hover:-translate-y-1"
+                className="bg-white dark:bg-[#232B3B] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
               >
                 <div className="flex items-center mb-6">
-                  <img
-                    src={value.icon}
-                    alt={value.title}
-                    className="h-10 w-10 mr-4"
-                  />
+                  <div className="w-12 h-12 p-2.5 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 mr-4">
+                    <img
+                      src={value.icon}
+                      alt={value.title}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                        const parent = target.parentElement;
+                        if (parent) {
+                          const fallbackIcon = document.createElement("div");
+                          fallbackIcon.className =
+                            "w-full h-full text-blue-600 dark:text-[#4F46E5]";
+                          fallbackIcon.innerHTML =
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+                          parent.appendChild(fallbackIcon);
+                        }
+                      }}
+                    />
+                  </div>
                   <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {value.title}
                   </h3>
                 </div>
-                <p className="text-lg text-gray-600 dark:text-gray-300">
+                <p className="text-lg text-gray-600 dark:text-gray-400">
                   {value.description}
                 </p>
               </motion.div>
@@ -525,7 +545,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA]">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -541,7 +561,7 @@ const Home: React.FC = () => {
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-full text-blue-600 dark:text-blue-500 bg-white dark:bg-gray-100 hover:bg-blue-50 dark:hover:bg-gray-200 transform hover:scale-105 transition-all"
+              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transform hover:scale-105 transition-all duration-300"
             >
               {t("home.cta.letsTalk")}
               <ArrowRight className="h-5 w-5 ml-2" />

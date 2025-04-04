@@ -8,6 +8,18 @@ interface ProfileData {
   name: string;
   email: string;
   profileImage: string | null;
+  socialLinks: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
+    behance?: string;
+    gmail?: string;
+    whatsapp?: string;
+  };
+  interests: string[];
 }
 
 interface PasswordData {
@@ -18,11 +30,13 @@ interface PasswordData {
 
 const SettingsManager: React.FC = () => {
   const { t } = useLanguage();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     email: "",
     profileImage: null,
+    socialLinks: {},
+    interests: [],
   });
   const [passwordData, setPasswordData] = useState<PasswordData>({
     currentPassword: "",
@@ -35,8 +49,18 @@ const SettingsManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (user) {
+      setProfileData({
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage || null,
+        socialLinks: user.socialLinks || {},
+        interests: user.interests || [],
+      });
+    } else {
+      fetchProfile();
+    }
+  }, [user]);
 
   const fetchProfile = async () => {
     try {
@@ -54,9 +78,13 @@ const SettingsManager: React.FC = () => {
           name: data.name,
           email: data.email,
           profileImage: data.profileImage,
+          socialLinks: data.socialLinks || {},
+          interests: data.interests || [],
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {

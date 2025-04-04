@@ -89,7 +89,7 @@ const Navbar: React.FC = () => {
             className="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-white"
           >
             <span className="text-blue-600 dark:text-blue-400">
-              {t("navbar.brand")}
+              {/* {t("navbar.brand")} */}
             </span>
           </Link>
 
@@ -161,20 +161,20 @@ const Navbar: React.FC = () => {
                   <div>
                     <button
                       onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                      className="flex text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                      className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200"
                     >
                       <span className="sr-only">
                         {t("navbar.profile.openMenu")}
                       </span>
                       {user.profileImage ? (
                         <img
-                          className="h-8 w-8 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700"
+                          className="h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
                           src={`${API_URL}${user.profileImage}`}
                           alt={user.name}
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
-                          <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
+                          <User className="h-5 w-5 text-white" />
                         </div>
                       )}
                     </button>
@@ -182,36 +182,54 @@ const Navbar: React.FC = () => {
                   <AnimatePresence>
                     {isProfileMenuOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-xl py-2 bg-white dark:bg-[#1B2333] ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700"
+                        className="origin-top-right absolute right-0 mt-2 w-64 rounded-xl shadow-lg py-2 bg-white dark:bg-[#1B2333] ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100 dark:divide-gray-700"
                       >
-                        <div className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-gray-500 dark:text-gray-400 text-xs">
+                        <div className="px-4 py-4">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {user.name}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                             {user.email}
                           </p>
                         </div>
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] transition-colors duration-200"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                        >
-                          <Settings className="h-4 w-4 mr-2" />
-                          {t("navbar.profile.settings")}
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setIsProfileMenuOpen(false);
-                            handleLogout();
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#242E42] transition-colors duration-200"
-                        >
-                          <LogOut className="h-4 w-4 mr-2" />
-                          {t("navbar.profile.signOut")}
-                        </button>
+                        <div className="py-2">
+                          <Link
+                            to="/profile"
+                            className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 group"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                          >
+                            <Settings className="h-5 w-5 mr-3 text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
+                            <div>
+                              <p className="font-medium">
+                                {t("navbar.profile.settings")}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Manage your account settings
+                              </p>
+                            </div>
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              handleLogout();
+                            }}
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 group"
+                          >
+                            <LogOut className="h-5 w-5 mr-3 text-gray-400 group-hover:text-red-500" />
+                            <div>
+                              <p className="font-medium">
+                                {t("navbar.profile.signOut")}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Sign out of your account
+                              </p>
+                            </div>
+                          </button>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

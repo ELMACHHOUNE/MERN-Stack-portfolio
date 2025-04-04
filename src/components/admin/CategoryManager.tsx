@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
-import { Plus, Trash2, Edit, Folder } from "lucide-react";
+import { Plus, Trash2, Edit, Folder, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "../ui/Card";
-import Button from "../ui/Button";
 
 interface Category {
   _id: string;
@@ -139,189 +131,192 @@ const CategoryManager: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("categories.management.title")}
-          </h2>
-          <Button
-            variant="primary"
-            size="lg"
-            leftIcon={<Plus className="w-5 h-5" />}
-            onClick={resetForm}
-          >
-            {t("categories.management.addCategory")}
-          </Button>
+    <div className="space-y-8 p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <Folder className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+              {t("categories.management.title")}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("categories.management.categoryList", {
+                count: categories.length,
+              })}
+            </p>
+          </div>
         </div>
+        <button
+          onClick={() => setIsEditing(false)}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-sm hover:shadow"
+        >
+          <Plus className="w-5 h-5" />
+          {t("categories.management.addCategory")}
+        </button>
+      </div>
 
-        {/* Add/Edit Category Form */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>
-              {isEditing
-                ? t("categories.management.editCategory")
-                : t("categories.management.addCategory")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="categoryName" className="label">
-                    {t("categories.management.form.title")}
-                  </label>
-                  <input
-                    type="text"
-                    id="categoryName"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="input"
-                    placeholder={t(
-                      "categories.management.form.namePlaceholder"
-                    )}
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="categoryIcon" className="label">
-                    {t("categories.management.form.iconUrl")}
-                  </label>
-                  <input
-                    type="url"
-                    id="categoryIcon"
-                    value={formData.icon}
-                    onChange={(e) =>
-                      setFormData({ ...formData, icon: e.target.value })
-                    }
-                    className="input"
-                    placeholder={t(
-                      "categories.management.form.iconUrlPlaceholder"
-                    )}
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="categoryDescription" className="label">
-                  {t("categories.management.form.description")}
-                </label>
-                <textarea
-                  id="categoryDescription"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="input resize-none"
-                  placeholder={t(
-                    "categories.management.form.descriptionPlaceholder"
-                  )}
-                  required
-                />
-              </div>
-              <CardFooter>
-                {isEditing && (
-                  <Button
-                    variant="outline"
-                    onClick={resetForm}
-                    className="mr-4"
-                  >
-                    {t("common.cancel")}
-                  </Button>
-                )}
-                <Button
-                  variant="primary"
-                  type="submit"
-                  leftIcon={<Plus className="w-5 h-5" />}
-                >
-                  {isEditing
-                    ? t("categories.management.editCategory")
-                    : t("categories.management.addCategory")}
-                </Button>
-              </CardFooter>
-            </form>
-          </CardContent>
-        </Card>
+      {/* Form Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("categories.management.form.title")}
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                placeholder={t("categories.management.form.namePlaceholder")}
+                required
+              />
+            </div>
 
-        {/* Categories List */}
-        <div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            {t("categories.management.categoryList")}
-          </h3>
-          {categories.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
-                  <Folder className="w-8 h-8 text-primary-600 dark:text-primary-400" />
-                </div>
-                <p className="text-gray-500 dark:text-gray-400">
-                  {t("categories.management.noCategories")}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.map((category) => (
-                <Card key={category._id} hover>
-                  <CardContent>
-                    <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
-                          {category.icon ? (
-                            <img
-                              src={category.icon}
-                              alt={`${category.name} icon`}
-                              className="w-6 h-6 object-contain"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <Folder className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                          {category.name}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {category.description}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
+            {/* Icon */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("categories.management.form.iconUrl")}
+              </label>
+              <input
+                type="url"
+                value={formData.icon}
+                onChange={(e) =>
+                  setFormData({ ...formData, icon: e.target.value })
+                }
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                placeholder={t("categories.management.form.iconUrlPlaceholder")}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("categories.management.form.description")}
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+              placeholder={t(
+                "categories.management.form.descriptionPlaceholder"
+              )}
+              required
+            />
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end gap-4">
+            {isEditing && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                {t("common.cancel")}
+              </button>
+            )}
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+            >
+              {isEditing ? (
+                <>
+                  <Edit className="w-4 h-4" />
+                  {t("common.save")}
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  {t("categories.management.addCategory")}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Categories List */}
+      <div className="space-y-6">
+        {categories.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <Folder className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400">
+              {t("categories.management.noCategories")}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((category) => (
+              <div
+                key={category._id}
+                className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    {category.icon ? (
+                      <img
+                        src={category.icon}
+                        alt={`${category.name} icon`}
+                        className="w-6 h-6 object-contain"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <Folder className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                        {category.name}
+                      </h4>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
                           onClick={() => handleEdit(category)}
-                          className="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+                          className="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                          title={t("common.edit")}
                         >
-                          <Edit className="w-5 h-5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleDelete(category._id)}
-                          className="text-gray-400 hover:text-error-600 dark:hover:text-error-400"
+                          className="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                          title={t("common.delete")}
                         >
-                          <Trash2 className="w-5 h-5" />
-                        </Button>
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {category.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import About from "./pages/About";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Experience from "./pages/Experience";
 import Skills from "./pages/Skills";
 import AdminDashboard from "./components/AdminDashboard";
@@ -56,6 +57,7 @@ const App: React.FC = () => {
                       <Route path="/experience" element={<Experience />} />
                       <Route path="/skills" element={<Skills />} />
                       <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
                       <Route path="/profile" element={<ProfileSettings />} />
                       <Route
                         path="/admin/*"

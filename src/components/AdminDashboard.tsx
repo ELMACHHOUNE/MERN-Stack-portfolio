@@ -16,15 +16,12 @@ import {
   User,
   Menu,
   X,
-  Layout,
-  Pencil,
-  Trash2,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
-import CategoryManager from "../components/admin/CategoryManager";
-import ProjectManager from "../components/admin/ProjectManager";
-import ContactManager from "../components/admin/ContactManager";
+import CategoryManager from "./admin/CategoryManager";
+import ProjectManager from "./admin/ProjectManager";
+import ContactManager from "./admin/ContactManager";
 import AnalyticsManager from "./admin/AnalyticsManager";
 import AdminSettings from "../pages/AdminSettings";
 import { toast } from "react-hot-toast";
@@ -142,7 +139,6 @@ const AdminDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
-    if (path.includes("/users")) return "users";
     if (path.includes("/skills")) return "skills";
     if (path.includes("/categories")) return "categories";
     if (path.includes("/projects")) return "projects";
@@ -197,10 +193,6 @@ const AdminDashboard: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleTabClick = (tab: string) => {
@@ -279,265 +271,236 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-800 shadow-lg md:hidden"
-      >
-        {isSidebarOpen ? (
-          <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-        ) : (
-          <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-        )}
-      </button>
-
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1121] flex">
       {/* Sidebar */}
-      <AnimatePresence>
-        {(isSidebarOpen || window.innerWidth >= 768) && (
-          <motion.div
-            initial={{ x: -300 }}
-            animate={{ x: 0 }}
-            exit={{ x: -300 }}
-            className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg z-40 overflow-y-auto md:relative md:translate-x-0"
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#1B2333] transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 lg:static shadow-lg lg:shadow-none border-r border-gray-200 dark:border-gray-800`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                <LayoutDashboard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                   {t("admin.dashboard.title")}
                 </h2>
-                <button
-                  onClick={toggleSidebar}
-                  className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {user?.email}
+                </p>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {user?.email}
-              </p>
             </div>
-            <nav className="mt-6">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex-1 px-4 py-4 space-y-1">
+            {[
+              {
+                label: t("admin.tabs.skills"),
+                icon: <Wrench className="w-5 h-5" />,
+                tab: "skills",
+              },
+              {
+                label: t("admin.tabs.projects"),
+                icon: <FolderKanban className="w-5 h-5" />,
+                tab: "projects",
+              },
+              {
+                label: t("admin.tabs.experience"),
+                icon: <Briefcase className="w-5 h-5" />,
+                tab: "experience",
+              },
+              {
+                label: t("admin.tabs.categories"),
+                icon: <Users className="w-5 h-5" />,
+                tab: "categories",
+              },
+              {
+                label: t("admin.tabs.users"),
+                icon: <User className="w-5 h-5" />,
+                tab: "users",
+              },
+              {
+                label: t("admin.tabs.analytics"),
+                icon: <BarChart3 className="w-5 h-5" />,
+                tab: "analytics",
+              },
+              {
+                label: t("admin.tabs.messages"),
+                icon: <Mail className="w-5 h-5" />,
+                tab: "messages",
+              },
+              {
+                label: t("admin.tabs.settings"),
+                icon: <Settings className="w-5 h-5" />,
+                tab: "settings",
+              },
+            ].map(({ label, icon, tab }) => (
               <button
-                onClick={() => handleTabClick("")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === ""
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
+                key={tab}
+                onClick={() => handleTabClick(tab)}
+                className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
+                  activeTab === tab
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50"
                 }`}
               >
-                <LayoutDashboard className="w-5 h-5 mr-3" />
-                {t("admin.")}
+                <span
+                  className={`mr-3 ${
+                    activeTab === tab
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  {icon}
+                </span>
+                {label}
               </button>
-              <button
-                onClick={() => handleTabClick("users")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "users"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Users className="w-5 h-5 mr-3" />
-                {t("admin.users")}
-              </button>
-              <button
-                onClick={() => handleTabClick("skills")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "skills"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Wrench className="w-5 h-5 mr-3" />
-                {t("admin.skills")}
-              </button>
-              <button
-                onClick={() => handleTabClick("categories")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "categories"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Layout className="w-5 h-5 mr-3" />
-                {t("admin.categories")}
-              </button>
-              <button
-                onClick={() => handleTabClick("projects")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "projects"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <FolderKanban className="w-5 h-5 mr-3" />
-                {t("admin.projects")}
-              </button>
-              <button
-                onClick={() => handleTabClick("experience")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "experience"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Briefcase className="w-5 h-5 mr-3" />
-                {t("admin.experience")}
-              </button>
-              <button
-                onClick={() => handleTabClick("analytics")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "analytics"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <BarChart3 className="w-5 h-5 mr-3" />
-                {t("admin.analytics")}
-              </button>
-              <button
-                onClick={() => handleTabClick("messages")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "messages"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Mail className="w-5 h-5 mr-3" />
-                {t("admin.messages")}
-              </button>
-              <button
-                onClick={() => handleTabClick("settings")}
-                className={`flex items-center w-full px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 ${
-                  activeTab === "settings"
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : ""
-                }`}
-              >
-                <Settings className="w-5 h-5 mr-3" />
-                {t("admin.settings")}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-6 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-500"
-              >
-                <LogOut className="w-5 h-5 mr-3" />
-                {t("auth.logout")}
-              </button>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+          </nav>
+
+          {/* Sidebar Footer */}
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
+            >
+              <LogOut className="w-5 h-5 mr-3" />
+              {t("admin.logout")}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 md:ml-64">
-        {activeTab === "" && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-              {t("admin.")}
-            </h2>
-            {/*  content */}
-          </div>
-        )}
+      <div className="flex-1 lg:ml-64">
+        {/* Mobile Header */}
+        <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-[#1B2333] border-b border-gray-200 dark:border-gray-800">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            {t(`admin.tabs.${activeTab}`)}
+          </h1>
+          <div className="w-5" /> {/* Spacer for alignment */}
+        </div>
 
-        {activeTab === "users" && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-              {t("admin.userManagement")}
-            </h2>
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        {t("admin.name")}
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        {t("auth.email")}
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        {t("admin.lastLogin")}
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        {t("common.actions")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {users.map((user) => (
-                      <tr key={user._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {user.name}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {user.email}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(user.lastLogin).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex space-x-2">
-                            {!user.isAdmin && (
-                              <>
-                                <button
-                                  onClick={() => handleEditUser(user)}
-                                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                                >
-                                  <Pencil className="w-5 h-5" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteUser(user._id)}
-                                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                                >
-                                  <Trash2 className="w-5 h-5" />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {loading && (
-                <div className="flex justify-center p-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        {/* Content Area */}
+        <div className="p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === "skills" && <SkillsManager />}
+              {activeTab === "projects" && <ProjectManager />}
+              {activeTab === "experience" && <ExperienceManager />}
+              {activeTab === "categories" && <CategoryManager />}
+              {activeTab === "analytics" && <AnalyticsManager />}
+              {activeTab === "messages" && <ContactManager />}
+              {activeTab === "settings" && <AdminSettings />}
+              {activeTab === "users" && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {t("admin.users.title")}
+                    </h2>
+                  </div>
+                  {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              {t("admin.users.name")}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              {t("admin.users.email")}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              {t("admin.users.role")}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              {t("admin.users.lastLogin")}
+                            </th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                              {t("admin.users.actions")}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                          {users.length > 0 ? (
+                            users.map((user) => (
+                              <tr key={user._id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                  {user.name}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                  {user.email}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                  {user.isAdmin
+                                    ? t("admin.users.admin")
+                                    : t("admin.users.user")}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                  {new Date(user.lastLogin).toLocaleString()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                  <button
+                                    onClick={() => handleEditUser(user)}
+                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                                  >
+                                    {t("admin.users.edit")}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteUser(user._id)}
+                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                  >
+                                    {t("admin.users.delete")}
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan={5}
+                                className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                              >
+                                {t("admin.users.noUsers")}
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
-              {!loading && users.length === 0 && (
-                <div className="text-center p-4 text-gray-500 dark:text-gray-400">
-                  {t("common.noResults")}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "skills" && <SkillsManager />}
-        {activeTab === "categories" && <CategoryManager />}
-        {activeTab === "projects" && <ProjectManager />}
-        {activeTab === "experience" && <ExperienceManager />}
-        {activeTab === "analytics" && <AnalyticsManager />}
-        {activeTab === "messages" && <ContactManager />}
-        {activeTab === "settings" && <AdminSettings />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Edit User Modal */}

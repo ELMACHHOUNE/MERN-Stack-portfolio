@@ -8,6 +8,18 @@ interface User {
   email: string;
   isAdmin: boolean;
   profileImage?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
+    behance?: string;
+    gmail?: string;
+    whatsapp?: string;
+  };
+  interests?: string[];
 }
 
 interface AuthContextType {
@@ -80,36 +92,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const data = await response.json();
-      console.log("Login response:", data); // Debug log
+      console.log("Login response:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // Check if we have the required data
       if (!data || !data.token) {
         console.error("Invalid response data:", data);
         throw new Error("Server response missing required data");
       }
 
-      // Create user object from response
-      const userData: User = {
-        _id: data._id || data.user?._id,
-        name: data.name || data.user?.name,
-        email: data.email || data.user?.email,
-        isAdmin: data.isAdmin || data.user?.isAdmin || false,
-        profileImage: data.profileImage || data.user?.profileImage,
-      };
+      // Store token first
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
 
-      // Validate required user fields
-      if (!userData._id || !userData.name || !userData.email) {
-        console.error("Invalid user data:", userData);
-        throw new Error("Server response missing required user data");
+      // Fetch complete profile data
+      const profileResponse = await fetch(`${API_URL}/api/settings/profile`, {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+
+      if (!profileResponse.ok) {
+        throw new Error("Failed to fetch profile data");
       }
 
-      localStorage.setItem("token", data.token);
+      const profileData = await profileResponse.json();
+      console.log("Profile data:", profileData);
+
+      // Create complete user object
+      const userData: User = {
+        _id: data._id || data.user?._id,
+        name: profileData.name || data.name || data.user?.name,
+        email: profileData.email || data.email || data.user?.email,
+        isAdmin: data.isAdmin || data.user?.isAdmin || false,
+        profileImage:
+          profileData.profileImage ||
+          data.profileImage ||
+          data.user?.profileImage,
+        socialLinks:
+          profileData.socialLinks ||
+          data.socialLinks ||
+          data.user?.socialLinks ||
+          {},
+        interests:
+          profileData.interests || data.interests || data.user?.interests || [],
+      };
+
+      console.log("Final user data:", userData);
       setUser(userData);
-      setToken(data.token);
       toast.success("Login successful!");
       return userData;
     } catch (error) {

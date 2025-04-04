@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { Users, Eye, Mail, Download } from "lucide-react";
+import { Users, Eye, Mail, Download, Globe, Award, Clock } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
@@ -101,20 +101,21 @@ const AnalyticsManager: React.FC = () => {
   console.log("Rendering analytics data:", analyticsData);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8 p-6">
+      {/* Header with time range selector */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
           {t("admin.analytics")}
         </h2>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {["day", "week", "month", "year"].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range as any)}
-              className={`px-4 py-2 rounded-md ${
+              className={`px-4 py-2 rounded-lg transition-colors ${
                 timeRange === range
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  ? "bg-blue-500 text-white shadow-md"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
             >
               {t(`admin.${range}`)}
@@ -123,89 +124,116 @@ const AnalyticsManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <div className="flex items-center">
-            <Users className="w-6 h-6 text-blue-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t("admin.uniqueVisitors")}
-            </h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-            {analyticsData.uniqueVisitors}
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <div className="flex items-center">
-            <Eye className="w-6 h-6 text-green-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t("admin.pageViews")}
-            </h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-            {analyticsData.pageViews}
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <div className="flex items-center">
-            <Mail className="w-6 h-6 text-purple-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t("admin.contactSubmissions")}
-            </h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-            {analyticsData.contactSubmissions}
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <div className="flex items-center">
-            <Download className="w-6 h-6 text-red-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t("admin.resumeDownloads")}
-            </h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-            {analyticsData.resumeDownloads}
-          </p>
-        </div>
-      </div>
-
-      {/* Top Locations */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-          {t("admin.topLocations")}
-        </h3>
-        <div className="space-y-2">
-          {analyticsData.topLocations.map((location, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <span className="text-gray-700 dark:text-gray-300">
-                {location.country}
-              </span>
-              <span className="text-gray-900 dark:text-white font-semibold">
-                {location.count}
-              </span>
+      {/* Overview Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <Users className="w-6 h-6 text-blue-500" />
             </div>
-          ))}
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {t("admin.uniqueVisitors")}
+              </h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                {analyticsData.uniqueVisitors}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+              <Eye className="w-6 h-6 text-green-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {t("admin.pageViews")}
+              </h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                {analyticsData.pageViews}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+              <Mail className="w-6 h-6 text-purple-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {t("admin.contactSubmissions")}
+              </h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                {analyticsData.contactSubmissions}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-lg">
+              <Download className="w-6 h-6 text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {t("admin.resumeDownloads")}
+              </h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                {analyticsData.resumeDownloads}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Top Projects and Skills */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-            {t("admin.topProjects")}
-          </h3>
-          <div className="space-y-2">
+      {/* Detailed Stats Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Locations */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+              <Globe className="w-5 h-5 text-indigo-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              {t("admin.topLocations")}
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {analyticsData.topLocations.map((location, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-400">
+                  {location.country}
+                </span>
+                <span className="text-gray-900 dark:text-white font-medium px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">
+                  {location.count}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Top Projects */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+              <Award className="w-5 h-5 text-amber-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              {t("admin.topProjects")}
+            </h3>
+          </div>
+          <div className="space-y-4">
             {analyticsData.topProjects.map((project, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-gray-700 dark:text-gray-300">
+              <div key={index} className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-400 truncate max-w-[200px]">
                   {project.title}
                 </span>
-                <span className="text-gray-900 dark:text-white font-semibold">
+                <span className="text-gray-900 dark:text-white font-medium px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">
                   {project.views}
                 </span>
               </div>
@@ -213,48 +241,39 @@ const AnalyticsManager: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-            {t("admin.topSkills")}
-          </h3>
-          <div className="space-y-2">
-            {analyticsData.topSkills.map((skill, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-gray-700 dark:text-gray-300">
-                  {skill.name}
-                </span>
-                <span className="text-gray-900 dark:text-white font-semibold">
-                  {skill.views}
-                </span>
-              </div>
-            ))}
+        {/* Time Spent */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-teal-50 dark:bg-teal-900/30 rounded-lg">
+              <Clock className="w-5 h-5 text-teal-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              {t("admin.timeSpent")}
+            </h3>
           </div>
-        </div>
-      </div>
-
-      {/* Time Spent */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-          {t("admin.timeSpent")}
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-gray-600 dark:text-gray-400">
-              {t("admin.averageTime")}
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {Math.round(analyticsData.timeSpent.average / 60)}{" "}
-              {t("admin.minutes")}
-            </p>
-          </div>
-          <div>
-            <p className="text-gray-600 dark:text-gray-400">
-              {t("admin.totalTime")}
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {Math.round(analyticsData.timeSpent.total / 3600)}{" "}
-              {t("admin.hours")}
-            </p>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {t("admin.averageTime")}
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {Math.round(analyticsData.timeSpent.average / 60)}{" "}
+                <span className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                  {t("admin.minutes")}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {t("admin.totalTime")}
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {Math.round(analyticsData.timeSpent.total / 3600)}{" "}
+                <span className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                  {t("admin.hours")}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
