@@ -33,7 +33,7 @@ const Login: React.FC = () => {
         navigate("/admin", { replace: true });
       } else {
         console.log("Redirecting to user dashboard"); // Debug log
-        navigate("/dashboard", { replace: true });
+        navigate("/", { replace: true });
       }
     } catch (error) {
       console.error("Login error in component:", error);
