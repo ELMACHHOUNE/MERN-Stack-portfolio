@@ -1,11 +1,12 @@
 import { toast } from 'react-toastify';
+import { API_URL } from '../config';
 
 interface ApiResponse<T = any> {
   data?: T;
   error?: string;
 }
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = `${API_URL}/api`;
 
 export const api = {
   get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {

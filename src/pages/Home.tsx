@@ -24,6 +24,9 @@ import {
   Briefcase,
   Heart,
 } from "lucide-react";
+import { API_URL } from "../config";
+import { api } from "../utils/api";
+import { toast } from "react-hot-toast";
 
 interface SocialLink {
   icon: LucideIcon;
@@ -133,48 +136,28 @@ const Home: React.FC = () => {
         setData((prev) => ({ ...prev, loading: true, error: null }));
 
         // Fetch categories first
-        const categoriesResponse = await fetch(
-          "http://localhost:5000/api/categories"
-        );
-        if (!categoriesResponse.ok) {
-          throw new Error(
-            `Failed to fetch categories: ${categoriesResponse.status}`
-          );
+        const categoriesResponse = await api.get("/categories");
+        if (!categoriesResponse.data) {
+          throw new Error("Failed to fetch categories");
         }
-        const categoriesData = await categoriesResponse.json();
 
         // Then fetch skills
-        const skillsResponse = await fetch("http://localhost:5000/api/skills");
-        if (!skillsResponse.ok) {
-          throw new Error(`Failed to fetch skills: ${skillsResponse.status}`);
+        const skillsResponse = await api.get("/skills");
+        if (!skillsResponse.data) {
+          throw new Error("Failed to fetch skills");
         }
-        const skillsData = await skillsResponse.json();
-
-        // Process skills data
-        const processedSkills = skillsData
-          .filter((skill: Skill) => skill.isActive)
-          .map((skill: Skill) => ({
-            ...skill,
-            level: skill.level < 10 ? skill.level * 10 : skill.level,
-            icon: skill.icon
-              ? skill.icon.startsWith("http")
-                ? skill.icon
-                : `http://localhost:5000/uploads/${skill.icon.replace(
-                    /^\/+/,
-                    ""
-                  )}`
-              : null,
-          }))
-          .sort((a: Skill, b: Skill) => (a.order || 0) - (b.order || 0));
 
         setData({
-          skills: processedSkills,
-          categories: categoriesData,
+          skills: skillsResponse.data,
+          categories: categoriesResponse.data,
           loading: false,
           error: null,
         });
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to fetch data"
+        );
         setData((prev) => ({
           ...prev,
           loading: false,
@@ -302,6 +285,13 @@ const Home: React.FC = () => {
       },
     ],
     socialLinks: getSocialLinks(),
+  };
+
+  // Update the image URL construction
+  const getImageUrl = (url: string) => {
+    return url.startsWith("http")
+      ? url
+      : `${API_URL}/uploads/${url.replace(/^\/uploads\//, "")}`;
   };
 
   if (data.loading) {
@@ -434,7 +424,7 @@ const Home: React.FC = () => {
                       <div className="flex items-center">
                         {skill.icon ? (
                           <img
-                            src={skill.icon}
+                            src={getImageUrl(skill.icon)}
                             alt={skill.name}
                             className="w-6 h-6 mr-3"
                             loading="lazy"
@@ -512,7 +502,7 @@ const Home: React.FC = () => {
                 <div className="flex items-center mb-6">
                   <div className="w-12 h-12 p-2.5 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 mr-4">
                     <img
-                      src={value.icon}
+                      src={getImageUrl(value.icon)}
                       alt={value.title}
                       className="w-full h-full object-contain"
                       loading="lazy"
