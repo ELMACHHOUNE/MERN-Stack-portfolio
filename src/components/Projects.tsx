@@ -14,6 +14,8 @@ import {
   X,
 } from "lucide-react";
 import { API_URL } from "../config";
+import { api } from "../utils/api";
+import { toast } from "react-toastify";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -56,15 +58,28 @@ const Projects: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:5000/api/projects");
-      if (!response.ok) {
-        throw new Error(`Failed to fetch projects: ${response.status}`);
+      const response = await api.get("/projects");
+
+      if (response.error) {
+        throw new Error(response.error);
       }
 
-      const data = await response.json();
-      setProjects(data);
+      if (!response.data) {
+        throw new Error("No projects data received");
+      }
+
+      if (!Array.isArray(response.data)) {
+        throw new Error(
+          "Invalid response format: expected an array of projects"
+        );
+      }
+
+      setProjects(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("projects.error"));
+      const errorMessage =
+        err instanceof Error ? err.message : t("projects.error");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

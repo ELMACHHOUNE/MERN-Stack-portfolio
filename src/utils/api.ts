@@ -8,25 +8,47 @@ interface ApiResponse<T = any> {
 
 const BASE_URL = `${API_URL}/api`;
 
+// List of public endpoints that don't require authentication
+const PUBLIC_ENDPOINTS = [
+  '/skills',
+  '/projects',
+  '/categories',
+  '/contact',
+  '/auth/login',
+  '/auth/register'
+];
+
+const isPublicEndpoint = (endpoint: string) => {
+  return PUBLIC_ENDPOINTS.some(publicEndpoint => endpoint.startsWith(publicEndpoint));
+};
+
+const getHeaders = (endpoint: string) => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  // Only add Authorization header for non-public endpoints
+  if (!isPublicEndpoint(endpoint)) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
 export const api = {
   get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(endpoint),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          // Clear invalid token
+        if (response.status === 401 && !isPublicEndpoint(endpoint)) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = '/login';
@@ -47,22 +69,14 @@ export const api = {
 
   post: async <T>(endpoint: string, body: any): Promise<ApiResponse<T>> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(endpoint),
         body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401 && !isPublicEndpoint(endpoint)) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = '/login';
@@ -83,22 +97,14 @@ export const api = {
 
   put: async <T>(endpoint: string, body: any): Promise<ApiResponse<T>> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(endpoint),
         body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401 && !isPublicEndpoint(endpoint)) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = '/login';
@@ -119,21 +125,13 @@ export const api = {
 
   delete: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(endpoint),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401 && !isPublicEndpoint(endpoint)) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = '/login';

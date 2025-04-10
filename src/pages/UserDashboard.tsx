@@ -6,6 +6,8 @@ import { motion } from "framer-react";
 import { User, Lock, Mail, Save, X, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
+import { api } from "../utils/api";
+import { toast } from "react-toastify";
 
 interface UserProfile {
   name: string;
@@ -42,29 +44,21 @@ const UserDashboard: React.FC = () => {
     setSuccess(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/update-profile",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: profile.name,
-            email: profile.email,
-          }),
-        }
-      );
+      const response = await api.put("/auth/update-profile", {
+        name: profile.name,
+        email: profile.email,
+      });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || t("user.profile.updateError"));
+      if (response.error) {
+        throw new Error(response.error);
       }
 
+      toast.success(t("user.profile.updateSuccess"));
       setSuccess(t("user.profile.updateSuccess"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("user.error"));
+      const errorMessage = err instanceof Error ? err.message : t("user.error");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -77,32 +71,24 @@ const UserDashboard: React.FC = () => {
     setSuccess(null);
 
     if (profile.newPassword !== profile.confirmPassword) {
-      setError(t("user.security.passwordMismatch"));
+      const errorMessage = t("user.security.passwordMismatch");
+      setError(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/update-password",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentPassword: profile.currentPassword,
-            newPassword: profile.newPassword,
-          }),
-        }
-      );
+      const response = await api.put("/auth/update-password", {
+        currentPassword: profile.currentPassword,
+        newPassword: profile.newPassword,
+      });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || t("user.security.updateError"));
+      if (response.error) {
+        throw new Error(response.error);
       }
 
+      toast.success(t("user.security.updateSuccess"));
       setSuccess(t("user.security.updateSuccess"));
       setProfile({
         ...profile,
@@ -111,7 +97,9 @@ const UserDashboard: React.FC = () => {
         confirmPassword: "",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("user.error"));
+      const errorMessage = err instanceof Error ? err.message : t("user.error");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

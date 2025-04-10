@@ -242,29 +242,9 @@
     "error": "Échec du chargement des compétences",
     "noSkills": "Aucune compétence trouvée",
     "retry": "Réessayer",
-    "categories": {
-      "frontend": "Développement Frontend",
-      "backend": "Développement Backend",
-      "database": "Base de données",
-      "devops": "DevOps",
-      "programming": "Langages de Programmation",
-      "web": "Développement Web",
-      "security": "Sécurité",
-      "cloud": "Cloud",
-      "version": "Contrôle de Version",
-      "networking": "Réseaux",
-      "system": "Administration Système",
-      "other": "Autre",
-      "test": "Tests"
-    },
-    "level": {
-      "beginner": "Débutant",
-      "intermediate": "Intermédiaire",
-      "advanced": "Avancé",
-      "expert": "Expert"
-    },
     "management": {
-      "title": "Gestion des compétences",
+      "title": "Gestion des Compétences",
+      "subtitle": "Gérez et organisez vos compétences techniques et votre expertise",
       "addSkill": "Ajouter une nouvelle compétence",
       "editSkill": "Modifier la compétence",
       "name": "Nom de la compétence",
@@ -290,6 +270,27 @@
     },
     "validation": {
       "levelRange": "Le niveau de compétence doit être compris entre 1 et 10"
+    },
+    "categories": {
+      "frontend": "Développement Frontend",
+      "backend": "Développement Backend",
+      "database": "Base de données",
+      "devops": "DevOps",
+      "programming": "Langages de Programmation",
+      "web": "Développement Web",
+      "security": "Sécurité",
+      "cloud": "Cloud",
+      "version": "Contrôle de Version",
+      "networking": "Réseaux",
+      "system": "Administration Système",
+      "other": "Autre",
+      "test": "Tests"
+    },
+    "level": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé",
+      "expert": "Expert"
     }
   },
   "categories": {
@@ -667,6 +668,7 @@
       "addInterest": "Ajouter",
       "socialLinks": "Liens sociaux",
       "saveChanges": "Enregistrer les modifications",
+      "save": "Enregistrer",
       "success": "Profil mis à jour avec succès",
       "error": "Échec de la mise à jour du profil",
       "imageAlt": "Photo de profil",

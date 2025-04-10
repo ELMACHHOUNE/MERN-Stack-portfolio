@@ -183,29 +183,9 @@
     "error": "Failed to load skills",
     "noSkills": "No skills found",
     "retry": "Retry",
-    "categories": {
-      "frontend": "Frontend Development",
-      "backend": "Backend Development",
-      "database": "Database",
-      "devops": "DevOps",
-      "programming": "Programming Languages",
-      "web": "Web Development",
-      "security": "Security",
-      "cloud": "Cloud",
-      "version": "Version Control",
-      "networking": "Networking",
-      "system": "System Administration",
-      "other": "Other",
-      "test": "Testing"
-    },
-    "level": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "expert": "Expert"
-    },
     "management": {
       "title": "Skills Management",
+      "subtitle": "Manage and organize your technical skills and expertise",
       "addSkill": "Add New Skill",
       "editSkill": "Edit Skill",
       "name": "Skill Name",
@@ -231,6 +211,27 @@
     },
     "validation": {
       "levelRange": "Skill level must be between 1 and 10"
+    },
+    "categories": {
+      "frontend": "Frontend Development",
+      "backend": "Backend Development",
+      "database": "Database",
+      "devops": "DevOps",
+      "programming": "Programming Languages",
+      "web": "Web Development",
+      "security": "Security",
+      "cloud": "Cloud",
+      "version": "Version Control",
+      "networking": "Networking",
+      "system": "System Administration",
+      "other": "Other",
+      "test": "Testing"
+    },
+    "level": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
     }
   },
   "categories": {
@@ -630,6 +631,7 @@
       "addInterest": "Add",
       "socialLinks": "Social Links",
       "saveChanges": "Save Changes",
+      "save": "Save",
       "success": "Profile updated successfully",
       "error": "Failed to update profile",
       "imageAlt": "Profile Image",

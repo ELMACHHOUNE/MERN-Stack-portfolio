@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
+import { api } from "../utils/api";
 
 interface ContactForm {
   name: string;
@@ -87,27 +88,21 @@ const Contact: React.FC = () => {
     setErrors([]);
 
     try {
-      const response = await fetch("http://localhost:5000/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await api.post("/contact", formData);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 400 && data.errors) {
-          const validationErrors = data.errors.map((err: any) => ({
-            field: err.param,
-            message: err.msg,
-          }));
+      if (response.error) {
+        if (response.error.includes("validation")) {
+          const validationErrors = response.error
+            .split(",")
+            .map((err: string) => {
+              const [field, message] = err.split(":");
+              return { field: field.trim(), message: message.trim() };
+            });
           setErrors(validationErrors);
           toast.error(t("contact.error.formErrors"));
           return;
         }
-        throw new Error(data.message || t("contact.error.sendFailed"));
+        throw new Error(response.error);
       }
 
       toast.success(t("contact.success.messageSent"));

@@ -28,6 +28,8 @@ import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
 import { trackPageView, trackSkillView } from "../services/analytics";
 import { useTheme } from "../context/ThemeContext";
+import { api } from "../utils/api";
+import { toast } from "react-toastify";
 
 interface Skill {
   _id: string;
@@ -87,21 +89,22 @@ const Skills: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/categories`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.get("/categories");
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch categories: ${response.status}`);
+      if (response.error) {
+        throw new Error(response.error);
       }
 
-      const data = await response.json();
-      console.log("Received categories data:", data);
-      setCategories(data);
+      if (!response.data) {
+        throw new Error("No categories data received");
+      }
+
+      setCategories(response.data);
     } catch (err) {
       console.error("Error fetching categories:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch categories";
+      toast.error(errorMessage);
     }
   };
 
@@ -110,36 +113,29 @@ const Skills: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_URL}/api/skills`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.get("/skills");
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(
-          `Failed to fetch skills: ${response.status} ${response.statusText}`
-        );
+      if (response.error) {
+        throw new Error(response.error);
       }
 
-      const data = await response.json();
-      console.log("Received skills data:", data);
-      console.log("Sample skill icon:", data[0]?.icon);
+      if (!response.data) {
+        throw new Error("No skills data received");
+      }
 
-      if (!Array.isArray(data)) {
+      if (!Array.isArray(response.data)) {
         throw new Error("Invalid response format: expected an array of skills");
       }
 
-      setSkills(data);
+      setSkills(response.data);
     } catch (err) {
       console.error("Error fetching skills:", err);
-      setError(
+      const errorMessage =
         err instanceof Error
           ? err.message
-          : "An unexpected error occurred while fetching skills"
-      );
+          : "An unexpected error occurred while fetching skills";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
