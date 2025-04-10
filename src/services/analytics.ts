@@ -1,4 +1,4 @@
-
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = 'http://localhost:5000/api/analytics';
 
@@ -16,21 +16,49 @@ const getVisitorId = () => {
 // Track page view
 export const trackPageView = async (path: string, timeSpent: number = 0) => {
   try {
-    await fetch(API_URL, {
+    console.log('Tracking page view for path:', path);
+    
+    // Skip tracking if the path is in the admin section
+    if (path.startsWith('/admin')) {
+      console.log('Skipping admin path');
+      return;
+    }
+
+    // Get the current user from localStorage
+    const userStr = localStorage.getItem('user');
+    let userId = null;
+
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      console.log('Full user data from localStorage:', user);
+      userId = user._id;
+    }
+
+    const visitorId = getVisitorId();
+    console.log('Tracking with visitorId:', visitorId);
+
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         type: 'pageView',
-        visitorId: getVisitorId(),
-        ip: '127.0.0.1', // In production, this should be the actual IP
+        visitorId: visitorId,
+        userId: userId,
+        ip: '127.0.0.1',
         userAgent: navigator.userAgent,
         path,
         timeSpent,
         referrer: document.referrer,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('Page view tracked successfully');
   } catch (error) {
     console.error('Error tracking page view:', error);
   }

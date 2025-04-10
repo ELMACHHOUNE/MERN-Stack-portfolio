@@ -53,7 +53,21 @@ const AnalyticsManager: React.FC = () => {
           }
         );
         console.log("Analytics data received:", response.data);
-        setAnalyticsData(response.data);
+
+        // Ensure all required fields are present
+        const data = {
+          uniqueVisitors: response.data.uniqueVisitors || 0,
+          pageViews: response.data.pageViews || 0,
+          contactSubmissions: response.data.contactSubmissions || 0,
+          resumeDownloads: response.data.resumeDownloads || 0,
+          topLocations: response.data.topLocations || [],
+          topProjects: response.data.topProjects || [],
+          topSkills: response.data.topSkills || [],
+          timeSpent: response.data.timeSpent || { average: 0, total: 0 },
+        };
+
+        console.log("Processed analytics data:", data);
+        setAnalyticsData(data);
         setError(null);
       } catch (err: any) {
         const errorMessage =

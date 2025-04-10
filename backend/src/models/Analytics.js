@@ -17,6 +17,15 @@ const analyticsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     ip: {
       type: String,
       required: true,

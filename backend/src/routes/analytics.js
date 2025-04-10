@@ -2,13 +2,17 @@ const express = require("express");
 const router = express.Router();
 const Analytics = require("../models/Analytics");
 const { protect, admin } = require("../middleware/auth");
+const User = require("../models/User");
 
 // @route   GET /api/analytics
 // @desc    Get analytics data
 // @access  Private/Admin
 router.get("/", protect, admin, async (req, res) => {
   try {
+    console.log("Fetching analytics data");
     const { timeRange = "week" } = req.query;
+    console.log("Time range:", timeRange);
+
     const now = new Date();
     let startDate;
 
@@ -29,34 +33,51 @@ router.get("/", protect, admin, async (req, res) => {
         startDate = new Date(now.setDate(now.getDate() - 7));
     }
 
+    console.log("Start date:", startDate);
+
+    // Get all analytics records for debugging
+    const allRecords = await Analytics.find({
+      createdAt: { $gte: startDate },
+    });
+    console.log("Total records found:", allRecords.length);
+    console.log("Sample records:", allRecords.slice(0, 3));
+
     // Get unique visitors
     const uniqueVisitors = await Analytics.distinct("visitorId", {
       createdAt: { $gte: startDate },
+      isAdmin: { $ne: true },
     });
+    console.log("Unique visitors:", uniqueVisitors.length);
 
     // Get page views
     const pageViews = await Analytics.countDocuments({
       type: "pageView",
       createdAt: { $gte: startDate },
+      path: { $not: /^\/admin/ },
+      isAdmin: { $ne: true },
     });
+    console.log("Page views:", pageViews);
 
     // Get contact submissions
     const contactSubmissions = await Analytics.countDocuments({
       type: "contactSubmission",
       createdAt: { $gte: startDate },
     });
+    console.log("Contact submissions:", contactSubmissions);
 
     // Get resume downloads
     const resumeDownloads = await Analytics.countDocuments({
       type: "resumeDownload",
       createdAt: { $gte: startDate },
     });
+    console.log("Resume downloads:", resumeDownloads);
 
     // Get top locations
     const topLocations = await Analytics.aggregate([
       {
         $match: {
           createdAt: { $gte: startDate },
+          isAdmin: { $ne: true },
         },
       },
       {
@@ -86,6 +107,7 @@ router.get("/", protect, admin, async (req, res) => {
         $match: {
           type: "projectView",
           createdAt: { $gte: startDate },
+          isAdmin: { $ne: true },
         },
       },
       {
@@ -126,6 +148,7 @@ router.get("/", protect, admin, async (req, res) => {
         $match: {
           type: "skillView",
           createdAt: { $gte: startDate },
+          isAdmin: { $ne: true },
         },
       },
       {
@@ -167,6 +190,7 @@ router.get("/", protect, admin, async (req, res) => {
           type: "pageView",
           createdAt: { $gte: startDate },
           timeSpent: { $gt: 0 },
+          isAdmin: { $ne: true },
         },
       },
       {
@@ -180,7 +204,7 @@ router.get("/", protect, admin, async (req, res) => {
 
     const timeSpent = timeSpentStats[0] || { average: 0, total: 0 };
 
-    res.json({
+    const analyticsData = {
       uniqueVisitors: uniqueVisitors.length,
       pageViews,
       contactSubmissions,
@@ -189,7 +213,10 @@ router.get("/", protect, admin, async (req, res) => {
       topProjects,
       topSkills,
       timeSpent,
-    });
+    };
+
+    console.log("Final analytics data:", analyticsData);
+    res.json(analyticsData);
   } catch (error) {
     console.error("Error fetching analytics:", error);
     res.status(500).json({ message: "Server error" });
@@ -204,9 +231,8 @@ router.post("/", async (req, res) => {
     const {
       type,
       visitorId,
+      userId,
       ip,
-      country = "Unknown",
-      city = "Unknown",
       userAgent,
       referrer,
       path,
@@ -214,12 +240,24 @@ router.post("/", async (req, res) => {
       metadata = {},
     } = req.body;
 
+    // Check if user is admin
+    let isAdmin = false;
+    if (userId) {
+      const user = await User.findById(userId);
+      isAdmin = user ? user.isAdmin : false;
+    }
+
+    // Skip tracking if user is admin
+    if (isAdmin) {
+      return res.status(200).json({ message: "Admin activity not tracked" });
+    }
+
     const analytics = new Analytics({
       type,
       visitorId,
+      userId,
+      isAdmin,
       ip,
-      country,
-      city,
       userAgent,
       referrer,
       path,
