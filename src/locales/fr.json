@@ -378,7 +378,10 @@
         "endDate": "Date de fin",
         "isActive": "Projet actif",
         "order": "Ordre d'affichage",
-        "featuresHelp": "Entrez les fonctionnalités séparées par des virgules (ex: Design Responsive, Authentification Utilisateur, Intégration API)"
+        "featuresHelp": "Entrez les fonctionnalités séparées par des virgules (ex: Design Responsive, Authentification Utilisateur, Intégration API)",
+        "uploadImage": "Télécharger une image",
+        "imageUrlPlaceholder": "Entrez l'URL de l'image (ex: https://example.com/image.jpg)",
+        "imagePreview": "Aperçu de l'image"
       },
       "actions": {
         "addSuccess": "Projet ajouté avec succès",
