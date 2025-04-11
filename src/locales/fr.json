@@ -377,7 +377,8 @@
         "startDate": "Date de début",
         "endDate": "Date de fin",
         "isActive": "Projet actif",
-        "order": "Ordre d'affichage"
+        "order": "Ordre d'affichage",
+        "featuresHelp": "Entrez les fonctionnalités séparées par des virgules (ex: Design Responsive, Authentification Utilisateur, Intégration API)"
       },
       "actions": {
         "addSuccess": "Projet ajouté avec succès",

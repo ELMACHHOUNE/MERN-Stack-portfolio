@@ -309,7 +309,8 @@
         "startDate": "Start Date",
         "endDate": "End Date",
         "isActive": "Active Project",
-        "order": "Display Order"
+        "order": "Display Order",
+        "featuresHelp": "Enter features separated by commas (e.g., Responsive Design, User Authentication, API Integration)"
       },
       "actions": {
         "addSuccess": "Project added successfully",
@@ -322,7 +323,8 @@
       "errors": {
         "fetchFailed": "Failed to fetch projects",
         "saveFailed": "Failed to save project",
-        "deleteFailed": "Failed to delete project"
+        "deleteFailed": "Failed to delete project",
+        "featuresRequired": "At least one feature is required"
       }
     }
   },

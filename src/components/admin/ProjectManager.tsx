@@ -109,16 +109,36 @@ const ProjectManager: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+
+      // Ensure features is not empty and properly formatted
+      const featuresArray = formData.features
+        .split(",")
+        .map((feature) => feature.trim())
+        .filter((feature) => feature.length > 0);
+
+      if (featuresArray.length === 0) {
+        toast.error(t("projects.management.errors.featuresRequired"));
+        return;
+      }
+
       const projectData = {
         ...formData,
+        features: featuresArray,
         technologies: formData.technologies
           .split(",")
-          .map((tech) => tech.trim()),
-        features: formData.features.split(",").map((feature) => feature.trim()),
+          .map((tech) => tech.trim())
+          .filter((tech) => tech.length > 0),
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
         order: Number(formData.order),
       };
+
+      // Remove empty strings from the data
+      Object.keys(projectData).forEach((key) => {
+        if (projectData[key] === "") {
+          delete projectData[key];
+        }
+      });
 
       const url = isEditing
         ? `${API_URL}/api/projects/${currentProject?._id}`
@@ -440,6 +460,26 @@ const ProjectManager: React.FC = () => {
             >
               {t("projects.management.form.isActive")}
             </label>
+          </div>
+
+          {/* Features */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("projects.management.form.features")}
+            </label>
+            <input
+              type="text"
+              value={formData.features}
+              onChange={(e) =>
+                setFormData({ ...formData, features: e.target.value })
+              }
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder={t("projects.management.form.featuresPlaceholder")}
+              required
+            />
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {t("projects.management.form.featuresHelp")}
+            </p>
           </div>
         </div>
 
