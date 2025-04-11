@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { protect, admin } = require("../middleware/auth");
 const Skill = require("../models/Skill");
-const fs = require("fs");
+const { upload, handleMulterError } = require("../middleware/upload");
 const path = require("path");
+const fs = require("fs");
 
 // Helper function to save base64 image
 const saveBase64Image = (base64String, filename) => {
@@ -12,7 +13,7 @@ const saveBase64Image = (base64String, filename) => {
   const buffer = Buffer.from(base64Data, "base64");
 
   // Create uploads directory if it doesn't exist
-  const uploadDir = path.join(__dirname, "../../uploads/skill-icons");
+  const uploadDir = path.join(__dirname, "../../uploads/skills");
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
@@ -22,7 +23,7 @@ const saveBase64Image = (base64String, filename) => {
   fs.writeFileSync(filePath, buffer);
 
   // Return the relative path to be stored in the database
-  return `skill-icons/${filename}`;
+  return `/uploads/skills/${filename}`;
 };
 
 // Get all skills (public route)
@@ -59,83 +60,100 @@ router.get("/admin", protect, admin, async (req, res) => {
 });
 
 // Create new skill (admin only)
-router.post("/", protect, admin, async (req, res) => {
-  try {
-    console.log("Creating new skill");
-    const { icon, ...skillData } = req.body;
+router.post(
+  "/",
+  protect,
+  admin,
+  upload.single("icon"),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      console.log("Creating new skill with data:", {
+        body: req.body,
+        file: req.file,
+      });
 
-    // Handle icon
-    let iconPath = icon;
-    if (icon && icon.startsWith("data:image")) {
-      // Generate a unique filename
-      const filename = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(7)}.png`;
-      iconPath = saveBase64Image(icon, filename);
-    }
+      const skillData = { ...req.body };
 
-    const skill = new Skill({
-      ...skillData,
-      icon: iconPath,
-    });
-
-    const newSkill = await skill.save();
-    const populatedSkill = await Skill.findById(newSkill._id).populate(
-      "category",
-      "name description icon"
-    );
-    console.log("Skill created successfully:", newSkill._id);
-    res.status(201).json(populatedSkill);
-  } catch (error) {
-    console.error("Error creating skill:", error);
-    res.status(400).json({ message: error.message });
-  }
-});
-
-// Update skill (admin only)
-router.patch("/:id", protect, admin, async (req, res) => {
-  try {
-    console.log("Updating skill:", req.params.id);
-    const skill = await Skill.findById(req.params.id);
-    if (!skill) {
-      console.log("Skill not found:", req.params.id);
-      return res.status(404).json({ message: "Skill not found" });
-    }
-
-    const { icon, ...updateData } = req.body;
-
-    // Handle icon update
-    if (icon && icon.startsWith("data:image")) {
-      // Delete old icon if it exists and is a local file
-      if (skill.icon && !skill.icon.startsWith("http")) {
-        const oldIconPath = path.join(__dirname, "../../uploads", skill.icon);
-        if (fs.existsSync(oldIconPath)) {
-          fs.unlinkSync(oldIconPath);
-        }
+      // Handle icon based on source
+      if (req.body.iconSource === "file" && req.file) {
+        skillData.icon = `/uploads/skills/${req.file.filename}`;
+      } else if (req.body.iconSource === "url" && req.body.icon) {
+        skillData.icon = req.body.icon;
       }
 
-      // Save new icon
-      const filename = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(7)}.png`;
-      updateData.icon = saveBase64Image(icon, filename);
-    } else {
-      updateData.icon = icon;
-    }
+      // Convert level and order to numbers
+      skillData.level = parseInt(skillData.level);
+      skillData.order = parseInt(skillData.order);
+      skillData.isActive = skillData.isActive === "true";
 
-    Object.assign(skill, updateData);
-    const updatedSkill = await skill.save();
-    const populatedSkill = await Skill.findById(updatedSkill._id).populate(
-      "category",
-      "name description icon"
-    );
-    console.log("Skill updated successfully:", updatedSkill._id);
-    res.json(populatedSkill);
-  } catch (error) {
-    console.error("Error updating skill:", error);
-    res.status(400).json({ message: error.message });
+      const skill = new Skill(skillData);
+      const newSkill = await skill.save();
+      const populatedSkill = await Skill.findById(newSkill._id).populate(
+        "category",
+        "name description icon"
+      );
+
+      console.log("Skill created successfully:", newSkill._id);
+      res.status(201).json(populatedSkill);
+    } catch (error) {
+      console.error("Error creating skill:", error);
+      res.status(400).json({ message: error.message });
+    }
   }
-});
+);
+
+// Update skill (admin only)
+router.patch(
+  "/:id",
+  protect,
+  admin,
+  upload.single("icon"),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      console.log("Updating skill:", req.params.id);
+      const skill = await Skill.findById(req.params.id);
+      if (!skill) {
+        console.log("Skill not found:", req.params.id);
+        return res.status(404).json({ message: "Skill not found" });
+      }
+
+      const skillData = { ...req.body };
+
+      // Handle icon update
+      if (req.body.iconSource === "file" && req.file) {
+        // Delete old icon if it exists and is a local file
+        if (skill.icon && !skill.icon.startsWith("http")) {
+          const oldIconPath = path.join(__dirname, "../../uploads", skill.icon);
+          if (fs.existsSync(oldIconPath)) {
+            fs.unlinkSync(oldIconPath);
+          }
+        }
+        skillData.icon = `/uploads/skills/${req.file.filename}`;
+      } else if (req.body.iconSource === "url" && req.body.icon) {
+        skillData.icon = req.body.icon;
+      }
+
+      // Convert level and order to numbers
+      skillData.level = parseInt(skillData.level);
+      skillData.order = parseInt(skillData.order);
+      skillData.isActive = skillData.isActive === "true";
+
+      Object.assign(skill, skillData);
+      const updatedSkill = await skill.save();
+      const populatedSkill = await Skill.findById(updatedSkill._id).populate(
+        "category",
+        "name description icon"
+      );
+      console.log("Skill updated successfully:", updatedSkill._id);
+      res.json(populatedSkill);
+    } catch (error) {
+      console.error("Error updating skill:", error);
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
 
 // Delete skill (admin only)
 router.delete("/:id", protect, admin, async (req, res) => {

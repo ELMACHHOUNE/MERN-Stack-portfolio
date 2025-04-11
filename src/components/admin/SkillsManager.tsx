@@ -15,10 +15,11 @@ import { useLanguage } from "../../context/LanguageContext";
 interface Skill {
   _id: string;
   name: string;
-  category: Category | null;
+  category: string | Category;
   level: number;
   icon: string;
   order: number;
+  isActive: boolean;
 }
 
 interface Category {
@@ -26,6 +27,17 @@ interface Category {
   name: string;
   description: string;
   icon: string;
+  order: number;
+  isActive: boolean;
+}
+
+interface FormData {
+  name: string;
+  category: string;
+  level: number;
+  icon: string;
+  order: number;
+  isActive: boolean;
 }
 
 const SkillsManager: React.FC = () => {
@@ -35,7 +47,7 @@ const SkillsManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentSkill, setCurrentSkill] = useState<Skill | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     category: "",
     level: 5,
@@ -43,6 +55,9 @@ const SkillsManager: React.FC = () => {
     order: 0,
     isActive: true,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [imageSource, setImageSource] = useState<"url" | "file">("url");
 
   useEffect(() => {
     fetchSkills();
@@ -113,33 +128,78 @@ const SkillsManager: React.FC = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+
+      // Create preview URL
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+
+      // Update form data with the file name
+      setFormData((prev) => ({
+        ...prev,
+        icon: file.name,
+      }));
+    }
+  };
+
+  const handleIconUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      icon: e.target.value,
+    }));
+    setSelectedFile(null);
+    setPreviewUrl("");
+  };
+
+  const handleImageSourceChange = (source: "url" | "file") => {
+    setImageSource(source);
+    if (source === "url") {
+      setSelectedFile(null);
+      setPreviewUrl("");
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        icon: "",
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Validate required fields
+      if (
+        !formData.name ||
+        !formData.category ||
+        !formData.level ||
+        formData.order === undefined ||
+        (!formData.icon && !selectedFile)
+      ) {
+        toast.error(t("skills.management.errors.requiredFields"));
+        return;
+      }
+
       const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error(t("common.error"));
-        return;
+      const formDataToSend = new FormData();
+
+      // Add file if selected
+      if (selectedFile) {
+        formDataToSend.append("icon", selectedFile);
+        formDataToSend.append("iconSource", "file");
+      } else if (formData.icon) {
+        formDataToSend.append("icon", formData.icon);
+        formDataToSend.append("iconSource", "url");
       }
 
-      if (!formData.name || !formData.category || !formData.icon) {
-        toast.error(t("common.error"));
-        return;
-      }
-
-      if (formData.level < 1 || formData.level > 10) {
-        toast.error(t("skills.validation.levelRange"));
-        return;
-      }
-
-      const skillData = {
-        ...formData,
-        order: isEditing ? currentSkill?.order : skills.length,
-        level: Number(formData.level),
-        icon: formData.icon.startsWith("http")
-          ? formData.icon
-          : `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formData.name.toLowerCase()}/${formData.name.toLowerCase()}-original.svg`,
-      };
+      // Add all required fields with proper validation
+      formDataToSend.append("name", formData.name.trim());
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("level", formData.level.toString());
+      formDataToSend.append("order", formData.order.toString());
+      formDataToSend.append("isActive", formData.isActive.toString());
 
       const url = isEditing
         ? `${API_URL}/api/skills/${currentSkill?._id}`
@@ -149,27 +209,43 @@ const SkillsManager: React.FC = () => {
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(skillData),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || t("common.error"));
+        throw new Error(
+          errorData.message || t("skills.management.errors.saveFailed")
+        );
       }
+
+      const savedSkill = await response.json();
 
       toast.success(
         isEditing
-          ? t("skills.management.updateSuccess")
-          : t("skills.management.addSuccess")
+          ? t("skills.management.actions.updateSuccess")
+          : t("skills.management.actions.addSuccess")
       );
+
+      // Update the form data with the saved skill's icon path
+      if (savedSkill.icon) {
+        setFormData((prev) => ({
+          ...prev,
+          icon: savedSkill.icon,
+        }));
+        // If it's a file upload, update the preview URL
+        if (savedSkill.icon.startsWith("/uploads/")) {
+          setPreviewUrl(`${API_URL}${savedSkill.icon}`);
+        }
+      }
+
       resetForm();
       fetchSkills();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving skill:", error);
-      toast.error(error instanceof Error ? error.message : t("common.error"));
+      toast.error(error.message || t("skills.management.errors.saveFailed"));
     }
   };
 
@@ -197,16 +273,18 @@ const SkillsManager: React.FC = () => {
   const handleEdit = (skill: Skill) => {
     setCurrentSkill(skill);
     setFormData({
-      name: skill.name,
-      category: skill.category?._id || "",
-      level: skill.level,
-      icon: skill.icon.startsWith("http")
-        ? skill.icon
-        : `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.name.toLowerCase()}/${skill.name.toLowerCase()}-original.svg`,
-      order: skill.order,
-      isActive: true,
+      name: skill.name || "",
+      category:
+        typeof skill.category === "string"
+          ? skill.category
+          : skill.category._id,
+      level: skill.level || 5,
+      icon: skill.icon || "",
+      order: skill.order || 0,
+      isActive: skill.isActive ?? true,
     });
     setIsEditing(true);
+    setImageSource(skill.icon?.startsWith("/uploads/") ? "file" : "url");
   };
 
   const resetForm = () => {
@@ -214,12 +292,15 @@ const SkillsManager: React.FC = () => {
       name: "",
       category: "",
       level: 5,
-      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+      icon: "",
       order: 0,
       isActive: true,
     });
-    setIsEditing(false);
+    setSelectedFile(null);
+    setPreviewUrl("");
+    setImageSource("url");
     setCurrentSkill(null);
+    setIsEditing(false);
   };
 
   if (loading) {
@@ -323,19 +404,78 @@ const SkillsManager: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t("skills.management.icon")}
               </label>
-              <input
-                type="text"
-                value={formData.icon}
-                onChange={(e) =>
-                  setFormData({ ...formData, icon: e.target.value })
-                }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
-                required
-              />
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {t("skills.management.iconPlaceholder")}
-              </p>
+
+              {/* Image Source Toggle */}
+              <div className="flex gap-4 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleImageSourceChange("url")}
+                  className={`px-4 py-2 rounded-lg ${
+                    imageSource === "url"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  {t("skills.management.form.iconUrl")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleImageSourceChange("file")}
+                  className={`px-4 py-2 rounded-lg ${
+                    imageSource === "file"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  {t("skills.management.form.uploadIcon")}
+                </button>
+              </div>
+
+              {/* Icon Input Fields */}
+              <div className="space-y-4">
+                {imageSource === "url" ? (
+                  <input
+                    type="text"
+                    value={formData.icon}
+                    onChange={handleIconUrlChange}
+                    placeholder={t("skills.management.form.iconUrlPlaceholder")}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  />
+                ) : (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  />
+                )}
+
+                {/* Icon Preview */}
+                {(previewUrl || formData.icon) && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t("skills.management.form.iconPreview")}
+                    </h4>
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                      <img
+                        src={
+                          previewUrl ||
+                          (formData.icon.startsWith("/uploads/")
+                            ? `${API_URL}${formData.icon}`
+                            : formData.icon)
+                        }
+                        alt="Preview"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          console.error("Icon load error:", e);
+                          const target = e.target as HTMLImageElement;
+                          target.src = "/placeholder-icon.png"; // Fallback icon
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -374,9 +514,13 @@ const SkillsManager: React.FC = () => {
       {/* Skills List */}
       <div className="space-y-6">
         {categories.map((category) => {
-          const categorySkills = skills.filter(
-            (skill) => skill.category && skill.category._id === category._id
-          );
+          const categorySkills = skills.filter((skill) => {
+            if (!skill.category) return false;
+            if (typeof skill.category === "string") {
+              return skill.category === category._id;
+            }
+            return (skill.category as Category)._id === category._id;
+          });
           if (categorySkills.length === 0) return null;
 
           return (
@@ -388,10 +532,18 @@ const SkillsManager: React.FC = () => {
                 {category.icon && (
                   <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                     <img
-                      src={category.icon}
+                      src={
+                        category.icon.startsWith("/uploads/")
+                          ? `${API_URL}${category.icon}`
+                          : category.icon
+                      }
                       alt={category.name}
                       className="w-5 h-5"
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder-icon.png";
+                      }}
                     />
                   </div>
                 )}
@@ -400,23 +552,29 @@ const SkillsManager: React.FC = () => {
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-4">
                 {categorySkills.map((skill) => (
                   <div
                     key={skill._id}
                     className="group bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 hover:shadow-md transition-all duration-200"
                   >
                     <div className="flex items-start gap-3">
-                      {skill.icon && (
-                        <div className="p-2 bg-white dark:bg-gray-600 rounded-lg">
-                          <img
-                            src={skill.icon}
-                            alt={skill.name}
-                            className="w-6 h-6"
-                            loading="lazy"
-                          />
-                        </div>
-                      )}
+                      <div className="p-2 bg-white dark:bg-gray-600 rounded-lg">
+                        <img
+                          src={
+                            skill.icon.startsWith("/uploads/")
+                              ? `${API_URL}${skill.icon}`
+                              : skill.icon
+                          }
+                          alt={skill.name}
+                          className="w-6 h-6 object-contain"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/placeholder-icon.png";
+                          }}
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">

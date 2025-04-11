@@ -5,7 +5,17 @@ const fs = require("fs");
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, "../../uploads/projects");
+    let uploadPath;
+
+    // Determine upload path based on the field name
+    if (file.fieldname === "icon") {
+      uploadPath = path.join(__dirname, "../../uploads/skills");
+    } else if (file.fieldname === "image") {
+      uploadPath = path.join(__dirname, "../../uploads/projects");
+    } else {
+      return cb(new Error("Invalid file field name"), false);
+    }
+
     console.log("Upload path:", uploadPath);
 
     // Ensure directory exists
@@ -26,15 +36,19 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = uniqueSuffix + path.extname(file.originalname);
-    console.log("Generated filename:", filename);
-    cb(null, filename);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg+xml",
+  ];
   console.log("Checking file type:", file.mimetype);
 
   if (allowedTypes.includes(file.mimetype)) {
@@ -44,7 +58,7 @@ const fileFilter = (req, file, cb) => {
     console.log("File type rejected");
     cb(
       new Error(
-        "Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed."
+        "Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed."
       ),
       false
     );
@@ -56,11 +70,11 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
   },
 });
 
-// Error handling middleware
+// Error handler middleware
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     console.error("Multer error:", err);

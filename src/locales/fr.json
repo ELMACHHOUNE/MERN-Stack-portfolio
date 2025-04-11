@@ -266,6 +266,12 @@
         "fetchFailed": "Échec de la récupération des compétences",
         "saveFailed": "Échec de l'enregistrement de la compétence",
         "deleteFailed": "Échec de la suppression de la compétence"
+      },
+      "form": {
+        "iconUrl": "URL de l'icône",
+        "uploadIcon": "Télécharger une icône",
+        "iconUrlPlaceholder": "Entrez l'URL de l'icône (ex: https://example.com/icon.png)",
+        "iconPreview": "Aperçu de l'icône"
       }
     },
     "validation": {

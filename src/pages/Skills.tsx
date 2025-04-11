@@ -99,7 +99,7 @@ const Skills: React.FC = () => {
         throw new Error("No categories data received");
       }
 
-      setCategories(response.data);
+      setCategories(response.data as Category[]);
     } catch (err) {
       console.error("Error fetching categories:", err);
       const errorMessage =
@@ -127,6 +127,7 @@ const Skills: React.FC = () => {
         throw new Error("Invalid response format: expected an array of skills");
       }
 
+      console.log("Received skills data:", response.data); // Debug log
       setSkills(response.data);
     } catch (err) {
       console.error("Error fetching skills:", err);
@@ -161,39 +162,32 @@ const Skills: React.FC = () => {
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
     const target = e.target as HTMLImageElement;
-    target.style.display = "none";
     const parent = target.parentElement;
     if (parent) {
-      // Add a fallback icon
       const fallbackIcon = document.createElement("div");
-      fallbackIcon.className = "text-gray-500 dark:text-gray-400";
+      fallbackIcon.className =
+        "w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400";
       const categoryName = target.alt;
-      const defaultIcon = getDefaultIcon(categoryName);
-      if (defaultIcon && defaultIcon.props && defaultIcon.props.children) {
-        fallbackIcon.innerHTML = defaultIcon.props.children;
-      } else {
-        fallbackIcon.innerHTML =
-          '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+      const icon = getDefaultIcon(categoryName);
+      if (React.isValidElement(icon)) {
+        target.style.display = "none";
+        parent.appendChild(fallbackIcon);
       }
-      parent.appendChild(fallbackIcon);
     }
   };
 
-  const getImageUrl = (url: string | null | undefined) => {
-    if (!url) return null;
+  const getImageUrl = (url: string | null | undefined): string | undefined => {
+    if (!url) return undefined;
 
-    // If it's a base64 image, return it as is
     if (url.startsWith("data:image")) {
       return url;
     }
 
-    // If it's already a full URL (http or https), return it as is
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
 
-    // For any local images (including skill icons)
-    return `${API_URL}/uploads/${url}`;
+    return `${API_URL}${url}`;
   };
 
   // Add tracking when a skill is viewed
@@ -294,35 +288,42 @@ const Skills: React.FC = () => {
                             className="group/skill"
                             onClick={() => handleSkillView(skill._id)}
                           >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-3">
+                            <div className="flex items-center mb-2">
+                              <div className="w-8 h-8 mr-3 flex-shrink-0">
                                 {skill.icon ? (
-                                  <div className="p-1.5 bg-gradient-to-br from-blue-600/5 to-purple-600/5 dark:from-[#4F46E5]/5 dark:to-[#9333EA]/5 rounded-lg border border-gray-200 dark:border-gray-800 group-hover/skill:border-gray-300 dark:group-hover/skill:border-gray-700">
-                                    <img
-                                      src={getImageUrl(skill.icon)}
-                                      alt={skill.name}
-                                      className="w-5 h-5"
-                                      loading="lazy"
-                                      onError={handleImageError}
-                                    />
-                                  </div>
+                                  <img
+                                    src={getImageUrl(skill.icon)}
+                                    alt={skill.name}
+                                    className="w-full h-full object-contain"
+                                    onError={handleImageError}
+                                  />
                                 ) : (
-                                  <Star className="w-5 h-5 text-yellow-500/80" />
+                                  <div className="text-gray-500 dark:text-gray-400">
+                                    {getDefaultIcon(skill.category?.name || "")}
+                                  </div>
                                 )}
-                                <span className="text-gray-700 dark:text-gray-300 group-hover/skill:text-gray-900 dark:group-hover/skill:text-white transition-colors">
-                                  {skill.name}
-                                </span>
                               </div>
-                            </div>
-                            <div className="relative h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{
-                                  width: `${(skill.level / 5) * 100}%`,
-                                }}
-                                transition={{ duration: 1, delay: 0.2 }}
-                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] rounded-full"
-                              />
+                              <div className="flex-grow">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {skill.name}
+                                  </span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {skill.level * 10}%
+                                  </span>
+                                </div>
+                                <div className="mt-1 h-2 relative bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                  <motion.div
+                                    className="absolute top-0 left-0 h-full bg-blue-500 dark:bg-blue-400"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${skill.level * 10}%` }}
+                                    transition={{
+                                      duration: 1,
+                                      ease: "easeOut",
+                                    }}
+                                  />
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))}
