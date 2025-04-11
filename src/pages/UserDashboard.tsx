@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { motion } from "framer-react";
-import { User, Lock, Mail, Save, X, Settings, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+
+import { User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
-import { api } from "../utils/api";
-import { toast } from "react-toastify";
 
 interface UserProfile {
   name: string;
@@ -18,17 +16,17 @@ interface UserProfile {
 }
 
 const UserDashboard: React.FC = () => {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { isDarkMode } = useTheme();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("profile");
-  const [profile, setProfile] = useState<UserProfile>({
+  const [] = useState("profile");
+  const [] = useState<UserProfile>({
     name: user?.name || "",
     email: user?.email || "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [] = useState(false);
+  const [] = useState<string | null>(null);
+  const [] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,74 +34,6 @@ const UserDashboard: React.FC = () => {
       navigate("/login");
     }
   }, [user, navigate]);
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const response = await api.put("/auth/update-profile", {
-        name: profile.name,
-        email: profile.email,
-      });
-
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      toast.success(t("user.profile.updateSuccess"));
-      setSuccess(t("user.profile.updateSuccess"));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("user.error");
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    if (profile.newPassword !== profile.confirmPassword) {
-      const errorMessage = t("user.security.passwordMismatch");
-      setError(errorMessage);
-      toast.error(errorMessage);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await api.put("/auth/update-password", {
-        currentPassword: profile.currentPassword,
-        newPassword: profile.newPassword,
-      });
-
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      toast.success(t("user.security.updateSuccess"));
-      setSuccess(t("user.security.updateSuccess"));
-      setProfile({
-        ...profile,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("user.error");
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogout = () => {
     logout();

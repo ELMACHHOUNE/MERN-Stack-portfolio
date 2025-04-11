@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
-import { useTheme } from "../context/ThemeContext";
 import {
   Code,
   ChevronDown,
@@ -21,8 +20,6 @@ import {
   Star,
   Twitter,
   ArrowRight,
-  Briefcase,
-  Heart,
 } from "lucide-react";
 import { API_URL } from "../config";
 import { api } from "../utils/api";
@@ -106,7 +103,6 @@ const getSkillLevel = (level: number, t: (key: string) => string): string => {
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
   const { adminProfile } = useAdminProfile() as {
     adminProfile: AdminProfile | null;
   };
@@ -148,8 +144,8 @@ const Home: React.FC = () => {
         }
 
         setData({
-          skills: skillsResponse.data,
-          categories: categoriesResponse.data,
+          skills: skillsResponse.data as Skill[],
+          categories: categoriesResponse.data as Category[],
           loading: false,
           error: null,
         });

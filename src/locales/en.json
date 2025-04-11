@@ -309,6 +309,7 @@
         "technologies": "Technologies Used",
         "technologiesPlaceholder": "Enter technologies (e.g., React, Node.js, MongoDB)",
         "imageUrl": "Image URL",
+        "image": "Image",
         "uploadImage": "Upload Image",
         "imageUrlPlaceholder": "Enter image URL (e.g., https://example.com/image.jpg)",
         "imagePreview": "Image Preview",

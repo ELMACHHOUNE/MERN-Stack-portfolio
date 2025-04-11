@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
-import { Briefcase, GraduationCap, Code, Heart, Download } from "lucide-react";
+import { Briefcase, Code, Heart, Download } from "lucide-react";
 
 const About: React.FC = () => {
   const { t } = useLanguage();

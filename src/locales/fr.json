@@ -379,6 +379,7 @@
         "technologies": "Technologies utilisées",
         "technologiesPlaceholder": "Entrez les technologies (ex: React, Node.js, MongoDB)",
         "imageUrl": "URL de l'image du projet",
+        "image": "Image",
         "githubUrl": "URL du dépôt GitHub",
         "liveUrl": "URL du projet en ligne",
         "features": "Fonctionnalités du projet",

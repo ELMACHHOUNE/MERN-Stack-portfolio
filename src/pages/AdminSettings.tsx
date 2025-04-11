@@ -7,8 +7,6 @@ import { API_URL } from "../config";
 import {
   User,
   Code,
-  Server,
-  Database,
   Plus,
   Trash2,
   Github,
@@ -480,7 +478,7 @@ const AdminSettings: React.FC = () => {
                               </div>
                             </div>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               onClick={() => handleRemoveValue(index)}
                               className="text-gray-400 hover:text-error-600 dark:hover:text-error-400"
@@ -532,7 +530,7 @@ const AdminSettings: React.FC = () => {
                       >
                         <span>{interest}</span>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={() => handleRemoveInterest(interest)}
                           className="text-primary-600 dark:text-primary-400 hover:text-error-600 dark:hover:text-error-400"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import Navbar from "./Navbar";
 import {
@@ -9,14 +9,11 @@ import {
   Mail,
   Settings,
   LogOut,
-  LayoutDashboard,
   BarChart3,
   Wrench,
   Briefcase,
   FolderKanban,
   User,
-  Menu,
-  X,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -149,15 +146,6 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/settings")) return "settings";
     return "";
   });
-
-  const navItems = [
-    { path: "/", label: t("navbar.menu.home") },
-    { path: "/about", label: t("navbar.menu.about") },
-    { path: "/projects", label: t("navbar.menu.projects") },
-    { path: "/experience", label: t("navbar.menu.experience") },
-    { path: "/skills", label: t("navbar.menu.skills") },
-    { path: "/contact", label: t("navbar.menu.contact") },
-  ];
 
   useEffect(() => {
     // Check if user is authenticated and is admin

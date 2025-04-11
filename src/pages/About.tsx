@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
-import { useTheme } from "../context/ThemeContext";
 import { API_URL } from "../config";
 import {
   User,
@@ -15,7 +14,6 @@ import {
   MapPin,
   Mail,
   MessageCircle,
-  Calendar,
   Code2,
   Briefcase,
   Heart,
@@ -25,7 +23,6 @@ import {
 const About: React.FC = () => {
   const { adminProfile, isLoading } = useAdminProfile();
   const { t } = useLanguage();
-  const { theme } = useTheme();
 
   if (isLoading) {
     return (

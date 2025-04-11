@@ -3,15 +3,7 @@ import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config";
-import {
-  User,
-  Code,
-  Server,
-  Database,
-  Wrench,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 interface Value {
   icon: string;

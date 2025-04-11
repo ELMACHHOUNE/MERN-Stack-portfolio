@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
-import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
-import { User, Settings, FolderTree, Cog, Mail, BarChart3 } from "lucide-react";
+import { Cog, Mail, BarChart3 } from "lucide-react";
 import SkillsManager from "../components/admin/SkillsManager";
 import ProjectManager from "../components/admin/ProjectManager";
 import ExperienceManager from "../components/admin/ExperienceManager";
@@ -14,9 +11,6 @@ import AnalyticsManager from "../components/admin/AnalyticsManager";
 import AdminSettings from "./AdminSettings";
 
 const AdminDashboard: React.FC = () => {
-  const { user } = useAuth();
-  const { isDarkMode } = useTheme();
-  const { adminProfile } = useAdminProfile();
   const { t } = useLanguage();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {

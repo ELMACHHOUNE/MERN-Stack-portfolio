@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, Calendar, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
+import { Briefcase, Calendar } from "lucide-react";
 import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
-import { useTheme } from "../context/ThemeContext";
 import { trackPageView } from "../services/analytics";
 
 interface Experience {
@@ -21,7 +20,6 @@ interface Experience {
 
 const Experience: React.FC = () => {
   const { t } = useLanguage();
-  const { isDarkMode } = useTheme();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

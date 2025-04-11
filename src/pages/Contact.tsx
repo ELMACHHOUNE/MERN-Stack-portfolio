@@ -4,7 +4,6 @@ import { Mail, MapPin, Send, MessageCircle, ExternalLink } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
-import { useTheme } from "../context/ThemeContext";
 import { api } from "../utils/api";
 
 interface ContactForm {
@@ -22,7 +21,6 @@ interface ValidationError {
 const Contact: React.FC = () => {
   const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
-  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
     email: "",

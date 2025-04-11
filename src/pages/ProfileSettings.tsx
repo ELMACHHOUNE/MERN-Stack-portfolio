@@ -16,12 +16,10 @@ import {
   Save,
   Key,
   Hash,
-  Globe,
   Lock,
   Eye,
   EyeOff,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface FormData {
   name: string;
@@ -49,9 +47,9 @@ const ProfileSettings: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     name: user?.name || "",
     email: user?.email || "",
-    title: user?.title || "",
-    location: user?.location || "",
-    bio: user?.bio || "",
+    title: (user as any)?.title || "",
+    location: (user as any)?.location || "", 
+    bio: (user as any)?.bio || "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -72,9 +70,9 @@ const ProfileSettings: React.FC = () => {
         ...prev,
         name: user.name || "",
         email: user.email || "",
-        title: user.title || "",
-        location: user.location || "",
-        bio: user.bio || "",
+        title: (user as any).title || "",
+        location: (user as any).location || "",
+        bio: (user as any).bio || "",
         interests: user.interests || [],
         socialLinks: {
           github: user.socialLinks?.github || "",

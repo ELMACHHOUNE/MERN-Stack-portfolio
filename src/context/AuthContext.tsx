@@ -3,6 +3,7 @@ import { API_URL } from "../config";
 import { toast } from "react-hot-toast";
 
 interface User {
+  title: string;
   _id: string;
   name: string;
   email: string;
@@ -120,13 +121,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const profileData = await profileResponse.json();
       console.log("Profile data:", profileData);
-
       // Create complete user object
       const userData: User = {
         _id: data._id || data.user?._id,
         name: profileData.name || data.name || data.user?.name,
         email: profileData.email || data.email || data.user?.email,
         isAdmin: data.isAdmin || data.user?.isAdmin || false,
+        title: profileData.title || data.title || data.user?.title || "",
         profileImage:
           profileData.profileImage ||
           data.profileImage ||
