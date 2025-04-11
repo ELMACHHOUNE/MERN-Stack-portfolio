@@ -448,6 +448,10 @@
         "name": "Name",
         "email": "Email",
         "subject": "Subject"
+      },
+      "actions": {
+        "markAsRead": "Mark as read",
+        "delete": "Delete"
       }
     }
   },

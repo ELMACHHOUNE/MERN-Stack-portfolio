@@ -263,7 +263,9 @@
         "addSuccess": "Compétence ajoutée avec succès",
         "updateSuccess": "Compétence mise à jour avec succès",
         "deleteSuccess": "Compétence supprimée avec succès",
-        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette compétence ?"
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette compétence ?",
+        "markAsRead": "Marquer comme lu",
+        "delete": "Supprimer"
       },
       "errors": {
         "fetchFailed": "Échec de la récupération des compétences",
@@ -522,7 +524,9 @@
         "markAsRead": "Marquer comme lu",
         "markAsUnread": "Marquer comme non lu",
         "reply": "Répondre",
-        "export": "Exporter"
+        "export": "Exporter",
+        "markAsRead": "Marquer comme lu",
+        "delete": "Supprimer"
       },
       "table": {
         "name": "Nom",

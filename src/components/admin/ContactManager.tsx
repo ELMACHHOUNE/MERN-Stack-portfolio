@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import {
   Mail,
   Trash2,
-  CheckCircle,
   MessageSquare,
   Calendar,
   Eye,
