@@ -9,9 +9,13 @@ const morgan = require("morgan");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const path = require("path");
+const createUploadsDir = require("./utils/createUploadsDir");
 
 // Load environment variables
 dotenv.config();
+
+// Create uploads directory
+createUploadsDir();
 
 // Create Express app
 const app = express();
@@ -42,12 +46,13 @@ app.use(
 // Serve static files from uploads directory
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "../uploads"), {
+  express.static(path.join(__dirname, "../../uploads"), {
     setHeaders: (res, path) => {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
       res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.setHeader("Cache-Control", "public, max-age=31536000");
     },
   })
 );

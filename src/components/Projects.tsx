@@ -442,11 +442,19 @@ const Projects: React.FC = () => {
             >
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={project.image}
+                  src={
+                    project.image.startsWith("/uploads/")
+                      ? `${API_URL}${project.image}`
+                      : project.image
+                  }
                   alt={project.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                   onError={(e) => {
+                    console.error("Project image load error:", {
+                      src: (e.target as HTMLImageElement).src,
+                      projectImage: project.image,
+                    });
                     const target = e.target as HTMLImageElement;
                     target.style.display = "none";
                     const parent = target.parentElement;

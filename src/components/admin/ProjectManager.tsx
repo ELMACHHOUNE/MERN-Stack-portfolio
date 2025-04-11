@@ -60,6 +60,9 @@ const ProjectManager: React.FC = () => {
     endDate: "",
     isActive: true,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [imageSource, setImageSource] = useState<"url" | "file">("url");
 
   useEffect(() => {
     fetchProjects();
@@ -105,38 +108,80 @@ const ProjectManager: React.FC = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+
+      // Create preview URL
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+
+      // Update form data with the file name
+      setFormData((prev) => ({
+        ...prev,
+        image: file.name,
+      }));
+    }
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: e.target.value,
+    }));
+    setSelectedFile(null);
+    setPreviewUrl("");
+  };
+
+  const handleImageSourceChange = (source: "url" | "file") => {
+    setImageSource(source);
+    if (source === "url") {
+      setSelectedFile(null);
+      setPreviewUrl("");
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      const formDataToSend = new FormData();
 
-      // Ensure features is not empty and properly formatted
+      // Add file if selected
+      if (selectedFile) {
+        formDataToSend.append("image", selectedFile);
+        formDataToSend.append("imageSource", "file");
+      } else if (formData.image) {
+        formDataToSend.append("imageSource", "url");
+      }
+
+      // Convert technologies and features from comma-separated strings to arrays
+      const technologiesArray = formData.technologies
+        .split(",")
+        .map((tech) => tech.trim())
+        .filter((tech) => tech.length > 0);
+
       const featuresArray = formData.features
         .split(",")
         .map((feature) => feature.trim())
         .filter((feature) => feature.length > 0);
 
-      if (featuresArray.length === 0) {
-        toast.error(t("projects.management.errors.featuresRequired"));
-        return;
-      }
-
-      const projectData = {
-        ...formData,
-        features: featuresArray,
-        technologies: formData.technologies
-          .split(",")
-          .map((tech) => tech.trim())
-          .filter((tech) => tech.length > 0),
-        startDate: new Date(formData.startDate),
-        endDate: new Date(formData.endDate),
-        order: Number(formData.order),
-      };
-
-      // Remove empty strings from the data
-      Object.keys(projectData).forEach((key) => {
-        if (projectData[key] === "") {
-          delete projectData[key];
+      // Add other form data
+      Object.keys(formData).forEach((key) => {
+        if (key !== "image" || !selectedFile) {
+          let value = formData[key as keyof typeof formData];
+          if (key === "technologies") {
+            value = JSON.stringify(technologiesArray);
+          } else if (key === "features") {
+            value = JSON.stringify(featuresArray);
+          }
+          formDataToSend.append(key, String(value));
         }
       });
 
@@ -148,10 +193,9 @@ const ProjectManager: React.FC = () => {
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(projectData),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
@@ -161,11 +205,26 @@ const ProjectManager: React.FC = () => {
         );
       }
 
+      const savedProject = await response.json();
+
       toast.success(
         isEditing
           ? t("projects.management.actions.updateSuccess")
           : t("projects.management.actions.addSuccess")
       );
+
+      // Update the form data with the saved project's image path
+      if (savedProject.image) {
+        setFormData((prev) => ({
+          ...prev,
+          image: savedProject.image,
+        }));
+        // If it's a file upload, update the preview URL
+        if (savedProject.image.startsWith("/uploads/")) {
+          setPreviewUrl(`${API_URL}${savedProject.image}`);
+        }
+      }
+
       resetForm();
       fetchProjects();
     } catch (error: any) {
@@ -202,11 +261,15 @@ const ProjectManager: React.FC = () => {
     setFormData({
       title: project.title,
       description: project.description,
-      technologies: project.technologies.join(", "),
+      technologies: Array.isArray(project.technologies)
+        ? project.technologies.join(", ")
+        : project.technologies,
       image: project.image,
-      githubUrl: project.githubUrl,
-      liveUrl: project.liveUrl,
-      features: project.features.join(", "),
+      githubUrl: project.githubUrl || "",
+      liveUrl: project.liveUrl || "",
+      features: Array.isArray(project.features)
+        ? project.features.join(", ")
+        : project.features,
       category:
         typeof project.category === "string"
           ? project.category
@@ -217,6 +280,7 @@ const ProjectManager: React.FC = () => {
       isActive: project.isActive,
     });
     setIsEditing(true);
+    setImageSource(project.image.startsWith("/uploads/") ? "file" : "url");
   };
 
   const resetForm = () => {
@@ -234,6 +298,9 @@ const ProjectManager: React.FC = () => {
       endDate: "",
       isActive: true,
     });
+    setSelectedFile(null);
+    setPreviewUrl("");
+    setImageSource("url");
     setCurrentProject(null);
     setIsEditing(false);
   };
@@ -346,20 +413,85 @@ const ProjectManager: React.FC = () => {
             />
           </div>
 
-          {/* Image URL */}
+          {/* Image */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t("projects.management.form.imageUrl")}
+              {t("projects.management.form.image")}
             </label>
-            <input
-              type="text"
-              value={formData.image}
-              onChange={(e) =>
-                setFormData({ ...formData, image: e.target.value })
-              }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              required
-            />
+
+            {/* Image Source Toggle */}
+            <div className="flex gap-4 mb-4">
+              <button
+                type="button"
+                onClick={() => handleImageSourceChange("url")}
+                className={`px-4 py-2 rounded-lg ${
+                  imageSource === "url"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                {t("projects.management.form.imageUrl")}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleImageSourceChange("file")}
+                className={`px-4 py-2 rounded-lg ${
+                  imageSource === "file"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                {t("projects.management.form.uploadImage")}
+              </button>
+            </div>
+
+            {/* Image Input Fields */}
+            <div className="space-y-4">
+              {imageSource === "url" ? (
+                <input
+                  type="text"
+                  value={formData.image}
+                  onChange={handleImageUrlChange}
+                  placeholder={t(
+                    "projects.management.form.imageUrlPlaceholder"
+                  )}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              ) : (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              )}
+
+              {/* Image Preview */}
+              {(previewUrl || formData.image) && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t("projects.management.form.imagePreview")}
+                  </h4>
+                  <div className="relative aspect-video rounded-lg overflow-hidden">
+                    <img
+                      src={
+                        previewUrl ||
+                        (formData.image.startsWith("/uploads/")
+                          ? `${API_URL}${formData.image}`
+                          : formData.image)
+                      }
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error("Image load error:", e);
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder-image.jpg"; // Fallback image
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* GitHub URL */}
@@ -531,9 +663,21 @@ const ProjectManager: React.FC = () => {
             >
               <div className="relative aspect-video mb-4 rounded-lg overflow-hidden">
                 <img
-                  src={project.image}
+                  src={
+                    project.image.startsWith("/uploads/")
+                      ? `${API_URL}${project.image}`
+                      : project.image
+                  }
                   alt={project.title}
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-200"
+                  onError={(e) => {
+                    console.error("Project image load error:", {
+                      src: (e.target as HTMLImageElement).src,
+                      projectImage: project.image,
+                    });
+                    (e.target as HTMLImageElement).src =
+                      "/placeholder-image.jpg";
+                  }}
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
                   <button
