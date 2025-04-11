@@ -1,18 +1,15 @@
 import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Github,
-  Link,
   ExternalLink,
   Code2,
   FolderGit2,
   Search,
   Filter,
   X,
-  Calendar,
 } from "lucide-react";
 import { API_URL } from "../config";
 import { api } from "../utils/api";
@@ -38,7 +35,6 @@ interface Project {
 }
 
 const Projects: React.FC = () => {
-  const { isDarkMode } = useTheme();
   const { t, language } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
