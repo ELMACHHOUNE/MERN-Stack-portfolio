@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
-import {
-  Plus,
-  Trash2,
-  Edit,
-  Wrench,
-  ChevronUp,
-  ChevronDown,
-  X,
-} from "lucide-react";
+import { Plus, Trash2, Edit, Wrench, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 
 interface Skill {

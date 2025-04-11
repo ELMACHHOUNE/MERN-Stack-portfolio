@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Code,
-  Server,
-  Database,
-  Wrench,
-  RefreshCw,
-  AlertCircle,
-  Star,
-  Sparkles,
   Box,
   Cpu,
   Globe,
@@ -17,7 +10,6 @@ import {
   Terminal,
   Network,
   Cloud,
-  Settings,
   GitBranch,
   Database as DatabaseIcon,
   Code2,
@@ -27,7 +19,6 @@ import {
 import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
 import { trackPageView, trackSkillView } from "../services/analytics";
-import { useTheme } from "../context/ThemeContext";
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 
@@ -76,12 +67,10 @@ const getDefaultIcon = (categoryName: string) => {
 
 const Skills: React.FC = () => {
   const { t } = useLanguage();
-  const { isDarkMode } = useTheme();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     trackPageView("/skills");
@@ -153,11 +142,6 @@ const Skills: React.FC = () => {
     );
   };
 
-  const handleRetry = () => {
-    setRetryCount((prev) => prev + 1);
-    fetchSkills();
-  };
-
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
@@ -213,12 +197,6 @@ const Skills: React.FC = () => {
           <p className="text-red-600 dark:text-red-400 mb-4">
             {t("skills.error")}
           </p>
-          <button
-            onClick={handleRetry}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
-          >
-            {t("skills.retry")}
-          </button>
         </div>
       </div>
     );
