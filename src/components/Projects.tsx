@@ -12,6 +12,7 @@ import {
   Search,
   Filter,
   X,
+  Calendar,
 } from "lucide-react";
 import { API_URL } from "../config";
 import { api } from "../utils/api";
@@ -38,7 +39,7 @@ interface Project {
 
 const Projects: React.FC = () => {
   const { isDarkMode } = useTheme();
-  const { t, currentLanguage } = useLanguage();
+  const { t, language } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
@@ -52,6 +53,9 @@ const Projects: React.FC = () => {
     sortBy: "newest",
     showFilters: false,
   });
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>(
+    []
+  );
 
   const fetchProjects = async () => {
     try {
@@ -85,10 +89,34 @@ const Projects: React.FC = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get<{ _id: string; name: string }[]>(
+        "/categories"
+      );
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      if (response.data) {
+        setCategories(response.data);
+      } else {
+        throw new Error("No categories data received");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : t("categories.management.errors.fetchFailed");
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
+
   // Fetch projects on mount and when language changes
   useEffect(() => {
     fetchProjects();
-  }, [currentLanguage]);
+    fetchCategories();
+  }, [language]);
 
   // Reset filters when language changes
   useEffect(() => {
@@ -99,13 +127,16 @@ const Projects: React.FC = () => {
       sortBy: "newest",
       showFilters: false,
     });
-  }, [currentLanguage, t]);
+  }, [language, t]);
 
   const filterProjects = (projects: Project[]) => {
     const filtered = projects.filter((project) => {
+      const categoryName = categories.find(
+        (c) => c._id === project.category
+      )?.name;
       const matchesCategory =
         filters.selectedCategory === t("projects.all") ||
-        project.category === filters.selectedCategory;
+        categoryName === filters.selectedCategory;
 
       const matchesTechnologies =
         filters.selectedTechnologies.length === 0 ||
@@ -223,6 +254,25 @@ const Projects: React.FC = () => {
     };
   }, [filteredProjects]);
 
+  // Update filter rendering to use project titles
+  const renderCategoryFilters = () => {
+    return [t("projects.all"), ...categories.map((c) => c.name)].map(
+      (category) => (
+        <button
+          key={category}
+          onClick={() => handleCategoryChange(category)}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+            filters.selectedCategory === category
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white"
+              : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+          }`}
+        >
+          {category}
+        </button>
+      )
+    );
+  };
+
   if (loading) {
     return (
       <section className="py-24 bg-white dark:bg-[#0B1121]">
@@ -306,81 +356,64 @@ const Projects: React.FC = () => {
             </div>
 
             {/* Categories */}
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
-                  {t("projects.categories.category")}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    t("projects.all"),
-                    ...new Set(projects.map((p) => p.category)),
-                  ].map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleCategoryChange(category)}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                        filters.selectedCategory === category
-                          ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white"
-                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                {t("projects.categories.category")}
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {renderCategoryFilters()}
               </div>
+            </div>
 
-              {/* Technologies */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
-                  {t("projects.technologies")}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {allTechnologies.map((tech) => (
-                    <button
-                      key={tech}
-                      onClick={() => toggleTechnology(tech)}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                        filters.selectedTechnologies.includes(tech)
-                          ? "bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white"
-                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
-                      }`}
-                    >
-                      {tech}
-                    </button>
-                  ))}
-                </div>
+            {/* Technologies */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                {t("projects.technologies")}
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {allTechnologies.map((tech) => (
+                  <button
+                    key={tech}
+                    onClick={() => toggleTechnology(tech)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      filters.selectedTechnologies.includes(tech)
+                        ? "bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white"
+                        : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                    }`}
+                  >
+                    {tech}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Sort Options */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
-                  {t("projects.sortBy")}
-                </h4>
-                <div className="flex gap-2">
-                  {[
-                    { value: "newest", label: t("projects.newest") },
-                    { value: "oldest", label: t("projects.oldest") },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          sortBy: option.value as "newest" | "oldest" | "name",
-                        }))
-                      }
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                        filters.sortBy === option.value
-                          ? "bg-gradient-to-r from-green-600 to-emerald-600 dark:from-[#059669] dark:to-[#047857] text-white"
-                          : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
+            {/* Sort Options */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                {t("projects.sortBy")}
+              </h4>
+              <div className="flex gap-2">
+                {[
+                  { value: "newest", label: t("projects.newest") },
+                  { value: "oldest", label: t("projects.oldest") },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        sortBy: option.value as "newest" | "oldest" | "name",
+                      }))
+                    }
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      filters.sortBy === option.value
+                        ? "bg-gradient-to-r from-green-600 to-emerald-600 dark:from-[#059669] dark:to-[#047857] text-white"
+                        : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
