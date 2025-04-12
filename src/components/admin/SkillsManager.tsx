@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Wrench, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -67,11 +66,14 @@ const SkillsManager: React.FC = () => {
         "Fetching skills with token:",
         token.substring(0, 10) + "..."
       );
-      const response = await fetch(`${API_URL}/api/skills/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/skills/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Skills fetch error:", errorData);
@@ -99,11 +101,14 @@ const SkillsManager: React.FC = () => {
         "Fetching categories with token:",
         token.substring(0, 10) + "..."
       );
-      const response = await fetch(`${API_URL}/api/categories/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Categories fetch error:", errorData);
@@ -194,8 +199,8 @@ const SkillsManager: React.FC = () => {
       formDataToSend.append("isActive", formData.isActive.toString());
 
       const url = isEditing
-        ? `${API_URL}/api/skills/${currentSkill?._id}`
-        : `${API_URL}/api/skills`;
+        ? `${import.meta.env.VITE_API_URL}/api/skills/${currentSkill?._id}`
+        : `${import.meta.env.VITE_API_URL}/api/skills`;
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await fetch(url, {
@@ -229,7 +234,7 @@ const SkillsManager: React.FC = () => {
         }));
         // If it's a file upload, update the preview URL
         if (savedSkill.icon.startsWith("/uploads/")) {
-          setPreviewUrl(`${API_URL}${savedSkill.icon}`);
+          setPreviewUrl(`${import.meta.env.VITE_API_URL}${savedSkill.icon}`);
         }
       }
 
@@ -246,12 +251,15 @@ const SkillsManager: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/skills/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/skills/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error(t("common.error"));
 
@@ -453,7 +461,7 @@ const SkillsManager: React.FC = () => {
                         src={
                           previewUrl ||
                           (formData.icon.startsWith("/uploads/")
-                            ? `${API_URL}${formData.icon}`
+                            ? `${import.meta.env.VITE_API_URL}${formData.icon}`
                             : formData.icon)
                         }
                         alt="Preview"
@@ -526,7 +534,7 @@ const SkillsManager: React.FC = () => {
                     <img
                       src={
                         category.icon.startsWith("/uploads/")
-                          ? `${API_URL}${category.icon}`
+                          ? `${import.meta.env.VITE_API_URL}${category.icon}`
                           : category.icon
                       }
                       alt={category.name}
@@ -555,7 +563,7 @@ const SkillsManager: React.FC = () => {
                         <img
                           src={
                             skill.icon.startsWith("/uploads/")
-                              ? `${API_URL}${skill.icon}`
+                              ? `${import.meta.env.VITE_API_URL}${skill.icon}`
                               : skill.icon
                           }
                           alt={skill.name}

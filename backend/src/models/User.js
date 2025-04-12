@@ -117,7 +117,7 @@ const userSchema = new mongoose.Schema(
 // Virtual for profile image URL
 userSchema.virtual("profileImageUrl").get(function () {
   if (!this.profileImage) return null;
-  const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+  const baseUrl = process.env.BASE_URL;
   return `${baseUrl}${this.profileImage}`;
 });
 

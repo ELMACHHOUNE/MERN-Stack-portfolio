@@ -65,7 +65,7 @@ const SettingsManager: React.FC = () => {
   const fetchProfile = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/settings/profile",
+        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/settings/profile",
+        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
         {
           method: "PATCH",
           headers: {
@@ -136,7 +136,7 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/settings/password",
+        `${import.meta.env.VITE_API_URL}/api/settings/password`,
         {
           method: "PATCH",
           headers: {
@@ -184,7 +184,7 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/settings/profile-image",
+        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
         {
           method: "POST",
           headers: {
@@ -266,7 +266,9 @@ const SettingsManager: React.FC = () => {
                 <div className="relative">
                   {profileData.profileImage ? (
                     <img
-                      src={`http://localhost:5000${profileData.profileImage}`}
+                      src={`${import.meta.env.VITE_API_URL}${
+                        profileData.profileImage
+                      }`}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover"
                       loading="lazy"

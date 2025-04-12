@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, Calendar } from "lucide-react";
-import { API_URL } from "../config";
 import { useLanguage } from "../context/LanguageContext";
 import { trackPageView } from "../services/analytics";
 
@@ -27,7 +26,9 @@ const Experience: React.FC = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/experience`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/experience`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch experiences");
         }

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-hot-toast";
-import { API_URL } from "../config";
 import {
   User,
   Mail,
@@ -48,7 +47,7 @@ const ProfileSettings: React.FC = () => {
     name: user?.name || "",
     email: user?.email || "",
     title: (user as any)?.title || "",
-    location: (user as any)?.location || "", 
+    location: (user as any)?.location || "",
     bio: (user as any)?.bio || "",
     currentPassword: "",
     newPassword: "",
@@ -93,13 +92,16 @@ const ProfileSettings: React.FC = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch(`${API_URL}/api/settings/profile-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -132,8 +134,8 @@ const ProfileSettings: React.FC = () => {
 
     try {
       const endpoint = user?.isAdmin
-        ? `${API_URL}/api/settings/admin-profile`
-        : `${API_URL}/api/settings/profile`;
+        ? `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`
+        : `${import.meta.env.VITE_API_URL}/api/settings/profile`;
 
       const response = await fetch(endpoint, {
         method: "PUT",
@@ -249,7 +251,7 @@ const ProfileSettings: React.FC = () => {
                   <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700">
                     {profileImage ? (
                       <img
-                        src={`${API_URL}${profileImage}`}
+                        src={`${import.meta.env.VITE_API_URL}${profileImage}`}
                         alt={t("settings.profile.imageAlt")}
                         className="w-full h-full object-cover"
                       />

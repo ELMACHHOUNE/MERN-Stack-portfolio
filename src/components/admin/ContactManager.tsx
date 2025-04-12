@@ -36,13 +36,16 @@ const ContactManager: React.FC = () => {
 
   const fetchContacts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/contact/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/contact/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(t("contact.management.messages.error"));
@@ -60,7 +63,7 @@ const ContactManager: React.FC = () => {
   const handleMarkAsRead = async (id: string) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/contact/admin/${id}/read`,
+        `${import.meta.env.VITE_API_URL}/api/contact/admin/${id}/read`,
         {
           method: "PUT",
           headers: {
@@ -91,7 +94,7 @@ const ContactManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/contact/admin/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/contact/admin/${id}`,
         {
           method: "DELETE",
           headers: {

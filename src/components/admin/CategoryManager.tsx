@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Folder, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -32,11 +31,14 @@ const CategoryManager: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/categories/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok)
         throw new Error(t("categories.management.errors.fetchFailed"));
       const data = await response.json();
@@ -58,8 +60,10 @@ const CategoryManager: React.FC = () => {
       };
 
       const url = isEditing
-        ? `${API_URL}/api/categories/${currentCategory?._id}`
-        : `${API_URL}/api/categories`;
+        ? `${import.meta.env.VITE_API_URL}/api/categories/${
+            currentCategory?._id
+          }`
+        : `${import.meta.env.VITE_API_URL}/api/categories`;
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -92,12 +96,15 @@ const CategoryManager: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/categories/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/categories/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok)
         throw new Error(t("categories.management.errors.deleteFailed"));

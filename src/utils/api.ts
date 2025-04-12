@@ -1,12 +1,11 @@
 import { toast } from 'react-toastify';
-import { API_URL } from '../config';
 
 interface ApiResponse<T = any> {
   data?: T;
   error?: string;
 }
 
-const BASE_URL = `${API_URL}/api`;
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 // List of public endpoints that don't require authentication
 const PUBLIC_ENDPOINTS = [

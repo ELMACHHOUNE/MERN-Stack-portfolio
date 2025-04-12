@@ -1,7 +1,3 @@
-
-
-const API_URL = 'http://localhost:5000/api/analytics';
-
 // Generate a simple visitor ID
 const getVisitorId = () => {
   let visitorId = localStorage.getItem('visitorId');
@@ -37,7 +33,7 @@ export const trackPageView = async (path: string, timeSpent: number = 0) => {
     const visitorId = getVisitorId();
     console.log('Tracking with visitorId:', visitorId);
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +63,7 @@ export const trackPageView = async (path: string, timeSpent: number = 0) => {
 // Track contact submission
 export const trackContactSubmission = async () => {
   try {
-    await fetch(API_URL, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -88,7 +84,7 @@ export const trackContactSubmission = async () => {
 // Track resume download
 export const trackResumeDownload = async () => {
   try {
-    await fetch(API_URL, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +105,7 @@ export const trackResumeDownload = async () => {
 // Track project view
 export const trackProjectView = async (projectId: string) => {
   try {
-    await fetch(API_URL, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -131,7 +127,7 @@ export const trackProjectView = async (projectId: string) => {
 // Track skill view
 export const trackSkillView = async (skillId: string) => {
   try {
-    await fetch(API_URL, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

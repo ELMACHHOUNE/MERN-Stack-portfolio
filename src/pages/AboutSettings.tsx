@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useAuth } from "../context/AuthContext";
-import { API_URL } from "../config";
 import { Plus, Trash2 } from "lucide-react";
 
 interface Value {
@@ -78,13 +77,16 @@ const AboutSettings: React.FC = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch(`${API_URL}/api/settings/profile-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -211,7 +213,9 @@ const AboutSettings: React.FC = () => {
                 <div className="relative w-24 h-24 rounded-full overflow-hidden">
                   {draftData.profileImage ? (
                     <img
-                      src={`${API_URL}${draftData.profileImage}`}
+                      src={`${import.meta.env.VITE_API_URL}${
+                        draftData.profileImage
+                      }`}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />

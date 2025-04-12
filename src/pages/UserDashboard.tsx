@@ -5,7 +5,6 @@ import { useLanguage } from "../context/LanguageContext";
 
 import { User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../config";
 
 interface UserProfile {
   name: string;
@@ -74,7 +73,7 @@ const UserDashboard: React.FC = () => {
           <div className="flex items-center space-x-4 mb-6">
             {user.profileImage ? (
               <img
-                src={`${API_URL}${user.profileImage}`}
+                src={`${import.meta.env.VITE_API_URL}${user.profileImage}`}
                 alt={user.name}
                 className="h-16 w-16 rounded-full object-cover"
               />

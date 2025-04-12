@@ -71,8 +71,8 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const url = editingSkill
-        ? `http://localhost:5000/api/skills/${editingSkill._id}`
-        : "http://localhost:5000/api/skills";
+        ? `${import.meta.env.VITE_API_URL}/api/skills/${editingSkill._id}`
+        : `${import.meta.env.VITE_API_URL}/api/skills`;
       const method = editingSkill ? "PATCH" : "POST";
 
       // Prepare the skill data
@@ -111,12 +111,15 @@ const SkillsManager: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/skills/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/skills/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete skill");

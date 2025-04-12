@@ -16,7 +16,7 @@ import {
   Server as ServerIcon,
   Wrench as WrenchIcon,
 } from "lucide-react";
-import { API_URL } from "../config";
+
 import { useLanguage } from "../context/LanguageContext";
 import { trackPageView, trackSkillView } from "../services/analytics";
 import { api } from "../utils/api";
@@ -171,7 +171,7 @@ const Skills: React.FC = () => {
       return url;
     }
 
-    return `${API_URL}${url}`;
+    return `${import.meta.env.VITE_API_URL}${url}`;
   };
 
   // Add tracking when a skill is viewed

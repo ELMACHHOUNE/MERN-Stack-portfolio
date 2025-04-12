@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
-import { API_URL } from "../config";
 import {
   User,
   Github,
@@ -133,7 +132,9 @@ const About: React.FC = () => {
                 <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300">
                   {adminProfile?.profileImage ? (
                     <img
-                      src={`${API_URL}${adminProfile.profileImage}`}
+                      src={`${import.meta.env.VITE_API_URL}${
+                        adminProfile.profileImage
+                      }`}
                       alt={adminProfile.name}
                       className="w-full h-full object-cover"
                       loading="lazy"

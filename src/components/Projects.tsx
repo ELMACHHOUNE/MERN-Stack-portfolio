@@ -11,7 +11,7 @@ import {
   Filter,
   X,
 } from "lucide-react";
-import { API_URL } from "../config";
+
 import { api } from "../utils/api";
 import { toast } from "react-toastify";
 
@@ -473,7 +473,7 @@ const Projects: React.FC = () => {
                 <img
                   src={
                     project.image.startsWith("/uploads/")
-                      ? `${API_URL}${project.image}`
+                      ? `${import.meta.env.VITE_API_URL}${project.image}`
                       : project.image
                   }
                   alt={project.title}

@@ -45,7 +45,9 @@ const AnalyticsManager: React.FC = () => {
         console.log("Fetching analytics with token:", token);
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/analytics?timeRange=${timeRange}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/analytics?timeRange=${timeRange}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

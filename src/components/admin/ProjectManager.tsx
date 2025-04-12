@@ -9,7 +9,6 @@ import {
   Calendar,
   X,
 } from "lucide-react";
-import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -71,11 +70,14 @@ const ProjectManager: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/categories/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok)
         throw new Error(t("categories.management.errors.fetchFailed"));
       const data = await response.json();
@@ -89,11 +91,14 @@ const ProjectManager: React.FC = () => {
   const fetchProjects = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/projects/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/projects/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok)
         throw new Error(t("projects.management.errors.fetchFailed"));
       const data = await response.json();
@@ -185,8 +190,8 @@ const ProjectManager: React.FC = () => {
       });
 
       const url = isEditing
-        ? `${API_URL}/api/projects/${currentProject?._id}`
-        : `${API_URL}/api/projects`;
+        ? `${import.meta.env.VITE_API_URL}/api/projects/${currentProject?._id}`
+        : `${import.meta.env.VITE_API_URL}/api/projects`;
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await fetch(url, {
@@ -220,7 +225,7 @@ const ProjectManager: React.FC = () => {
         }));
         // If it's a file upload, update the preview URL
         if (savedProject.image.startsWith("/uploads/")) {
-          setPreviewUrl(`${API_URL}${savedProject.image}`);
+          setPreviewUrl(`${import.meta.env.VITE_API_URL}${savedProject.image}`);
         }
       }
 
@@ -237,12 +242,15 @@ const ProjectManager: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/projects/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/projects/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok)
         throw new Error(t("projects.management.errors.deleteFailed"));
@@ -476,7 +484,7 @@ const ProjectManager: React.FC = () => {
                       src={
                         previewUrl ||
                         (formData.image.startsWith("/uploads/")
-                          ? `${API_URL}${formData.image}`
+                          ? `${import.meta.env.VITE_API_URL}${formData.image}`
                           : formData.image)
                       }
                       alt="Preview"
@@ -664,7 +672,7 @@ const ProjectManager: React.FC = () => {
                 <img
                   src={
                     project.image.startsWith("/uploads/")
-                      ? `${API_URL}${project.image}`
+                      ? `${import.meta.env.VITE_API_URL}${project.image}`
                       : project.image
                   }
                   alt={project.title}

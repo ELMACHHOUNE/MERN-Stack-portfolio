@@ -21,7 +21,6 @@ import {
   Twitter,
   ArrowRight,
 } from "lucide-react";
-import { API_URL } from "../config";
 import { api } from "../utils/api";
 import { toast } from "react-hot-toast";
 
@@ -287,7 +286,10 @@ const Home: React.FC = () => {
   const getImageUrl = (url: string) => {
     return url.startsWith("http")
       ? url
-      : `${API_URL}/uploads/${url.replace(/^\/uploads\//, "")}`;
+      : `${import.meta.env.VITE_API_URL}/uploads/${url.replace(
+          /^\/uploads\//,
+          ""
+        )}`;
   };
 
   if (data.loading) {

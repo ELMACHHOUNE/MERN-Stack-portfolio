@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { API_URL } from "../config";
 import {
   Menu,
   X,
@@ -173,7 +172,9 @@ const Navbar: React.FC<NavbarProps> = ({
                     {user.profileImage ? (
                       <img
                         className="h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
-                        src={`${API_URL}${user.profileImage}`}
+                        src={`${import.meta.env.VITE_API_URL}${
+                          user.profileImage
+                        }`}
                         alt={user.name}
                       />
                     ) : (

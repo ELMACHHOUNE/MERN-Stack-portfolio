@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { API_URL } from "../config";
 import { toast } from "react-hot-toast";
 
 interface User {
@@ -58,11 +57,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setToken(storedToken);
 
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const userData = await response.json();
@@ -84,13 +86,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
       console.log("Login response:", data);
@@ -109,11 +114,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setToken(data.token);
 
       // Fetch complete profile data
-      const profileResponse = await fetch(`${API_URL}/api/settings/profile`, {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      });
+      const profileResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        }
+      );
 
       if (!profileResponse.ok) {
         throw new Error("Failed to fetch profile data");
@@ -154,13 +162,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        }
+      );
 
       const data = await response.json();
 

@@ -3,7 +3,6 @@ import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
-import { API_URL } from "../config";
 import {
   User,
   Code,
@@ -107,13 +106,16 @@ const AdminSettings: React.FC = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch(`${API_URL}/api/settings/profile-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -227,7 +229,9 @@ const AdminSettings: React.FC = () => {
                       <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
                         {profileImage ? (
                           <img
-                            src={`${API_URL}${profileImage}`}
+                            src={`${
+                              import.meta.env.VITE_API_URL
+                            }${profileImage}`}
                             alt={t("settings.profile.imageAlt")}
                             className="w-full h-full object-cover"
                           />

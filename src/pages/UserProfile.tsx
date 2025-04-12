@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { toast } from "react-toastify";
-import { API_URL } from "../config";
 import { User, Mail, Lock, Eye, EyeOff, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -23,7 +22,9 @@ const UserProfile: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(
-    user?.profileImage ? `${API_URL}${user.profileImage}` : null
+    user?.profileImage
+      ? `${import.meta.env.VITE_API_URL}${user.profileImage}`
+      : null
   );
   const [formData, setFormData] = useState<FormData>({
     name: user?.name || "",
@@ -35,11 +36,14 @@ const UserProfile: React.FC = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/settings/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch user profile");
@@ -54,7 +58,9 @@ const UserProfile: React.FC = () => {
       }));
 
       setProfileImage(
-        data.profileImage ? `${API_URL}${data.profileImage}` : null
+        data.profileImage
+          ? `${import.meta.env.VITE_API_URL}${data.profileImage}`
+          : null
       );
       setUser(data); // Update the global user state
     } catch (error) {
@@ -93,13 +99,16 @@ const UserProfile: React.FC = () => {
     formData.append("image", file);
 
     try {
-      const response = await fetch(`${API_URL}/api/settings/profile-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -107,7 +116,7 @@ const UserProfile: React.FC = () => {
       }
 
       const data = await response.json();
-      setProfileImage(`${API_URL}${data.profileImage}`);
+      setProfileImage(`${import.meta.env.VITE_API_URL}${data.profileImage}`);
       toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
@@ -131,19 +140,22 @@ const UserProfile: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/settings/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          currentPassword: formData.currentPassword || undefined,
-          newPassword: formData.newPassword || undefined,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            currentPassword: formData.currentPassword || undefined,
+            newPassword: formData.newPassword || undefined,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

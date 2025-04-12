@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { API_URL } from "../config";
 
 interface Value {
   icon: string;
@@ -72,9 +71,12 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // If user is logged in as admin, fetch their profile
       if (user?.isAdmin && token) {
-        const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
-          headers,
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`,
+          {
+            headers,
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin profile");
@@ -98,9 +100,12 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       // If user is logged in but not admin, or not logged in at all, fetch public admin profile
       else {
-        const response = await fetch(`${API_URL}/api/settings/public-profile`, {
-          headers,
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/settings/public-profile`,
+          {
+            headers,
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch public admin profile");
@@ -129,14 +134,17 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       console.log("Updating profile with data:", data);
-      const response = await fetch(`${API_URL}/api/settings/admin-profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

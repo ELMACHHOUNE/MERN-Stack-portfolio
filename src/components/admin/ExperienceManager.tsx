@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { API_URL } from "../../config";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Briefcase, Calendar, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -45,11 +44,14 @@ const ExperienceManager: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/experience/admin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/experience/admin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
@@ -90,8 +92,10 @@ const ExperienceManager: React.FC = () => {
       };
 
       const url = isEditing
-        ? `${API_URL}/api/experience/${currentExperience?._id}`
-        : `${API_URL}/api/experience`;
+        ? `${import.meta.env.VITE_API_URL}/api/experience/${
+            currentExperience?._id
+          }`
+        : `${import.meta.env.VITE_API_URL}/api/experience`;
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -138,12 +142,15 @@ const ExperienceManager: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/experience/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/experience/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
