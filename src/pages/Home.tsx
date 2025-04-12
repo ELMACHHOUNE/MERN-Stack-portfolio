@@ -284,12 +284,25 @@ const Home: React.FC = () => {
 
   // Update the image URL construction
   const getImageUrl = (url: string) => {
-    return url.startsWith("http")
-      ? url
-      : `${import.meta.env.VITE_API_URL.replace(
-          /\/?api\/?$/,
-          ""
-        )}/uploads/${url.replace(/^\/uploads\//, "")}`;
+    if (!url) return undefined;
+
+    // If it's already a full URL (http/https), return as is
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+
+    // If it's a data URL, return as is
+    if (url.startsWith("data:")) {
+      return url;
+    }
+
+    // If it's a local path (starts with /uploads), prepend the base URL
+    if (url.startsWith("/uploads")) {
+      return `${import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")}${url}`;
+    }
+
+    // For any other case, return the URL as is
+    return url;
   };
 
   if (data.loading) {
@@ -428,16 +441,28 @@ const Home: React.FC = () => {
                             loading="lazy"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
-                              const parent = target.parentElement;
-                              if (parent) {
-                                const fallbackIcon =
-                                  document.createElement("div");
-                                fallbackIcon.className =
-                                  "text-gray-500 dark:text-gray-400";
-                                fallbackIcon.innerHTML =
-                                  '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-                                parent.appendChild(fallbackIcon);
+                              if (
+                                target.src !==
+                                `${window.location.origin}/placeholder-image.jpg`
+                              ) {
+                                target.src = "/placeholder-image.jpg";
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  const fallbackIcon =
+                                    document.createElement("div");
+                                  fallbackIcon.className =
+                                    "text-gray-500 dark:text-gray-400";
+                                  const icon = getIconComponent(skill.category);
+                                  if (React.isValidElement(icon)) {
+                                    parent.appendChild(fallbackIcon);
+                                    // Render the icon into the fallback div
+                                    const iconContainer =
+                                      document.createElement("div");
+                                    iconContainer.className = "w-6 h-6";
+                                    fallbackIcon.appendChild(iconContainer);
+                                  }
+                                }
                               }
                             }}
                           />
@@ -506,15 +531,21 @@ const Home: React.FC = () => {
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                        const parent = target.parentElement;
-                        if (parent) {
-                          const fallbackIcon = document.createElement("div");
-                          fallbackIcon.className =
-                            "w-full h-full text-blue-600 dark:text-[#4F46E5]";
-                          fallbackIcon.innerHTML =
-                            '<svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-                          parent.appendChild(fallbackIcon);
+                        if (
+                          target.src !==
+                          `${window.location.origin}/placeholder-image.jpg`
+                        ) {
+                          target.src = "/placeholder-image.jpg";
+                          target.style.display = "none";
+                          const parent = target.parentElement;
+                          if (parent) {
+                            const fallbackIcon = document.createElement("div");
+                            fallbackIcon.className =
+                              "w-full h-full text-blue-600 dark:text-[#4F46E5] flex items-center justify-center";
+                            fallbackIcon.innerHTML =
+                              '<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>';
+                            parent.appendChild(fallbackIcon);
+                          }
                         }
                       }}
                     />

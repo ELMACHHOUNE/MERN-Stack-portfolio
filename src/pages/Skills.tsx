@@ -142,36 +142,26 @@ const Skills: React.FC = () => {
     );
   };
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    const target = e.target as HTMLImageElement;
-    const parent = target.parentElement;
-    if (parent) {
-      const fallbackIcon = document.createElement("div");
-      fallbackIcon.className =
-        "w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400";
-      const categoryName = target.alt;
-      const icon = getDefaultIcon(categoryName);
-      if (React.isValidElement(icon)) {
-        target.style.display = "none";
-        parent.appendChild(fallbackIcon);
-      }
-    }
-  };
-
   const getImageUrl = (url: string | null | undefined): string | undefined => {
     if (!url) return undefined;
 
-    if (url.startsWith("data:image")) {
-      return url;
-    }
-
+    // If it's already a full URL (http/https), return as is
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
 
-    return `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${url}`;
+    // If it's a data URL, return as is
+    if (url.startsWith("data:")) {
+      return url;
+    }
+
+    // If it's a local path (starts with /uploads), prepend the base URL
+    if (url.startsWith("/uploads")) {
+      return `${import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")}${url}`;
+    }
+
+    // For any other case, return the URL as is
+    return url;
   };
 
   // Add tracking when a skill is viewed
@@ -239,7 +229,27 @@ const Skills: React.FC = () => {
                             alt={category.name}
                             className="w-8 h-8"
                             loading="lazy"
-                            onError={handleImageError}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              if (
+                                target.src !==
+                                `${window.location.origin}/placeholder-image.jpg`
+                              ) {
+                                target.src = "/placeholder-image.jpg";
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  const fallbackIcon =
+                                    document.createElement("div");
+                                  fallbackIcon.className =
+                                    "w-8 h-8 text-blue-600 group-hover:text-purple-600 dark:text-[#4F46E5] dark:group-hover:text-[#9333EA] transition-colors";
+                                  const icon = getDefaultIcon(category.name);
+                                  if (React.isValidElement(icon)) {
+                                    parent.appendChild(fallbackIcon);
+                                  }
+                                }
+                              }
+                            }}
                           />
                         ) : (
                           <div className="w-8 h-8 text-blue-600 group-hover:text-purple-600 dark:text-[#4F46E5] dark:group-hover:text-[#9333EA] transition-colors">
@@ -273,7 +283,38 @@ const Skills: React.FC = () => {
                                     src={getImageUrl(skill.icon)}
                                     alt={skill.name}
                                     className="w-full h-full object-contain"
-                                    onError={handleImageError}
+                                    onError={(e) => {
+                                      const target =
+                                        e.target as HTMLImageElement;
+                                      if (
+                                        target.src !==
+                                        `${window.location.origin}/placeholder-image.jpg`
+                                      ) {
+                                        target.src = "/placeholder-image.jpg";
+                                        target.style.display = "none";
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          const fallbackIcon =
+                                            document.createElement("div");
+                                          fallbackIcon.className =
+                                            "w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400";
+                                          const categoryName =
+                                            skill.category?.name || "";
+                                          const icon =
+                                            getDefaultIcon(categoryName);
+                                          if (React.isValidElement(icon)) {
+                                            parent.appendChild(fallbackIcon);
+                                            // Render the icon into the fallback div
+                                            const iconContainer =
+                                              document.createElement("div");
+                                            iconContainer.className = "w-8 h-8";
+                                            fallbackIcon.appendChild(
+                                              iconContainer
+                                            );
+                                          }
+                                        }
+                                      }
+                                    }}
                                   />
                                 ) : (
                                   <div className="text-gray-500 dark:text-gray-400">
