@@ -71,8 +71,8 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const url = editingSkill
-        ? `${import.meta.env.VITE_API_URL}/api/skills/${editingSkill._id}`
-        : `${import.meta.env.VITE_API_URL}/api/skills`;
+        ? `${import.meta.env.VITE_API_URL}/skills/${editingSkill._id}`
+        : `${import.meta.env.VITE_API_URL}/skills`;
       const method = editingSkill ? "PATCH" : "POST";
 
       // Prepare the skill data
@@ -112,7 +112,7 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/skills/${id}`,
+        `${import.meta.env.VITE_API_URL}/skills/${id}`,
         {
           method: "DELETE",
           headers: {

@@ -27,7 +27,7 @@ const Experience: React.FC = () => {
     const fetchExperiences = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/experience`
+          `${import.meta.env.VITE_API_URL}/experience`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch experiences");

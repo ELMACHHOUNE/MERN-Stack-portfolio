@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { API_URL, ENDPOINTS } from "../utils/api";
 import {
   User,
   Code,
@@ -48,7 +49,7 @@ interface SocialLinks {
 const AdminSettings: React.FC = () => {
   const { t } = useLanguage();
   const { adminProfile, updateAdminProfile } = useAdminProfile();
-  const { token } = useAuth();
+  const { token, setUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(
     adminProfile?.profileImage || ""
@@ -106,16 +107,13 @@ const AdminSettings: React.FC = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(ENDPOINTS.SETTINGS.PROFILE_IMAGE, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -123,8 +121,43 @@ const AdminSettings: React.FC = () => {
       }
 
       const data = await response.json();
-      setProfileImage(data.profileImage);
-      await updateAdminProfile({ profileImage: data.profileImage });
+      const newProfileImage = data.profileImage;
+
+      // Update local state
+      setProfileImage(newProfileImage);
+
+      // Create a new profile object with all existing data
+      const updatedProfile = {
+        ...adminProfile,
+        profileImage: newProfileImage,
+      };
+
+      // Update the admin profile context
+      await updateAdminProfile(updatedProfile);
+
+      // Update the auth context by fetching fresh user data
+      const userResponse = await fetch(ENDPOINTS.AUTH.ME, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setUser(userData); // This will update the user context with the new image
+      }
+
+      // Dispatch custom event with full image URL
+      const fullImageUrl = `${API_URL.replace("/api", "")}${newProfileImage}`;
+      window.dispatchEvent(
+        new CustomEvent("profileImageUpdated", {
+          detail: {
+            profileImage: fullImageUrl,
+            timestamp: Date.now(),
+          },
+        })
+      );
+
       toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
@@ -194,6 +227,7 @@ const AdminSettings: React.FC = () => {
       interests,
       values,
       socialLinks,
+      profileImage,
     };
 
     try {
@@ -229,9 +263,10 @@ const AdminSettings: React.FC = () => {
                       <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
                         {profileImage ? (
                           <img
-                            src={`${
-                              import.meta.env.VITE_API_URL
-                            }${profileImage}`}
+                            src={`${API_URL.replace(
+                              "/api",
+                              ""
+                            )}${profileImage}`}
                             alt={t("settings.profile.imageAlt")}
                             className="w-full h-full object-cover"
                           />

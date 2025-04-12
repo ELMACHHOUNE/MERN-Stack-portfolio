@@ -65,7 +65,7 @@ const SettingsManager: React.FC = () => {
   const fetchProfile = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        `${import.meta.env.VITE_API_URL}/settings/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        `${import.meta.env.VITE_API_URL}/settings/profile`,
         {
           method: "PATCH",
           headers: {
@@ -136,7 +136,7 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/password`,
+        `${import.meta.env.VITE_API_URL}/settings/password`,
         {
           method: "PATCH",
           headers: {
@@ -184,7 +184,10 @@ const SettingsManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        `${import.meta.env.VITE_API_URL.replace(
+          /\/?api\/?$/,
+          ""
+        )}/settings/profile-image`,
         {
           method: "POST",
           headers: {

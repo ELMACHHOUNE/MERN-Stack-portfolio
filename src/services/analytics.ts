@@ -33,7 +33,7 @@ export const trackPageView = async (path: string, timeSpent: number = 0) => {
     const visitorId = getVisitorId();
     console.log('Tracking with visitorId:', visitorId);
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export const trackPageView = async (path: string, timeSpent: number = 0) => {
 // Track contact submission
 export const trackContactSubmission = async () => {
   try {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export const trackContactSubmission = async () => {
 // Track resume download
 export const trackResumeDownload = async () => {
   try {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export const trackResumeDownload = async () => {
 // Track project view
 export const trackProjectView = async (projectId: string) => {
   try {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export const trackProjectView = async (projectId: string) => {
 // Track skill view
 export const trackSkillView = async (skillId: string) => {
   try {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/analytics`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

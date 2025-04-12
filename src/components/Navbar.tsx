@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import { API_URL } from "../utils/api";
 import {
   Menu,
   X,
@@ -31,6 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [profileImageKey, setProfileImageKey] = useState(Date.now());
   const location = useLocation();
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -45,6 +47,27 @@ const Navbar: React.FC<NavbarProps> = ({
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Listen for profile image updates
+  useEffect(() => {
+    const handleProfileImageUpdate = (event: CustomEvent) => {
+      if (event.detail?.profileImage) {
+        setProfileImageKey(event.detail.timestamp || Date.now());
+      }
+    };
+
+    window.addEventListener(
+      "profileImageUpdated",
+      handleProfileImageUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "profileImageUpdated",
+        handleProfileImageUpdate as EventListener
+      );
+    };
   }, []);
 
   // Close mobile menu when route changes
@@ -169,12 +192,13 @@ const Navbar: React.FC<NavbarProps> = ({
                     <span className="sr-only">
                       {t("navbar.profile.openMenu")}
                     </span>
-                    {user.profileImage ? (
+                    {user?.profileImage ? (
                       <img
+                        key={profileImageKey}
                         className="h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
-                        src={`${import.meta.env.VITE_API_URL}${
+                        src={`${API_URL.replace("/api", "")}${
                           user.profileImage
-                        }`}
+                        }?v=${profileImageKey}`}
                         alt={user.name}
                       />
                     ) : (

@@ -29,6 +29,7 @@ interface AdminProfile {
   interests: string[];
   values: Value[];
   socialLinks?: SocialLinks;
+  cvUrl?: string;
 }
 
 interface AdminProfileContextType {
@@ -72,7 +73,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
       // If user is logged in as admin, fetch their profile
       if (user?.isAdmin && token) {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`,
+          `${import.meta.env.VITE_API_URL}/settings/admin-profile`,
           {
             headers,
           }
@@ -94,6 +95,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           interests: data.interests || [],
           values: data.values || [],
           socialLinks: data.socialLinks || {},
+          cvUrl: data.cvUrl || "",
         };
         setAdminProfile(profile);
         return profile;
@@ -101,7 +103,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
       // If user is logged in but not admin, or not logged in at all, fetch public admin profile
       else {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/settings/public-profile`,
+          `${import.meta.env.VITE_API_URL}/settings/public-profile`,
           {
             headers,
           }
@@ -135,7 +137,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       console.log("Updating profile with data:", data);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`,
+        `${import.meta.env.VITE_API_URL}/settings/admin-profile`,
         {
           method: "PUT",
           headers: {

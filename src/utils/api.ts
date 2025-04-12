@@ -5,7 +5,37 @@ interface ApiResponse<T = any> {
   error?: string;
 }
 
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+// API URL utility
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+// API endpoints
+export const ENDPOINTS = {
+  AUTH: {
+    LOGIN: `${API_URL}/auth/login`,
+    REGISTER: `${API_URL}/auth/register`,
+    ME: `${API_URL}/auth/me`,
+  },
+  SETTINGS: {
+    PROFILE: `${API_URL}/settings/profile`,
+    ADMIN_PROFILE: `${API_URL}/settings/admin-profile`,
+    PROFILE_IMAGE: `${API_URL}/settings/profile-image`,
+  },
+  CONTACT: {
+    ADMIN: `${API_URL}/contact/admin`,
+    MARK_READ: (id: string) => `${API_URL}/contact/admin/${id}/read`,
+    DELETE: (id: string) => `${API_URL}/contact/admin/${id}`,
+  },
+  SKILLS: {
+    ADMIN: `${API_URL}/skills/admin`,
+    DELETE: (id: string) => `${API_URL}/skills/${id}`,
+  },
+  CATEGORIES: {
+    ADMIN: `${API_URL}/categories/admin`,
+  },
+  ANALYTICS: {
+    BASE: `${API_URL}/analytics`,
+  },
+};
 
 // List of public endpoints that don't require authentication
 const PUBLIC_ENDPOINTS = [
@@ -41,7 +71,7 @@ const getHeaders = (endpoint: string) => {
 export const api = {
   get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'GET',
         headers: getHeaders(endpoint),
       });
@@ -68,7 +98,7 @@ export const api = {
 
   post: async <T>(endpoint: string, body: any): Promise<ApiResponse<T>> => {
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: getHeaders(endpoint),
         body: JSON.stringify(body),
@@ -96,7 +126,7 @@ export const api = {
 
   put: async <T>(endpoint: string, body: any): Promise<ApiResponse<T>> => {
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PUT',
         headers: getHeaders(endpoint),
         body: JSON.stringify(body),
@@ -124,7 +154,7 @@ export const api = {
 
   delete: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'DELETE',
         headers: getHeaders(endpoint),
       });

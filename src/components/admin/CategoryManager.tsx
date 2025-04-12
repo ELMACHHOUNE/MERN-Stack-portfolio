@@ -32,7 +32,7 @@ const CategoryManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
+        `${import.meta.env.VITE_API_URL}/categories/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,10 +60,8 @@ const CategoryManager: React.FC = () => {
       };
 
       const url = isEditing
-        ? `${import.meta.env.VITE_API_URL}/api/categories/${
-            currentCategory?._id
-          }`
-        : `${import.meta.env.VITE_API_URL}/api/categories`;
+        ? `${import.meta.env.VITE_API_URL}/categories/${currentCategory?._id}`
+        : `${import.meta.env.VITE_API_URL}/categories`;
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -97,7 +95,7 @@ const CategoryManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/${id}`,
+        `${import.meta.env.VITE_API_URL}/categories/${id}`,
         {
           method: "DELETE",
           headers: {

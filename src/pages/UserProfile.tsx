@@ -23,7 +23,9 @@ const UserProfile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(
     user?.profileImage
-      ? `${import.meta.env.VITE_API_URL}${user.profileImage}`
+      ? `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${
+          user.profileImage
+        }`
       : null
   );
   const [formData, setFormData] = useState<FormData>({
@@ -37,7 +39,10 @@ const UserProfile: React.FC = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        `${import.meta.env.VITE_API_URL.replace(
+          /\/?api\/?$/,
+          ""
+        )}/settings/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +64,9 @@ const UserProfile: React.FC = () => {
 
       setProfileImage(
         data.profileImage
-          ? `${import.meta.env.VITE_API_URL}${data.profileImage}`
+          ? `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${
+              data.profileImage
+            }`
           : null
       );
       setUser(data); // Update the global user state
@@ -100,7 +107,10 @@ const UserProfile: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        `${import.meta.env.VITE_API_URL.replace(
+          /\/?api\/?$/,
+          ""
+        )}/settings/profile-image`,
         {
           method: "POST",
           headers: {
@@ -116,7 +126,11 @@ const UserProfile: React.FC = () => {
       }
 
       const data = await response.json();
-      setProfileImage(`${import.meta.env.VITE_API_URL}${data.profileImage}`);
+      setProfileImage(
+        `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${
+          data.profileImage
+        }`
+      );
       toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
@@ -141,7 +155,10 @@ const UserProfile: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile`,
+        `${import.meta.env.VITE_API_URL.replace(
+          /\/?api\/?$/,
+          ""
+        )}/settings/profile`,
         {
           method: "PUT",
           headers: {

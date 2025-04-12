@@ -168,7 +168,7 @@ const AdminDashboard: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/admin/users`,
+        `${import.meta.env.VITE_API_URL}/auth/admin/users`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/admin/users/${userId}`,
+        `${import.meta.env.VITE_API_URL}/auth/admin/users/${userId}`,
         {
           method: "DELETE",
           headers: {
@@ -236,9 +236,7 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/admin/users/${
-          editingUser._id
-        }`,
+        `${import.meta.env.VITE_API_URL}/auth/admin/users/${editingUser._id}`,
         {
           method: "PUT",
           headers: {

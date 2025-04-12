@@ -171,7 +171,7 @@ const Skills: React.FC = () => {
       return url;
     }
 
-    return `${import.meta.env.VITE_API_URL}${url}`;
+    return `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${url}`;
   };
 
   // Add tracking when a skill is viewed

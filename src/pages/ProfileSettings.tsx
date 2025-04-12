@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { ENDPOINTS } from "../utils/api";
 
 interface FormData {
   name: string;
@@ -92,16 +93,13 @@ const ProfileSettings: React.FC = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(ENDPOINTS.SETTINGS.PROFILE_IMAGE, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -134,8 +132,8 @@ const ProfileSettings: React.FC = () => {
 
     try {
       const endpoint = user?.isAdmin
-        ? `${import.meta.env.VITE_API_URL}/api/settings/admin-profile`
-        : `${import.meta.env.VITE_API_URL}/api/settings/profile`;
+        ? `${import.meta.env.VITE_API_URL}/settings/admin-profile`
+        : `${import.meta.env.VITE_API_URL}/settings/profile`;
 
       const response = await fetch(endpoint, {
         method: "PUT",
@@ -251,7 +249,10 @@ const ProfileSettings: React.FC = () => {
                   <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700">
                     {profileImage ? (
                       <img
-                        src={`${import.meta.env.VITE_API_URL}${profileImage}`}
+                        src={`${import.meta.env.VITE_API_URL.replace(
+                          /\/?api\/?$/,
+                          ""
+                        )}${profileImage}`}
                         alt={t("settings.profile.imageAlt")}
                         className="w-full h-full object-cover"
                       />

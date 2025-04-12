@@ -45,7 +45,7 @@ const ExperienceManager: React.FC = () => {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/experience/admin`,
+        `${import.meta.env.VITE_API_URL}/experience/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -92,10 +92,10 @@ const ExperienceManager: React.FC = () => {
       };
 
       const url = isEditing
-        ? `${import.meta.env.VITE_API_URL}/api/experience/${
+        ? `${import.meta.env.VITE_API_URL}/experience/${
             currentExperience?._id
           }`
-        : `${import.meta.env.VITE_API_URL}/api/experience`;
+        : `${import.meta.env.VITE_API_URL}/experience`;
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -143,7 +143,7 @@ const ExperienceManager: React.FC = () => {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/experience/${id}`,
+        `${import.meta.env.VITE_API_URL}/experience/${id}`,
         {
           method: "DELETE",
           headers: {

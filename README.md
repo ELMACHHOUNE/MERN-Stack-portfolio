@@ -1,52 +1,71 @@
 # MERN Stack Portfolio
 
-A modern, responsive portfolio website built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring a beautiful UI, dark mode support, and multilingual capabilities.
+A modern, full-stack portfolio application built with the MERN stack (MongoDB, Express.js, React, Node.js) and TypeScript.
 
 ## Features
 
-- 🌐 **Multilingual Support**: Built-in translation system supporting English and French
-- 🌓 **Dark Mode**: Seamless dark/light theme switching
-- 📱 **Responsive Design**: Fully responsive layout for all devices
-- 🔒 **Authentication**: Secure user authentication with JWT
-- 👑 **Admin Dashboard**: Comprehensive admin panel for content management
-- 📬 **Contact Form**: Interactive contact form with email notifications
-- 🎨 **Modern UI**: Beautiful and intuitive user interface
-- ⚡ **Performance Optimized**: Fast loading times and smooth transitions
+- 🎨 Modern UI with Tailwind CSS
+- 🌍 Internationalization support
+- 🔒 Authentication & Authorization
+- 📊 Analytics Dashboard
+- 🖼️ Dynamic Profile Management
+- 📱 Responsive Design
+- 🌓 Dark/Light Mode
+- 🔍 SEO Optimized
+- 📝 Blog/Projects Management
+- 📈 Skills & Experience Tracking
 
 ## Tech Stack
 
 ### Frontend
 
-- React.js with TypeScript
+- React with TypeScript
+- Vite for build tooling
 - Tailwind CSS for styling
 - Framer Motion for animations
 - React Router for navigation
 - Context API for state management
-- i18n for internationalization
+- i18next for internationalization
 
 ### Backend
 
-- Node.js with Express
+- Node.js & Express.js
 - MongoDB with Mongoose
 - JWT for authentication
-- Nodemailer for email notifications
-- Nodemon for development
+- Multer for file uploads
+- Express Validator for validation
 
-## Getting Started
+## Project Structure
 
-### Prerequisites
+```
+├── src/                      # Frontend source code
+│   ├── components/           # Reusable React components
+│   ├── context/             # React Context providers
+│   ├── pages/               # Page components
+│   ├── services/            # API service functions
+│   ├── utils/               # Utility functions
+│   ├── constants/           # Constants and configurations
+│   ├── locales/             # Translation files
+│   └── layouts/             # Layout components
+│
+├── backend/                  # Backend source code
+│   ├── src/
+│   │   ├── models/          # MongoDB models
+│   │   ├── routes/          # Express routes
+│   │   ├── middleware/      # Custom middleware
+│   │   └── utils/           # Utility functions
+│   └── uploads/             # Uploaded files
+│
+├── public/                   # Static files
+└── uploads/                  # Uploaded files (frontend)
+```
 
-- Node.js (v14 or higher)
-- MongoDB
-- npm or yarn
-- nodemon (for development)
-
-### Installation
+## Setup Instructions
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/MERN-Stack-portfolio.git
+git clone https://github.com/ELMACHHOUNE/MERN-Stack-portfolio
 cd MERN-Stack-portfolio
 ```
 
@@ -54,85 +73,81 @@ cd MERN-Stack-portfolio
 
 ```bash
 # Install frontend dependencies
-cd client
 npm install
 
 # Install backend dependencies
-cd ../server
-npm install
-
-# Install nodemon globally (if not already installed)
+cd backend
 npm install -g nodemon
+npm install
 ```
 
-3. Set up environment variables:
-   Create a `.env` file in the server directory with the following variables:
+3. Environment Setup:
+
+Frontend (.env):
 
 ```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Backend (.env):
+
+```env
+PORT=5000
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_password
 ```
 
 4. Start the development servers:
 
 ```bash
-# Start backend server with nodemon (in one terminal)
-cd server
-nodemon
-
-# Start frontend server (in another terminal)
-cd client
+# Start frontend (from root directory)
 npm run dev
+
+# Start backend (from backend directory)
+nodemon
 ```
 
-The application will be available at:
+## Features Documentation
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000
+### Authentication
 
-## Project Structure
+- JWT-based authentication
+- Protected routes
+- Role-based access control (Admin/User)
 
-```
-MERN-Stack-portfolio/
-├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── context/       # React context providers
-│   │   ├── locales/       # Translation files
-│   │   ├── pages/         # Page components
-│   │   └── utils/         # Utility functions
-│   └── public/            # Static assets
-└── server/                # Backend Node.js application
-    ├── controllers/       # Route controllers
-    ├── models/           # MongoDB models
-    ├── routes/           # API routes
-    └── middleware/       # Custom middleware
-```
+### Profile Management
 
-## Translation System
+- Upload profile picture
+- Update personal information
+- Manage social links
+- CV/Resume upload and management
 
-The application uses a custom translation system built with React Context. Translation files are located in `src/locales/`:
+### Skills & Experience
 
-- `en.json`: English translations
-- `fr.json`: French translations
+- Add/Edit/Delete skills
+- Categorize skills
+- Track experience and projects
+- Manage core values and interests
 
-To add new translations:
+### Analytics
 
-1. Add the translation key to both language files
-2. Use the `useLanguage` hook in your components:
+- Page view tracking
+- User interaction metrics
+- Download statistics
+- Contact form analytics
 
-```typescript
-const { t } = useLanguage();
-t("your.translation.key");
-```
+### Internationalization
 
-For interpolation:
+- Multi-language support
+- Easy language switching
+- Customizable translations
 
-```typescript
-t("your.translation.key", { variable: "value" });
-```
+### Admin Dashboard
+
+- User management
+- Content management
+- Analytics overview
+- Settings management
 
 ## Contributing
 
@@ -157,6 +172,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Mohamed EL MACHHOUNE - [@ELMACHHOUNE](https://github.com/ELMACHHOUNE) - mohamed.elmachhoune@gmail.com
+Mohamed EL MACHHOUNE - [@ELMACHHOUNE](https://github.com/ELMACHHOUNE) - business.elmachhoune@gmail.com
 
 Project Link: [https://github.com/ELMACHHOUNE/MERN-Stack-portfolio](https://github.com/ELMACHHOUNE/MERN-Stack-portfolio)

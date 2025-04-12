@@ -37,7 +37,7 @@ const ContactManager: React.FC = () => {
   const fetchContacts = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact/admin`,
+        `${import.meta.env.VITE_API_URL}/contact/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ const ContactManager: React.FC = () => {
   const handleMarkAsRead = async (id: string) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact/admin/${id}/read`,
+        `${import.meta.env.VITE_API_URL}/contact/admin/${id}/read`,
         {
           method: "PUT",
           headers: {
@@ -94,7 +94,7 @@ const ContactManager: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact/admin/${id}`,
+        `${import.meta.env.VITE_API_URL}/contact/admin/${id}`,
         {
           method: "DELETE",
           headers: {

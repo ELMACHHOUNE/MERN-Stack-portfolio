@@ -286,10 +286,10 @@ const Home: React.FC = () => {
   const getImageUrl = (url: string) => {
     return url.startsWith("http")
       ? url
-      : `${import.meta.env.VITE_API_URL}/uploads/${url.replace(
-          /^\/uploads\//,
+      : `${import.meta.env.VITE_API_URL.replace(
+          /\/?api\/?$/,
           ""
-        )}`;
+        )}/uploads/${url.replace(/^\/uploads\//, "")}`;
   };
 
   if (data.loading) {

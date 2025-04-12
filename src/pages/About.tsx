@@ -132,7 +132,7 @@ const About: React.FC = () => {
                 <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300">
                   {adminProfile?.profileImage ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL}${
+                      src={`${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${
                         adminProfile.profileImage
                       }`}
                       alt={adminProfile.name}

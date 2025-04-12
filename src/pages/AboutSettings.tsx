@@ -78,7 +78,7 @@ const AboutSettings: React.FC = () => {
       formData.append("image", file);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/profile-image`,
+        `${import.meta.env.VITE_API_URL}/settings/profile-image`,
         {
           method: "POST",
           headers: {

@@ -67,7 +67,7 @@ const SkillsManager: React.FC = () => {
         token.substring(0, 10) + "..."
       );
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/skills/admin`,
+        `${import.meta.env.VITE_API_URL}/skills/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ const SkillsManager: React.FC = () => {
         token.substring(0, 10) + "..."
       );
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
+        `${import.meta.env.VITE_API_URL}/categories/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -199,8 +199,8 @@ const SkillsManager: React.FC = () => {
       formDataToSend.append("isActive", formData.isActive.toString());
 
       const url = isEditing
-        ? `${import.meta.env.VITE_API_URL}/api/skills/${currentSkill?._id}`
-        : `${import.meta.env.VITE_API_URL}/api/skills`;
+        ? `${import.meta.env.VITE_API_URL}/skills/${currentSkill?._id}`
+        : `${import.meta.env.VITE_API_URL}/skills`;
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await fetch(url, {
@@ -252,7 +252,7 @@ const SkillsManager: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/skills/${id}`,
+        `${import.meta.env.VITE_API_URL}/skills/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -301,6 +301,18 @@ const SkillsManager: React.FC = () => {
     setImageSource("url");
     setCurrentSkill(null);
     setIsEditing(false);
+  };
+
+  const getIconUrl = (iconPath: string) => {
+    if (!iconPath) return "/placeholder-icon.png";
+    if (iconPath.startsWith("http")) return iconPath;
+    if (iconPath.startsWith("/uploads/")) {
+      return `${import.meta.env.VITE_API_URL.replace(
+        /\/?api\/?$/,
+        ""
+      )}${iconPath}`;
+    }
+    return iconPath;
   };
 
   if (loading) {
@@ -458,18 +470,13 @@ const SkillsManager: React.FC = () => {
                     </h4>
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
                       <img
-                        src={
-                          previewUrl ||
-                          (formData.icon.startsWith("/uploads/")
-                            ? `${import.meta.env.VITE_API_URL}${formData.icon}`
-                            : formData.icon)
-                        }
+                        src={previewUrl || getIconUrl(formData.icon)}
                         alt="Preview"
                         className="w-full h-full object-contain"
                         onError={(e) => {
                           console.error("Icon load error:", e);
                           const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-icon.png"; // Fallback icon
+                          target.src = "/assets/placeholder-icon.png";
                         }}
                       />
                     </div>
@@ -532,17 +539,13 @@ const SkillsManager: React.FC = () => {
                 {category.icon && (
                   <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                     <img
-                      src={
-                        category.icon.startsWith("/uploads/")
-                          ? `${import.meta.env.VITE_API_URL}${category.icon}`
-                          : category.icon
-                      }
+                      src={getIconUrl(category.icon)}
                       alt={category.name}
                       className="w-5 h-5"
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder-icon.png";
+                        target.src = "/uploads/placeholder-icon.png";
                       }}
                     />
                   </div>
@@ -561,17 +564,13 @@ const SkillsManager: React.FC = () => {
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-white dark:bg-gray-600 rounded-lg">
                         <img
-                          src={
-                            skill.icon.startsWith("/uploads/")
-                              ? `${import.meta.env.VITE_API_URL}${skill.icon}`
-                              : skill.icon
-                          }
+                          src={getIconUrl(skill.icon)}
                           alt={skill.name}
                           className="w-6 h-6 object-contain"
                           loading="lazy"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = "/placeholder-icon.png";
+                            target.src = "/assets/placeholder-icon.png";
                           }}
                         />
                       </div>

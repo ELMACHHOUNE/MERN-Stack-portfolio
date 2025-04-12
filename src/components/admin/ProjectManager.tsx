@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_URL, ENDPOINTS } from "../../utils/api";
 
 interface Category {
   _id: string;
@@ -36,6 +37,11 @@ interface Project {
   endDate: string;
   isActive: boolean;
 }
+
+// Add a helper function to get the base URL
+const getBaseUrl = () => {
+  return API_URL.replace(/\/api\/?$/, "");
+};
 
 const ProjectManager: React.FC = () => {
   const { t } = useLanguage();
@@ -70,14 +76,11 @@ const ProjectManager: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/admin`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(ENDPOINTS.CATEGORIES.ADMIN, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok)
         throw new Error(t("categories.management.errors.fetchFailed"));
       const data = await response.json();
@@ -91,14 +94,11 @@ const ProjectManager: React.FC = () => {
   const fetchProjects = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/projects/admin`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/projects/admin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok)
         throw new Error(t("projects.management.errors.fetchFailed"));
       const data = await response.json();
@@ -190,8 +190,8 @@ const ProjectManager: React.FC = () => {
       });
 
       const url = isEditing
-        ? `${import.meta.env.VITE_API_URL}/api/projects/${currentProject?._id}`
-        : `${import.meta.env.VITE_API_URL}/api/projects`;
+        ? `${API_URL}/projects/${currentProject?._id}`
+        : `${API_URL}/projects`;
       const method = isEditing ? "PATCH" : "POST";
 
       const response = await fetch(url, {
@@ -225,7 +225,7 @@ const ProjectManager: React.FC = () => {
         }));
         // If it's a file upload, update the preview URL
         if (savedProject.image.startsWith("/uploads/")) {
-          setPreviewUrl(`${import.meta.env.VITE_API_URL}${savedProject.image}`);
+          setPreviewUrl(`${API_URL}${savedProject.image}`);
         }
       }
 
@@ -242,15 +242,12 @@ const ProjectManager: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/projects/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/projects/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok)
         throw new Error(t("projects.management.errors.deleteFailed"));
@@ -483,16 +480,21 @@ const ProjectManager: React.FC = () => {
                     <img
                       src={
                         previewUrl ||
-                        (formData.image.startsWith("/uploads/")
-                          ? `${import.meta.env.VITE_API_URL}${formData.image}`
-                          : formData.image)
+                        (formData.image &&
+                        formData.image.startsWith("/uploads/")
+                          ? `${getBaseUrl()}${formData.image}`
+                          : formData.image || "/placeholder-image.jpg")
                       }
                       alt="Preview"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        console.error("Image load error:", e);
                         const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder-image.jpg"; // Fallback image
+                        if (
+                          target.src !==
+                          `${window.location.origin}/placeholder-image.jpg`
+                        ) {
+                          target.src = "/placeholder-image.jpg";
+                        }
                       }}
                     />
                   </div>
@@ -671,19 +673,20 @@ const ProjectManager: React.FC = () => {
               <div className="relative aspect-video mb-4 rounded-lg overflow-hidden">
                 <img
                   src={
-                    project.image.startsWith("/uploads/")
-                      ? `${import.meta.env.VITE_API_URL}${project.image}`
-                      : project.image
+                    project.image && project.image.startsWith("/uploads/")
+                      ? `${getBaseUrl()}${project.image}`
+                      : project.image || "/placeholder-image.jpg"
                   }
                   alt={project.title}
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-200"
                   onError={(e) => {
-                    console.error("Project image load error:", {
-                      src: (e.target as HTMLImageElement).src,
-                      projectImage: project.image,
-                    });
-                    (e.target as HTMLImageElement).src =
-                      "/placeholder-image.jpg";
+                    const target = e.target as HTMLImageElement;
+                    if (
+                      target.src !==
+                      `${window.location.origin}/placeholder-image.jpg`
+                    ) {
+                      target.src = "/placeholder-image.jpg";
+                    }
                   }}
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
