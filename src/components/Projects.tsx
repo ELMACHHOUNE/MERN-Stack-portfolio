@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 
-import { api } from "../utils/api";
+import { api, API_URL } from "../utils/api";
 import { toast } from "react-toastify";
 
 // Register ScrollTrigger plugin
@@ -33,6 +33,11 @@ interface Project {
   order: number;
   isActive: boolean;
 }
+
+// Add a helper function to get the base URL
+const getBaseUrl = () => {
+  return API_URL.replace(/\/api\/?$/, "");
+};
 
 const Projects: React.FC = () => {
   const { t, language } = useLanguage();
@@ -473,27 +478,19 @@ const Projects: React.FC = () => {
                 <img
                   src={
                     project.image.startsWith("/uploads/")
-                      ? `${import.meta.env.VITE_API_URL}${project.image}`
+                      ? `${getBaseUrl()}${project.image}`
                       : project.image
                   }
                   alt={project.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                   onError={(e) => {
-                    console.error("Project image load error:", {
-                      src: (e.target as HTMLImageElement).src,
-                      projectImage: project.image,
-                    });
                     const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                    const parent = target.parentElement;
-                    if (parent) {
-                      const fallbackIcon = document.createElement("div");
-                      fallbackIcon.className =
-                        "w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-[#232B3B] dark:to-[#1B2333] flex items-center justify-center";
-                      fallbackIcon.innerHTML =
-                        '<div class="p-8 rounded-xl bg-gray-100/50 dark:bg-gray-800/50"><svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>';
-                      parent.appendChild(fallbackIcon);
+                    if (
+                      target.src !==
+                      `${window.location.origin}/placeholder-image.jpg`
+                    ) {
+                      target.src = "/placeholder-image.jpg";
                     }
                   }}
                 />
