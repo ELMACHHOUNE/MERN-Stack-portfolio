@@ -15,7 +15,6 @@ const experienceRouter = require("./routes/experience");
 const projectsRouter = require("./routes/projects");
 const settingsRouter = require("./routes/settings");
 const analyticsRouter = require("./routes/analytics");
-const xss = require("xss-clean");
 const hpp = require("hpp");
 const loadModels = require("./models");
 const errorHandler = require("./middleware/error");
@@ -31,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Configure Helmet with necessary adjustments for image loading
+// Configure Helmet with necessary adjustments for image loading and XSS protection
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -42,10 +41,10 @@ app.use(
         connectSrc: ["'self'", "*"],
       },
     },
+    xssFilter: true,
   })
 );
 
-app.use(xss());
 app.use(hpp());
 
 // CORS configuration
