@@ -137,6 +137,11 @@ router.post(
   upload.single("image"),
   handleMulterError,
   async (req, res) => {
+    // Add CORS headers explicitly
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
