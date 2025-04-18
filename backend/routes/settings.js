@@ -137,10 +137,19 @@ router.post(
   upload.single("image"),
   handleMulterError,
   async (req, res) => {
-    // Add CORS headers explicitly
+    // Set CORS headers
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Accept"
+    );
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    // Handle preflight
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
 
     try {
       if (!req.file) {

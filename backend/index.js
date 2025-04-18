@@ -28,13 +28,16 @@ const app = express();
 // CORS configuration - Apply before other middleware
 app.use(
   cors({
-    origin: true, // Allow all origins
+    origin: "*", // Allow all origins
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     exposedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 // Middleware
 app.use(express.json());
