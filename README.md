@@ -38,26 +38,40 @@ A modern, full-stack portfolio application built with the MERN stack (MongoDB, E
 ## Project Structure
 
 ```
-├── src/                      # Frontend source code
-│   ├── components/           # Reusable React components
-│   ├── context/             # React Context providers
-│   ├── pages/               # Page components
-│   ├── services/            # API service functions
-│   ├── utils/               # Utility functions
-│   ├── constants/           # Constants and configurations
-│   ├── locales/             # Translation files
-│   └── layouts/             # Layout components
+├── frontend/                 # Frontend application
+│   ├── src/                 # Frontend source code
+│   │   ├── components/      # Reusable React components
+│   │   ├── context/        # React Context providers
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API service functions
+│   │   ├── utils/          # Utility functions
+│   │   ├── constants/      # Constants and configurations
+│   │   ├── locales/        # Translation files
+│   │   ├── layouts/        # Layout components
+│   │   ├── app/            # App-specific code
+│   │   ├── lib/            # Library code
+│   │   ├── index.css       # Global styles
+│   │   ├── App.tsx         # Main application component
+│   │   ├── main.tsx        # Application entry point
+│   │   └── i18n.ts         # Internationalization setup
+│   ├── public/             # Static files
+│   ├── uploads/            # Uploaded files (frontend)
+│   ├── package.json        # Frontend dependencies
+│   ├── vite.config.ts      # Vite configuration
+│   ├── tailwind.config.js  # Tailwind CSS configuration
+│   └── postcss.config.cjs  # PostCSS configuration
 │
-├── backend/                  # Backend source code
-│   ├── src/
-│   │   ├── models/          # MongoDB models
-│   │   ├── routes/          # Express routes
-│   │   ├── middleware/      # Custom middleware
-│   │   └── utils/           # Utility functions
-│   └── uploads/             # Uploaded files
-│
-├── public/                   # Static files
-└── uploads/                  # Uploaded files (frontend)
+├── backend/                 # Backend application
+│   ├── src/                # Backend source code
+│   │   ├── models/         # MongoDB models
+│   │   ├── routes/         # Express routes
+│   │   ├── middleware/     # Custom middleware
+│   │   ├── services/       # Business logic services
+│   │   ├── utils/          # Utility functions
+│   │   ├── config/         # Configuration files
+│   │   └── index.js        # Server entry point
+│   ├── uploads/            # Uploaded files (backend)
+│   └── package.json        # Backend dependencies
 ```
 
 ## Setup Instructions
@@ -73,11 +87,11 @@ cd MERN-Stack-portfolio
 
 ```bash
 # Install frontend dependencies
+cd frontend
 npm install
 
 # Install backend dependencies
-cd backend
-npm install -g nodemon
+cd ../backend
 npm install
 ```
 
@@ -100,11 +114,13 @@ JWT_SECRET=your_jwt_secret
 4. Start the development servers:
 
 ```bash
-# Start frontend (from root directory)
+# Start frontend (from frontend directory)
+cd frontend
 npm run dev
 
 # Start backend (from backend directory)
-nodemon
+cd backend
+npm run dev
 ```
 
 ## Features Documentation
