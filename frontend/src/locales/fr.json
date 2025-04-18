@@ -421,6 +421,7 @@
     "company": "Entreprise",
     "date": "Date",
     "technologies": "Technologies",
+    "noExperiences": "Aucune expérience trouvée",
     "management": {
       "title": "Gestion de l'expérience",
       "addExperience": "Ajouter une nouvelle expérience",

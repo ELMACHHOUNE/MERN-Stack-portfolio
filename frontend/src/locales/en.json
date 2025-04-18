@@ -352,6 +352,7 @@
     "company": "Company",
     "date": "Date",
     "technologies": "Technologies",
+    "noExperiences": "No experiences found",
     "management": {
       "title": "Experience Management",
       "addExperience": "Add New Experience",
