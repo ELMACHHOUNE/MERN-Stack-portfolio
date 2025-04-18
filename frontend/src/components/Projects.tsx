@@ -471,7 +471,9 @@ const Projects: React.FC = () => {
           {filteredProjects.map((project, index) => (
             <div
               key={project._id}
-              ref={(el) => (cardsRef.current[index] = el as HTMLDivElement)}
+              ref={(el) => {
+                if (el) cardsRef.current[index] = el;
+              }}
               className="group bg-gray-50 dark:bg-[#1B2333] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
             >
               <div className="relative h-48 overflow-hidden">
