@@ -135,9 +135,7 @@ const About: React.FC = () => {
                       src={`${import.meta.env.VITE_API_URL.replace(
                         /\/?api\/?$/,
                         ""
-                      )}/settings/profile-image/${adminProfile.profileImage
-                        .split("/")
-                        .pop()}`}
+                      )}${adminProfile.profileImage}`}
                       alt={adminProfile.name}
                       className="w-full h-full object-cover"
                       loading="lazy"

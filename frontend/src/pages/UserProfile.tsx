@@ -126,7 +126,11 @@ const UserProfile: React.FC = () => {
       }
 
       const data = await response.json();
-      setProfileImage(data.imageUrl);
+      setProfileImage(
+        `${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}${
+          data.profileImage
+        }`
+      );
       toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);

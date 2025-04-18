@@ -269,12 +269,9 @@ const SettingsManager: React.FC = () => {
                 <div className="relative">
                   {profileData.profileImage ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL.replace(
-                        /\/?api\/?$/,
-                        ""
-                      )}/settings/profile-image/${profileData.profileImage
-                        .split("/")
-                        .pop()}`}
+                      src={`${import.meta.env.VITE_API_URL}${
+                        profileData.profileImage
+                      }`}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover"
                       loading="lazy"

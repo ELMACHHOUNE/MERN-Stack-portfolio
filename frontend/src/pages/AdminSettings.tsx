@@ -266,9 +266,7 @@ const AdminSettings: React.FC = () => {
                             src={`${API_URL.replace(
                               "/api",
                               ""
-                            )}/settings/profile-image/${profileImage
-                              .split("/")
-                              .pop()}`}
+                            )}${profileImage}`}
                             alt={t("settings.profile.imageAlt")}
                             className="w-full h-full object-cover"
                           />
