@@ -53,6 +53,8 @@ app.use(
     origin: [
       process.env.CLIENT_URL || "http://localhost:3000",
       "http://localhost:5173",
+      "https://mern-portfolio.vercel.app",
+      "https://*.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -105,6 +107,25 @@ app.use("/api/experience", experienceRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/analytics", analyticsRouter);
+
+// Root route handler
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to the Portfolio API",
+    status: "online",
+    version: "1.0.0",
+    endpoints: [
+      "/api/auth",
+      "/api/contact",
+      "/api/skills",
+      "/api/categories",
+      "/api/experience",
+      "/api/projects",
+      "/api/settings",
+      "/api/analytics",
+    ],
+  });
+});
 
 // Error handling middleware
 app.use(errorHandler);
