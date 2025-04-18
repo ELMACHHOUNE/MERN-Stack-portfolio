@@ -85,7 +85,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(compression());
 
 // Serve static files from uploads directory
-const uploadsPath = path.join(__dirname, "../uploads");
+const uploadsPath = path.join(__dirname, "uploads");
 // Create uploads directory if it doesn't exist
 const fs = require("fs");
 if (!fs.existsSync(uploadsPath)) {

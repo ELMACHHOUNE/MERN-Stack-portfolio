@@ -1,193 +1,164 @@
 # MERN Stack Portfolio
 
-A modern, full-stack portfolio application built with the MERN stack (MongoDB, Express.js, React, Node.js) and TypeScript.
-
-## Features
-
-- 🎨 Modern UI with Tailwind CSS
-- 🌍 Internationalization support
-- 🔒 Authentication & Authorization
-- 📊 Analytics Dashboard
-- 🖼️ Dynamic Profile Management
-- 📱 Responsive Design
-- 🌓 Dark/Light Mode
-- 🔍 SEO Optimized
-- 📝 Blog/Projects Management
-- 📈 Skills & Experience Tracking
-
-## Tech Stack
-
-### Frontend
-
-- React with TypeScript
-- Vite for build tooling
-- Tailwind CSS for styling
-- Framer Motion for animations
-- React Router for navigation
-- Context API for state management
-- i18next for internationalization
-
-### Backend
-
-- Node.js & Express.js
-- MongoDB with Mongoose
-- JWT for authentication
-- Multer for file uploads
-- Express Validator for validation
+A full-stack portfolio website built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring a modern UI and comprehensive admin dashboard.
 
 ## Project Structure
 
 ```
-├── frontend/                 # Frontend application
-│   ├── src/                 # Frontend source code
-│   │   ├── components/      # Reusable React components
-│   │   ├── context/        # React Context providers
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API service functions
-│   │   ├── utils/          # Utility functions
-│   │   ├── constants/      # Constants and configurations
-│   │   ├── locales/        # Translation files
-│   │   ├── layouts/        # Layout components
-│   │   ├── app/            # App-specific code
-│   │   ├── lib/            # Library code
-│   │   ├── index.css       # Global styles
-│   │   ├── App.tsx         # Main application component
-│   │   ├── main.tsx        # Application entry point
-│   │   └── i18n.ts         # Internationalization setup
-│   ├── public/             # Static files
-│   ├── uploads/            # Uploaded files (frontend)
-│   ├── package.json        # Frontend dependencies
-│   ├── vite.config.ts      # Vite configuration
-│   ├── tailwind.config.js  # Tailwind CSS configuration
-│   └── postcss.config.cjs  # PostCSS configuration
+MERN-Stack-portfolio/
+├── frontend/               # React frontend application
+│   ├── src/
+│   │   ├── components/    # Reusable React components
+│   │   ├── pages/        # Page components
+│   │   ├── context/      # React context providers
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── services/     # API service functions
+│   │   └── utils/        # Utility functions
+│   └── public/           # Static assets
 │
-├── backend/                 # Backend application
-│   ├── src/                # Backend source code
-│   │   ├── models/         # MongoDB models
-│   │   ├── routes/         # Express routes
-│   │   ├── middleware/     # Custom middleware
-│   │   ├── services/       # Business logic services
-│   │   ├── utils/          # Utility functions
-│   │   ├── config/         # Configuration files
-│   │   └── index.js        # Server entry point
-│   ├── uploads/            # Uploaded files (backend)
-│   └── package.json        # Backend dependencies
+├── backend/               # Node.js/Express backend server
+│   ├── config/           # Configuration files
+│   ├── middleware/       # Express middleware
+│   ├── models/           # MongoDB models
+│   ├── routes/           # API routes
+│   ├── services/         # Business logic
+│   ├── utils/            # Utility functions
+│   └── uploads/          # File uploads directory
+│       ├── profile-images/
+│       ├── projects/
+│       ├── skills/
+│       └── cv/
 ```
 
-## Setup Instructions
+## Features
+
+### Frontend
+
+- Modern, responsive UI with Tailwind CSS
+- Dark/Light mode support
+- Multi-language support (i18n)
+- Interactive components and animations
+- Admin dashboard for content management
+- Profile image upload and management
+- Project showcase with image gallery
+- Skills management with icons
+- Contact form with email integration
+
+### Backend
+
+- RESTful API architecture
+- JWT-based authentication
+- Role-based access control (Admin/User)
+- File upload handling with Multer
+- MongoDB database integration
+- Email service using Nodemailer
+- Rate limiting and security measures
+- Error handling and logging
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB
+- npm or yarn package manager
+
+## Installation
 
 1. Clone the repository:
 
+   ```bash
+   git clone https://github.com/ELMACHHOUNE/MERN-Stack-portfolio.git
+   cd MERN-Stack-portfolio
+   ```
+
+2. Install backend dependencies:
+
+   ```bash
+   cd backend
+   npm install
+   ```
+
+3. Install frontend dependencies:
+
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+4. Create environment files:
+
+   Backend (.env):
+
+   ```
+   PORT=5000
+   MONGODB_URI=mongodb://localhost:27017/portfolio
+   JWT_SECRET=your_jwt_secret_key_here
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_email_app_password_here
+   CLIENT_URL=http://localhost:5173
+   ```
+
+   Frontend (.env):
+
+   ```
+   VITE_API_URL=http://localhost:5000/api
+   ```
+
+## Development
+
+1. Start the backend server:
+
+   ```bash
+   cd backend
+   npm run dev or nodemon
+   ```
+
+2. Start the frontend development server:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+## Production Deployment
+
+1. Build the frontend:
+
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. Start the production server:
+   ```bash
+   cd backend
+   npm start
+   ```
+
+## Creating Admin User
+
+To create an admin user, run:
+
 ```bash
-git clone https://github.com/ELMACHHOUNE/MERN-Stack-portfolio
-cd MERN-Stack-portfolio
-```
-
-2. Install dependencies:
-
-```bash
-# Install frontend dependencies
-cd frontend
-npm install
-
-# Install backend dependencies
-cd ../backend
-npm install
-```
-
-3. Environment Setup:
-
-Frontend (.env):
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-Backend (.env):
-
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-```
-
-4. Start the development servers:
-
-```bash
-# Start frontend (from frontend directory)
-cd frontend
-npm run dev
-
-# Start backend (from backend directory)
 cd backend
-npm run dev
+npm run create-admin
 ```
 
-## Features Documentation
+Default admin credentials:
 
-### Authentication
+- Email: admin@example.com
+- Password: admin123
+
+## Security Features
 
 - JWT-based authentication
-- Protected routes
-- Role-based access control (Admin/User)
-
-### Profile Management
-
-- Upload profile picture
-- Update personal information
-- Manage social links
-- CV/Resume upload and management
-
-### Skills & Experience
-
-- Add/Edit/Delete skills
-- Categorize skills
-- Track experience and projects
-- Manage core values and interests
-
-### Analytics
-
-- Page view tracking
-- User interaction metrics
-- Download statistics
-- Contact form analytics
-
-### Internationalization
-
-- Multi-language support
-- Easy language switching
-- Customizable translations
-
-### Admin Dashboard
-
-- User management
-- Content management
-- Analytics overview
-- Settings management
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- Password hashing with bcrypt
+- Rate limiting
+- CORS configuration
+- Helmet security headers
+- Input validation
+- Error handling
+- File upload restrictions
+- XSS protection
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [React](https://reactjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [MongoDB](https://www.mongodb.com/)
-- [Express.js](https://expressjs.com/)
-- [Nodemon](https://nodemon.io/)
-
-## Contact
-
-Mohamed EL MACHHOUNE - [@ELMACHHOUNE](https://github.com/ELMACHHOUNE) - business.elmachhoune@gmail.com
-
-Project Link: [https://github.com/ELMACHHOUNE/MERN-Stack-portfolio](https://github.com/ELMACHHOUNE/MERN-Stack-portfolio)
+ISC

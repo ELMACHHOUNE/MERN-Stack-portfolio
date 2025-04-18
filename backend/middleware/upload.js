@@ -9,9 +9,9 @@ const storage = multer.diskStorage({
 
     // Determine upload path based on the field name
     if (file.fieldname === "icon") {
-      uploadPath = path.join(__dirname, "../../uploads/skills");
+      uploadPath = path.join(__dirname, "../uploads/skills");
     } else if (file.fieldname === "image") {
-      uploadPath = path.join(__dirname, "../../uploads/projects");
+      uploadPath = path.join(__dirname, "../uploads/projects");
     } else {
       return cb(new Error("Invalid file field name"), false);
     }
