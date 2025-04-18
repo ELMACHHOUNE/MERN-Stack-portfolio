@@ -50,13 +50,7 @@ app.use(hpp());
 // CORS configuration
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL || "http://localhost:3000",
-      "http://localhost:5173",
-      "https://mern-portfolio.vercel.app",
-      "https://*.vercel.app",
-      "http://localhost:3000",
-    ],
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
