@@ -252,7 +252,9 @@ const ProfileSettings: React.FC = () => {
                         src={`${import.meta.env.VITE_API_URL.replace(
                           /\/?api\/?$/,
                           ""
-                        )}${profileImage}`}
+                        )}/settings/profile-image/${profileImage
+                          .split("/")
+                          .pop()}`}
                         alt={t("settings.profile.imageAlt")}
                         className="w-full h-full object-cover"
                       />

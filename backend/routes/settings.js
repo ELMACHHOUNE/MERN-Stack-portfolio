@@ -159,9 +159,15 @@ router.post(
       user.profileImage = `/uploads/profile-images/${req.file.filename}`;
       await user.save();
 
+      // Return the full URL to the image
+      const imageUrl = `${req.protocol}://${req.get("host")}${
+        user.profileImage
+      }`;
+
       res.json({
         message: "Profile image updated successfully",
         profileImage: user.profileImage,
+        imageUrl: imageUrl,
       });
     } catch (error) {
       console.error("Profile image upload error:", error);
@@ -169,6 +175,29 @@ router.post(
     }
   }
 );
+
+// Get profile image
+router.get("/profile-image/:filename", async (req, res) => {
+  try {
+    const imagePath = path.join(
+      "/tmp",
+      "uploads",
+      "profile-images",
+      req.params.filename
+    );
+
+    // Check if the file exists
+    if (!fs.existsSync(imagePath)) {
+      return res.status(404).json({ message: "Image not found" });
+    }
+
+    // Send the file
+    res.sendFile(imagePath);
+  } catch (error) {
+    console.error("Profile image retrieval error:", error);
+    res.status(500).json({ message: "Failed to retrieve profile image" });
+  }
+});
 
 // Get admin profile
 router.get("/admin-profile", protect, admin, async (req, res) => {

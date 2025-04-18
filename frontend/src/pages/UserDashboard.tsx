@@ -73,7 +73,9 @@ const UserDashboard: React.FC = () => {
           <div className="flex items-center space-x-4 mb-6">
             {user.profileImage ? (
               <img
-                src={`${import.meta.env.VITE_API_URL}${user.profileImage}`}
+                src={`${import.meta.env.VITE_API_URL.replace(/\/?api\/?$/, "")}/settings/profile-image/${
+                  user.profileImage.split('/').pop()
+                }`}
                 alt={user.name}
                 className="h-16 w-16 rounded-full object-cover"
               />

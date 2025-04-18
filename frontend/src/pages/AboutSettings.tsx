@@ -213,9 +213,12 @@ const AboutSettings: React.FC = () => {
                 <div className="relative w-24 h-24 rounded-full overflow-hidden">
                   {draftData.profileImage ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL}${
-                        draftData.profileImage
-                      }`}
+                      src={`${import.meta.env.VITE_API_URL.replace(
+                        /\/?api\/?$/,
+                        ""
+                      )}/settings/profile-image/${draftData.profileImage
+                        .split("/")
+                        .pop()}`}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
