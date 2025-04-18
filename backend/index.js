@@ -83,7 +83,17 @@ if (!fs.existsSync(uploadsPath)) {
 if (!fs.existsSync(path.join(uploadsPath, "profile-images"))) {
   fs.mkdirSync(path.join(uploadsPath, "profile-images"), { recursive: true });
 }
-app.use("/uploads", express.static(uploadsPath));
+
+// Serve static files with proper headers
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(uploadsPath)
+);
 
 // Routes
 app.use("/api/contact", contactRouter);
