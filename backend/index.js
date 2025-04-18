@@ -55,6 +55,7 @@ app.use(
       "http://localhost:5173",
       "https://mern-portfolio.vercel.app",
       "https://*.vercel.app",
+      "http://localhost:3000",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
