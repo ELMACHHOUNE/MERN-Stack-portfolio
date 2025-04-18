@@ -10,7 +10,7 @@ const fs = require("fs");
 // Configure multer for image upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, "../../uploads/profile-images");
+    const uploadDir = path.join("/tmp", "uploads", "profile-images");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -137,20 +137,6 @@ router.post(
   upload.single("image"),
   handleMulterError,
   async (req, res) => {
-    // Set CORS headers
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, Accept"
-    );
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    // Handle preflight
-    if (req.method === "OPTIONS") {
-      return res.status(200).end();
-    }
-
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -163,7 +149,7 @@ router.post(
 
       // Delete old profile image if it exists
       if (user.profileImage) {
-        const oldImagePath = path.join(__dirname, "../../", user.profileImage);
+        const oldImagePath = path.join("/tmp", user.profileImage);
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }

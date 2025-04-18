@@ -47,38 +47,19 @@ app.use(
 
 app.use(hpp());
 
-// Handle preflight requests
-app.options("*", cors());
-
-// CORS configuration
+// CORS configuration - Apply before other middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        process.env.CLIENT_URL || "http://localhost:3000",
-        "http://localhost:5173",
-        "https://mern-portfolio.vercel.app",
-        "https://*.vercel.app",
-        "http://localhost:3000",
-      ];
-
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-
-      return callback(null, true);
-    },
+    origin: "*", // Allow all origins
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     exposedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -104,7 +85,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(compression());
 
 // Serve static files from uploads directory
-const uploadsPath = path.join(__dirname, "uploads");
+const uploadsPath = path.join("/tmp", "uploads"); // Use /tmp for serverless
 // Create uploads directory if it doesn't exist
 const fs = require("fs");
 if (!fs.existsSync(uploadsPath)) {
