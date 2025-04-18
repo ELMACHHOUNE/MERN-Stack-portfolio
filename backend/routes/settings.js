@@ -139,7 +139,7 @@ router.post(
   async (req, res) => {
     // Set CORS headers
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH");
     res.header(
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization, Accept"
