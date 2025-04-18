@@ -25,6 +25,9 @@ dotenv.config();
 // Create Express app
 const app = express();
 
+// CORS configuration - MUST BE FIRST
+app.use(cors());
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -46,20 +49,6 @@ app.use(
 );
 
 app.use(hpp());
-
-// CORS configuration - Apply before other middleware
-app.use(
-  cors({
-    origin: "*", // Allow all origins
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-    exposedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-// Handle preflight requests
-app.options("*", cors());
 
 // Rate limiting
 const limiter = rateLimit({
