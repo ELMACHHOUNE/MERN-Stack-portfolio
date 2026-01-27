@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 
 const connectDB = async () => {
   const normalizeUri = (uri) => {
@@ -19,22 +20,23 @@ const connectDB = async () => {
 
   try {
     // Helpful connection lifecycle logs (Mongoose v9 docs)
-    mongoose.connection.on("connected", () =>
-      console.log("MongoDB: connected"),
-    );
-    mongoose.connection.on("open", () => console.log("MongoDB: open"));
+    mongoose.connection.on("connected", () => logger.info("MongoDB connected"));
+    mongoose.connection.on("open", () => logger.debug("MongoDB open"));
     mongoose.connection.on("disconnected", () =>
-      console.log("MongoDB: disconnected"),
+      logger.warn("MongoDB disconnected"),
     );
     mongoose.connection.on("reconnected", () =>
-      console.log("MongoDB: reconnected"),
+      logger.info("MongoDB reconnected"),
     );
     mongoose.connection.on("disconnecting", () =>
-      console.log("MongoDB: disconnecting"),
+      logger.warn("MongoDB disconnecting"),
     );
-    mongoose.connection.on("close", () => console.log("MongoDB: close"));
+    mongoose.connection.on("close", () => logger.warn("MongoDB close"));
     mongoose.connection.on("error", (err) =>
-      console.error("MongoDB: error", err),
+      logger.error("MongoDB error", {
+        errorName: err?.name,
+        errorMessage: err?.message,
+      }),
     );
 
     const conn = await mongoose.connect(uri, {
@@ -42,7 +44,10 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 5000,
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    logger.info("MongoDB ready", {
+      host: conn.connection.host,
+      db: conn.connection.name,
+    });
     return conn;
   } catch (error) {
     // Distinguish Atlas SRV DNS issues from a normal connection failure.
@@ -51,9 +56,9 @@ const connectDB = async () => {
       uri.startsWith("mongodb+srv://") &&
       (error?.syscall === "querySrv" || error?.syscall === "getaddrinfo")
     ) {
-      console.error(
-        "MongoDB Atlas SRV lookup failed. This is usually DNS/VPN/proxy/firewall (not an Atlas IP whitelist issue). Try: disable VPN/proxy, switch network (hotspot), or use the Atlas *standard* connection string (mongodb://... not mongodb+srv://).",
-      );
+      logger.error("MongoDB Atlas SRV lookup failed", {
+        hint: "Try: disable VPN/proxy, switch network (hotspot), or use Atlas standard connection string (mongodb://...) instead of mongodb+srv://",
+      });
     }
     throw error;
   }

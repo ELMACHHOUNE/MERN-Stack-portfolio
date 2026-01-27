@@ -19,9 +19,10 @@ const hpp = require("hpp");
 const loadModels = require("./models");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
+const logger = require("./utils/logger");
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Create Express app
 const app = express();
@@ -131,6 +132,11 @@ app.use(errorHandler);
 // Start the application
 (async () => {
   try {
+    logger.info("Backend starting", {
+      service: "portfolio-backend",
+      env: process.env.NODE_ENV || "development",
+    });
+
     await connectDB();
 
     // Load models after successful connection
@@ -139,10 +145,16 @@ app.use(errorHandler);
     // Start server only after successful database connection
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      logger.info("Server listening", { port: Number(PORT) });
     });
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    logger.error("Startup failed", {
+      errorName: error?.name,
+      errorMessage: error?.message,
+      code: error?.code,
+      syscall: error?.syscall,
+      hostname: error?.hostname,
+    });
     process.exit(1);
   }
 })();
