@@ -17,6 +17,7 @@ const settingsRouter = require("./routes/settings");
 const analyticsRouter = require("./routes/analytics");
 const hpp = require("hpp");
 const loadModels = require("./models");
+const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
 
 // Load environment variables
@@ -45,7 +46,7 @@ app.use(
       },
     },
     xssFilter: true,
-  })
+  }),
 );
 
 app.use(hpp());
@@ -92,7 +93,7 @@ app.use(
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     next();
   },
-  express.static(uploadsPath)
+  express.static(uploadsPath),
 );
 
 // Routes
@@ -127,18 +128,10 @@ app.get("/", (req, res) => {
 // Error handling middleware
 app.use(errorHandler);
 
-// Connect to MongoDB
-const connectDB = async () => {
+// Start the application
+(async () => {
   try {
-    const conn = await mongoose.connect(
-      process.env.MONGODB_URI || "mongodb://localhost:27017/portfolio",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
-
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    await connectDB();
 
     // Load models after successful connection
     await loadModels();
@@ -150,15 +143,6 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    console.error(
-      "Please make sure MongoDB is installed and running on your system."
-    );
-    console.error(
-      "You can download MongoDB from: https://www.mongodb.com/try/download/community"
-    );
     process.exit(1);
   }
-};
-
-// Start the application
-connectDB();
+})();
