@@ -111,7 +111,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Virtual for profile image URL
@@ -122,17 +122,13 @@ userSchema.virtual("profileImageUrl").get(function () {
 });
 
 // Update the updatedAt timestamp before saving
-userSchema.pre("save", function (next) {
+userSchema.pre("save", function () {
   this.updatedAt = new Date();
-  next();
 });
 
 // Encrypt password using bcrypt
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
-
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
