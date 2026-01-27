@@ -2,58 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { protect, admin } = require("../middleware/auth");
 const User = require("../models/User");
-const multer = require("multer");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
+const { upload, handleMulterError } = require("../middleware/upload");
 
-// Configure multer for image upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join("/tmp", "uploads", "profile-images");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(
-      new Error("Invalid file type. Only JPEG, JPG, PNG, and GIF are allowed."),
-      false
-    );
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-});
-
-// Error handling middleware for multer
-const handleMulterError = (err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === "LIMIT_FILE_SIZE") {
-      return res
-        .status(400)
-        .json({ message: "File size too large. Maximum size is 5MB." });
-    }
-  } else if (err) {
-    return res.status(400).json({ message: err.message });
-  }
-  next();
-};
+const getUploadsRoot = () =>
+  process.env.UPLOADS_DIR || path.join(__dirname, "../uploads");
 
 // Get current user's profile
 router.get("/profile", protect, async (req, res) => {
@@ -149,7 +104,9 @@ router.post(
 
       // Delete old profile image if it exists
       if (user.profileImage) {
-        const oldImagePath = path.join("/tmp", user.profileImage);
+        const uploadsRoot = getUploadsRoot();
+        const relativeOld = user.profileImage.replace(/^\/uploads\/?/, "");
+        const oldImagePath = path.join(uploadsRoot, relativeOld);
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
@@ -167,7 +124,7 @@ router.post(
       console.error("Profile image upload error:", error);
       res.status(500).json({ message: "Failed to upload profile image" });
     }
-  }
+  },
 );
 
 // Get admin profile

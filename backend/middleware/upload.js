@@ -2,16 +2,26 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+const getUploadsRoot = () =>
+  process.env.UPLOADS_DIR || path.join(__dirname, "../uploads");
+
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     let uploadPath;
+    const uploadsRoot = getUploadsRoot();
 
     // Determine upload path based on the field name
     if (file.fieldname === "icon") {
-      uploadPath = path.join(__dirname, "../uploads/skills");
+      uploadPath = path.join(uploadsRoot, "skills");
     } else if (file.fieldname === "image") {
-      uploadPath = path.join(__dirname, "../uploads/projects");
+      // Reuse the same field name "image" for multiple endpoints.
+      // Route by request path to avoid collisions.
+      if (req.baseUrl === "/api/settings" && req.path === "/profile-image") {
+        uploadPath = path.join(uploadsRoot, "profile-images");
+      } else {
+        uploadPath = path.join(uploadsRoot, "projects");
+      }
     } else {
       return cb(new Error("Invalid file field name"), false);
     }
@@ -58,9 +68,9 @@ const fileFilter = (req, file, cb) => {
     console.log("File type rejected");
     cb(
       new Error(
-        "Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed."
+        "Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed.",
       ),
-      false
+      false,
     );
   }
 };

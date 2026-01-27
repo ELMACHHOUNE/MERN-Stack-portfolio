@@ -92,7 +92,10 @@ router.post(
         console.log("Using uploaded file image path:", projectData.image);
 
         // Verify file exists
-        const fullPath = path.join(__dirname, "../../", projectData.image);
+        const uploadsRoot =
+          process.env.UPLOADS_DIR || path.join(__dirname, "../uploads");
+        const relativePath = projectData.image.replace(/^\/uploads\/?/, "");
+        const fullPath = path.join(uploadsRoot, relativePath);
         if (!fs.existsSync(fullPath)) {
           console.error("Uploaded file not found at:", fullPath);
           return res.status(400).json({ message: "Image file not found" });
@@ -116,7 +119,7 @@ router.post(
       console.error("Error creating project:", error);
       res.status(400).json({ message: error.message });
     }
-  }
+  },
 );
 
 // Update project (admin only)
@@ -159,7 +162,10 @@ router.patch(
       if (req.body.imageSource === "file" && req.file) {
         // Delete old image if it's a local file
         if (project.image && project.image.startsWith("/uploads/")) {
-          const oldImagePath = path.join(__dirname, "../../", project.image);
+          const uploadsRoot =
+            process.env.UPLOADS_DIR || path.join(__dirname, "../uploads");
+          const relativeOld = project.image.replace(/^\/uploads\/?/, "");
+          const oldImagePath = path.join(uploadsRoot, relativeOld);
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
@@ -168,7 +174,10 @@ router.patch(
         console.log("Using new uploaded file image path:", updateData.image);
 
         // Verify new file exists
-        const fullPath = path.join(__dirname, "../../", updateData.image);
+        const uploadsRoot =
+          process.env.UPLOADS_DIR || path.join(__dirname, "../uploads");
+        const relativePath = updateData.image.replace(/^\/uploads\/?/, "");
+        const fullPath = path.join(uploadsRoot, relativePath);
         if (!fs.existsSync(fullPath)) {
           console.error("Uploaded file not found at:", fullPath);
           return res.status(400).json({ message: "Image file not found" });
@@ -192,7 +201,7 @@ router.patch(
       console.error("Error updating project:", error);
       res.status(400).json({ message: error.message });
     }
-  }
+  },
 );
 
 // Delete project (admin only)

@@ -77,18 +77,17 @@ const projectSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Add index for efficient querying
 projectSchema.index({ category: 1, order: 1 });
 
 // Validate that endDate is after startDate
-projectSchema.pre("save", function (next) {
+projectSchema.pre("save", function () {
   if (this.endDate < this.startDate) {
-    next(new Error("End date must be after start date"));
+    throw new Error("End date must be after start date");
   }
-  next();
 });
 
 const Project = mongoose.model("Project", projectSchema);

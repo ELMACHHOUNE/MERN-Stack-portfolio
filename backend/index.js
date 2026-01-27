@@ -76,7 +76,9 @@ if (process.env.NODE_ENV === "production") {
 app.use(compression());
 
 // Serve static files from uploads directory
-const uploadsPath = path.join("/tmp", "uploads"); // Use /tmp for serverless
+// Use a local uploads directory in development. In serverless deployments, you may
+// want to override this via UPLOADS_DIR.
+const uploadsPath = process.env.UPLOADS_DIR || path.join(__dirname, "uploads");
 // Create uploads directory if it doesn't exist
 const fs = require("fs");
 if (!fs.existsSync(uploadsPath)) {
@@ -84,6 +86,9 @@ if (!fs.existsSync(uploadsPath)) {
 }
 if (!fs.existsSync(path.join(uploadsPath, "profile-images"))) {
   fs.mkdirSync(path.join(uploadsPath, "profile-images"), { recursive: true });
+}
+if (!fs.existsSync(path.join(uploadsPath, "projects"))) {
+  fs.mkdirSync(path.join(uploadsPath, "projects"), { recursive: true });
 }
 
 // Serve static files with proper headers
