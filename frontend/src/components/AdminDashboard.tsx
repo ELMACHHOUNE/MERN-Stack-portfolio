@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,7 +13,7 @@ import {
   Wrench,
   Briefcase,
   FolderKanban,
-  User,
+  User as UserIcon,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -22,6 +22,7 @@ import ProjectManager from "./admin/ProjectManager";
 import ContactManager from "./admin/ContactManager";
 import AnalyticsManager from "./admin/AnalyticsManager";
 import AdminSettings from "../pages/AdminSettings";
+import ClientsManager from "./admin/ClientsManager";
 import { toast } from "react-hot-toast";
 
 interface User {
@@ -36,7 +37,7 @@ interface EditUserModalProps {
   user: User | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (userData: Partial<User>) => Promise<void>;
+  onSave: (_userData: Partial<User>) => Promise<void>;
 }
 
 const EditUserModal: React.FC<EditUserModalProps> = ({
@@ -144,8 +145,50 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/messages")) return "messages";
     if (path.includes("/settings")) return "settings";
+    if (path.includes("/users")) return "users";
+    if (path.includes("/clients")) return "clients";
     return "";
   });
+
+  // Keep active tab synced with location changes
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes("/skills")) setActiveTab("skills");
+    else if (path.includes("/categories")) setActiveTab("categories");
+    else if (path.includes("/projects")) setActiveTab("projects");
+    else if (path.includes("/experience")) setActiveTab("experience");
+    else if (path.includes("/analytics")) setActiveTab("analytics");
+    else if (path.includes("/messages")) setActiveTab("messages");
+    else if (path.includes("/settings")) setActiveTab("settings");
+    else if (path.includes("/users")) setActiveTab("users");
+    else if (path.includes("/clients")) setActiveTab("clients");
+    else setActiveTab("");
+  }, [location.pathname]);
+
+  // Fetch users list (stable across renders)
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/admin/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error(t("admin.errors.fetchUsersFailed"));
+    } finally {
+      setLoading(false);
+    }
+  }, [token, t]);
 
   useEffect(() => {
     // Check if user is authenticated and is admin
@@ -162,31 +205,7 @@ const AdminDashboard: React.FC = () => {
     if (activeTab === "users") {
       fetchUsers();
     }
-  }, [user, navigate, activeTab]);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/admin/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-      const data = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast.error(t("admin.errors.fetchUsersFailed"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, navigate, activeTab, fetchUsers]);
 
   const handleLogout = () => {
     logout();
@@ -216,7 +235,7 @@ const AdminDashboard: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -244,7 +263,7 @@ const AdminDashboard: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(userData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -340,8 +359,13 @@ const AdminDashboard: React.FC = () => {
                   },
                   {
                     label: t("admin.tabs.users"),
-                    icon: <User className="w-5 h-5" />,
+                    icon: <UserIcon className="w-5 h-5" />,
                     tab: "users",
+                  },
+                  {
+                    label: "Clients",
+                    icon: <Users className="w-5 h-5" />,
+                    tab: "clients",
                   },
                   {
                     label: t("admin.tabs.analytics"),
@@ -415,6 +439,7 @@ const AdminDashboard: React.FC = () => {
               {activeTab === "analytics" && <AnalyticsManager />}
               {activeTab === "messages" && <ContactManager />}
               {activeTab === "settings" && <AdminSettings />}
+              {activeTab === "clients" && <ClientsManager />}
               {activeTab === "users" && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                   <div className="flex justify-between items-center mb-6">

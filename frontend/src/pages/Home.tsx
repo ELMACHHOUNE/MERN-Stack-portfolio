@@ -4,19 +4,11 @@ import { Link } from "react-router-dom";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
-  Code,
-  Cloud,
-  Database,
   Github,
   Linkedin,
   Mail,
   LucideIcon,
-  Server,
-  Layout,
-  Smartphone,
   Code2,
-  Settings,
-  Star,
   Twitter,
   ArrowRight,
   User,
@@ -53,6 +45,15 @@ interface Skill {
   level: number;
   category: Category;
   icon?: string;
+  order?: number;
+  isActive: boolean;
+}
+
+interface ClientItem {
+  _id: string;
+  name: string;
+  logo: string;
+  website?: string;
   order?: number;
   isActive: boolean;
 }
@@ -107,13 +108,7 @@ const defaultSocialLinks: SocialLink[] = [
   },
 ];
 
-const getSkillLevel = (level: number, t: (_key: string) => string): string => {
-  if (level >= 90) return t("home.skills.level.expert");
-  if (level >= 75) return t("home.skills.level.advanced");
-  if (level >= 50) return t("home.skills.level.intermediate");
-  if (level >= 25) return t("home.skills.level.basic");
-  return t("home.skills.level.beginner");
-};
+// Removed unused helper getSkillLevel
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
@@ -124,6 +119,7 @@ const Home: React.FC = () => {
   const [data, setData] = useState<{
     skills: Skill[];
     categories: Category[];
+    clients: ClientItem[];
     stats: {
       yearsOfExperience: number;
       projectsCompleted: number;
@@ -134,6 +130,7 @@ const Home: React.FC = () => {
   }>({
     skills: [],
     categories: [],
+    clients: [],
     stats: null,
     loading: true,
     error: null,
@@ -158,9 +155,10 @@ const Home: React.FC = () => {
           throw new Error("Failed to fetch home data");
         }
 
-        const { categories, skills, stats } = homeResponse.data as {
+        const { categories, skills, clients, stats } = homeResponse.data as {
           categories: Category[];
           skills: Skill[];
+          clients: ClientItem[];
           stats: {
             yearsOfExperience: number;
             projectsCompleted: number;
@@ -171,6 +169,7 @@ const Home: React.FC = () => {
         setData({
           skills,
           categories,
+          clients,
           stats,
           loading: false,
           error: null,
@@ -266,46 +265,7 @@ const Home: React.FC = () => {
     return socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
   };
 
-  // Map icon strings to actual icon components
-  const getIconComponent = (category: Category) => {
-    const iconMap: Record<string, LucideIcon> = {
-      frontend: Layout,
-      backend: Server,
-      database: Database,
-      cloud: Cloud,
-      mobile: Smartphone,
-      tools: Settings,
-      testing: Code2,
-      devops: Cloud,
-      "tools & others": Settings,
-      default: Code,
-    };
-
-    // Try to match by category name
-    const icon = iconMap[category.name.toLowerCase()] || iconMap.default;
-    return icon;
-  };
-
-  // Group skills by category
-  const getSkillsByCategory = () => {
-    if (!Array.isArray(data.skills) || !Array.isArray(data.categories))
-      return [];
-
-    return data.categories
-      .filter((category) => category.isActive)
-      .map((category) => ({
-        category,
-        skills: data.skills
-          .filter(
-            (skill) =>
-              skill.isActive &&
-              skill.category &&
-              skill.category._id === category._id,
-          )
-          .sort((a, b) => (a.order || 0) - (b.order || 0)),
-      }))
-      .filter((group) => group.skills.length > 0);
-  };
+  // Removed unused helpers getIconComponent and getSkillsByCategory
 
   const personalInfo = {
     name: adminProfile?.name || t(defaultProfile.name),
@@ -508,8 +468,6 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-            
-
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -646,6 +604,71 @@ const Home: React.FC = () => {
                     <Download className="w-5 h-5 mr-2" />
                     {t("about.downloadCV")}
                   </a>
+                </motion.div>
+              )}
+
+              {/* Clients Section */}
+              {Array.isArray(data.clients) && data.clients.length > 0 && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="mt-16"
+                >
+                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                      Clients
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-center">
+                      {data.clients.map((client) => {
+                        const logoUrl = getImageUrl(client.logo);
+                        const content = (
+                          <div className="flex items-center justify-center bg-white dark:bg-[#232B3B] rounded-xl p-4 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+                            {logoUrl ? (
+                              <img
+                                src={logoUrl}
+                                alt={client.name}
+                                className="h-16 object-contain"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = "none";
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    const fallback =
+                                      document.createElement("div");
+                                    fallback.className =
+                                      "text-gray-600 dark:text-gray-400";
+                                    fallback.textContent = client.name;
+                                    parent.appendChild(fallback);
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <span className="text-gray-600 dark:text-gray-400 text-sm">
+                                {client.name}
+                              </span>
+                            )}
+                          </div>
+                        );
+
+                        return client.website ? (
+                          <a
+                            key={client._id}
+                            href={client.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={client.name}
+                            className="block"
+                          >
+                            {content}
+                          </a>
+                        ) : (
+                          <div key={client._id}>{content}</div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </>

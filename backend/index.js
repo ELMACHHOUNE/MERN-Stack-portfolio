@@ -91,6 +91,10 @@ if (!fs.existsSync(path.join(uploadsPath, "profile-images"))) {
 if (!fs.existsSync(path.join(uploadsPath, "projects"))) {
   fs.mkdirSync(path.join(uploadsPath, "projects"), { recursive: true });
 }
+// Ensure clients folder exists for client logos
+if (!fs.existsSync(path.join(uploadsPath, "clients"))) {
+  fs.mkdirSync(path.join(uploadsPath, "clients"), { recursive: true });
+}
 
 // Serve static files with proper headers
 app.use(
@@ -113,6 +117,9 @@ app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/home", homeRouter);
+// Clients routes
+const clientsRouter = require("./routes/clients");
+app.use("/api/clients", clientsRouter);
 
 // Root route handler
 app.get("/", (req, res) => {
@@ -130,6 +137,7 @@ app.get("/", (req, res) => {
       "/api/settings",
       "/api/analytics",
       "/api/home",
+      "/api/clients",
     ],
   });
 });

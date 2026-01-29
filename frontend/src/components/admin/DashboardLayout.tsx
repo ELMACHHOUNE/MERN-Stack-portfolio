@@ -34,6 +34,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       icon: "💼",
     },
     {
+      path: "/admin/clients",
+      label: "Clients",
+      icon: "🤝",
+    },
+    {
       path: "/admin/about",
       label: t("dashboardLayout.menu.about"),
       icon: "👤",

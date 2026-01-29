@@ -6,6 +6,7 @@ const Skill = require("../models/Skill");
 const Project = require("../models/Project");
 const Experience = require("../models/Experience");
 const Contact = require("../models/Contact");
+const Client = require("../models/Client");
 
 // @route   GET /api/home
 // @desc    Get aggregated public data for Home page
@@ -41,12 +42,13 @@ router.get("/", async (req, res) => {
       : null;
 
     // Fetch active categories and skills
-    const [categories, skills] = await Promise.all([
+    const [categories, skills, clients] = await Promise.all([
       Category.find({ isActive: true }).sort({ order: 1 }).lean(),
       Skill.find({ isActive: true })
         .populate("category", "name description icon")
         .sort({ order: 1 })
         .lean(),
+      Client.find({ isActive: true }).sort({ order: 1 }).lean(),
     ]);
 
     // Compute basic stats
@@ -86,7 +88,7 @@ router.get("/", async (req, res) => {
           : contactsCount,
     };
 
-    res.json({ profile, categories, skills, stats });
+    res.json({ profile, categories, skills, clients, stats });
   } catch (error) {
     console.error("Error fetching home data:", error);
     res.status(500).json({ message: "Server error" });

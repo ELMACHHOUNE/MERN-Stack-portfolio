@@ -9,6 +9,7 @@ import CategoryManager from "../components/admin/CategoryManager";
 import ContactManager from "../components/admin/ContactManager";
 import AnalyticsManager from "../components/admin/AnalyticsManager";
 import AdminSettings from "./AdminSettings";
+import ClientsManager from "../components/admin/ClientsManager";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
@@ -19,6 +20,7 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/projects")) return "projects";
     if (path.includes("/experience")) return "experience";
     if (path.includes("/categories")) return "categories";
+    if (path.includes("/clients")) return "clients";
     if (path.includes("/messages")) return "messages";
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/settings")) return "settings";
@@ -76,6 +78,16 @@ const AdminDashboard: React.FC = () => {
               {t("admin.tabs.categories")}
             </button>
             <button
+              onClick={() => setActiveTab("clients")}
+              className={`${
+                activeTab === "clients"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Clients
+            </button>
+            <button
               onClick={() => setActiveTab("analytics")}
               className={`${
                 activeTab === "analytics"
@@ -117,6 +129,7 @@ const AdminDashboard: React.FC = () => {
           {activeTab === "projects" && <ProjectManager />}
           {activeTab === "experience" && <ExperienceManager />}
           {activeTab === "categories" && <CategoryManager />}
+          {activeTab === "clients" && <ClientsManager />}
           {activeTab === "analytics" && <AnalyticsManager />}
           {activeTab === "messages" && <ContactManager />}
           {activeTab === "settings" && <AdminSettings />}

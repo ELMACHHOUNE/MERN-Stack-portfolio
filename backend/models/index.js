@@ -7,6 +7,7 @@ const Experience = require("./Experience");
 const Contact = require("./Contact");
 const Setting = require("./Setting");
 const Analytics = require("./Analytics");
+const Client = require("./Client");
 
 // Load models in correct order
 const loadModels = async () => {
@@ -19,6 +20,7 @@ const loadModels = async () => {
     await Contact.init();
     await Setting.init();
     await Analytics.init();
+    await Client.init();
     console.log("All models loaded successfully");
 
     // Verify model references
@@ -27,6 +29,9 @@ const loadModels = async () => {
     }
     if (!mongoose.models.Skill) {
       throw new Error("Skill model not properly registered");
+    }
+    if (!mongoose.models.Client) {
+      throw new Error("Client model not properly registered");
     }
     console.log("Model references verified");
   } catch (error) {

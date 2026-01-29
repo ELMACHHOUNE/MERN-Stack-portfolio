@@ -19,6 +19,8 @@ const storage = multer.diskStorage({
       // Route by request path to avoid collisions.
       if (req.baseUrl === "/api/settings" && req.path === "/profile-image") {
         uploadPath = path.join(uploadsRoot, "profile-images");
+      } else if (req.baseUrl === "/api/clients") {
+        uploadPath = path.join(uploadsRoot, "clients");
       } else {
         uploadPath = path.join(uploadsRoot, "projects");
       }
