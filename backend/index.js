@@ -14,6 +14,7 @@ const categoriesRouter = require("./routes/categories");
 const experienceRouter = require("./routes/experience");
 const projectsRouter = require("./routes/projects");
 const settingsRouter = require("./routes/settings");
+const homeRouter = require("./routes/home");
 const analyticsRouter = require("./routes/analytics");
 const hpp = require("hpp");
 const loadModels = require("./models");
@@ -111,6 +112,7 @@ app.use("/api/experience", experienceRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/home", homeRouter);
 
 // Root route handler
 app.get("/", (req, res) => {
@@ -127,6 +129,7 @@ app.get("/", (req, res) => {
       "/api/projects",
       "/api/settings",
       "/api/analytics",
+      "/api/home",
     ],
   });
 });

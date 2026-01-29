@@ -59,13 +59,13 @@ const Navbar: React.FC<NavbarProps> = ({
 
     window.addEventListener(
       "profileImageUpdated",
-      handleProfileImageUpdate as EventListener
+      handleProfileImageUpdate as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         "profileImageUpdated",
-        handleProfileImageUpdate as EventListener
+        handleProfileImageUpdate as EventListener,
       );
     };
   }, []);
@@ -77,7 +77,6 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { path: "/", label: t("navbar.menu.home"), icon: Home },
-    { path: "/about", label: t("navbar.menu.about"), icon: User },
     { path: "/projects", label: t("navbar.menu.projects"), icon: Briefcase },
     {
       path: "/experience",

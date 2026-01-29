@@ -5,7 +5,6 @@ import { useAdminProfile } from "../context/AdminProfileContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Code,
-  ChevronDown,
   Cloud,
   Database,
   Github,
@@ -20,6 +19,15 @@ import {
   Star,
   Twitter,
   ArrowRight,
+  User,
+  Facebook,
+  Instagram,
+  Youtube,
+  MapPin,
+  MessageCircle,
+  Briefcase,
+  Heart,
+  Download,
 } from "lucide-react";
 import { api } from "../utils/api";
 import { toast } from "react-hot-toast";
@@ -54,6 +62,8 @@ interface AdminProfile {
   title: string;
   location: string;
   bio: string;
+  profileImage?: string;
+  interests?: string[];
   values: Array<{
     icon: string;
     title: string;
@@ -63,8 +73,13 @@ interface AdminProfile {
     github?: string;
     linkedin?: string;
     twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
     gmail?: string;
+    whatsapp?: string;
   };
+  cvUrl?: string;
 }
 
 const defaultProfile = {
@@ -92,7 +107,7 @@ const defaultSocialLinks: SocialLink[] = [
   },
 ];
 
-const getSkillLevel = (level: number, t: (key: string) => string): string => {
+const getSkillLevel = (level: number, t: (_key: string) => string): string => {
   if (level >= 90) return t("home.skills.level.expert");
   if (level >= 75) return t("home.skills.level.advanced");
   if (level >= 50) return t("home.skills.level.intermediate");
@@ -102,17 +117,24 @@ const getSkillLevel = (level: number, t: (key: string) => string): string => {
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
-  const { adminProfile } = useAdminProfile() as {
+  const { adminProfile, isLoading } = useAdminProfile() as {
     adminProfile: AdminProfile | null;
+    isLoading: boolean;
   };
   const [data, setData] = useState<{
     skills: Skill[];
     categories: Category[];
+    stats: {
+      yearsOfExperience: number;
+      projectsCompleted: number;
+      happyClients: number;
+    } | null;
     loading: boolean;
     error: string | null;
   }>({
     skills: [],
     categories: [],
+    stats: null,
     loading: true,
     error: null,
   });
@@ -130,28 +152,33 @@ const Home: React.FC = () => {
       try {
         setData((prev) => ({ ...prev, loading: true, error: null }));
 
-        // Fetch categories first
-        const categoriesResponse = await api.get("/categories");
-        if (!categoriesResponse.data) {
-          throw new Error("Failed to fetch categories");
+        // Aggregated data for home
+        const homeResponse = await api.get("/home");
+        if (!homeResponse.data) {
+          throw new Error("Failed to fetch home data");
         }
 
-        // Then fetch skills
-        const skillsResponse = await api.get("/skills");
-        if (!skillsResponse.data) {
-          throw new Error("Failed to fetch skills");
-        }
+        const { categories, skills, stats } = homeResponse.data as {
+          categories: Category[];
+          skills: Skill[];
+          stats: {
+            yearsOfExperience: number;
+            projectsCompleted: number;
+            happyClients: number;
+          };
+        };
 
         setData({
-          skills: skillsResponse.data as Skill[],
-          categories: categoriesResponse.data as Category[],
+          skills,
+          categories,
+          stats,
           loading: false,
           error: null,
         });
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error(
-          error instanceof Error ? error.message : "Failed to fetch data"
+          error instanceof Error ? error.message : "Failed to fetch data",
         );
         setData((prev) => ({
           ...prev,
@@ -196,6 +223,30 @@ const Home: React.FC = () => {
       });
     }
 
+    if (adminProfile.socialLinks.facebook) {
+      socialLinks.push({
+        icon: Facebook,
+        url: adminProfile.socialLinks.facebook,
+        label: t("about.socialLinks.facebook"),
+      });
+    }
+
+    if (adminProfile.socialLinks.instagram) {
+      socialLinks.push({
+        icon: Instagram,
+        url: adminProfile.socialLinks.instagram,
+        label: t("about.socialLinks.instagram"),
+      });
+    }
+
+    if (adminProfile.socialLinks.youtube) {
+      socialLinks.push({
+        icon: Youtube,
+        url: adminProfile.socialLinks.youtube,
+        label: t("about.socialLinks.youtube"),
+      });
+    }
+
     if (adminProfile.socialLinks.gmail) {
       socialLinks.push({
         icon: Mail,
@@ -204,12 +255,20 @@ const Home: React.FC = () => {
       });
     }
 
+    if (adminProfile.socialLinks.whatsapp) {
+      socialLinks.push({
+        icon: MessageCircle,
+        url: adminProfile.socialLinks.whatsapp,
+        label: t("about.socialLinks.whatsapp"),
+      });
+    }
+
     return socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
   };
 
   // Map icon strings to actual icon components
   const getIconComponent = (category: Category) => {
-    const iconMap: { [key: string]: any } = {
+    const iconMap: Record<string, LucideIcon> = {
       frontend: Layout,
       backend: Server,
       database: Database,
@@ -241,7 +300,7 @@ const Home: React.FC = () => {
             (skill) =>
               skill.isActive &&
               skill.category &&
-              skill.category._id === category._id
+              skill.category._id === category._id,
           )
           .sort((a, b) => (a.order || 0) - (b.order || 0)),
       }))
@@ -253,6 +312,7 @@ const Home: React.FC = () => {
     title: adminProfile?.title || t(defaultProfile.title),
     location: adminProfile?.location || t(defaultProfile.location),
     bio: adminProfile?.bio || t(defaultProfile.bio),
+    profileImage: adminProfile?.profileImage || "",
     values: adminProfile?.values?.map((value) => ({
       icon: value.icon,
       title: value.title,
@@ -280,7 +340,27 @@ const Home: React.FC = () => {
       },
     ],
     socialLinks: getSocialLinks(),
+    interests: adminProfile?.interests || [],
+    cvUrl: adminProfile?.cvUrl || "",
   };
+
+  const stats = [
+    {
+      icon: <Briefcase className="w-6 h-6" />,
+      label: t("about.yearsOfExperience"),
+      value: data.stats ? `${data.stats.yearsOfExperience}+` : "",
+    },
+    {
+      icon: <Code2 className="w-6 h-6" />,
+      label: t("about.projectsCompleted"),
+      value: data.stats ? `${data.stats.projectsCompleted}+` : "",
+    },
+    {
+      icon: <Heart className="w-6 h-6" />,
+      label: t("about.happyClients"),
+      value: data.stats ? `${data.stats.happyClients}+` : "",
+    },
+  ];
 
   // Update the image URL construction
   const getImageUrl = (url: string) => {
@@ -331,235 +411,245 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-[#0B1121]">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <motion.div
           style={{ opacity, y }}
-          className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10"
+          className="absolute inset-0 bg-gradient-to-br from-blue-50/60 to-purple-50/60 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10"
         />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative max-w-4xl mx-auto text-center z-10 px-4 sm:px-6 lg:px-8"
-        >
-          <h1 className="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-6">
-            {personalInfo.name}
-          </h1>
-          <p className="text-3xl text-gray-700 dark:text-gray-300 mb-4">
-            {personalInfo.title}
-          </p>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-            {personalInfo.bio}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Link
-              to="/projects"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transform hover:scale-105 transition-all duration-300"
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             >
-              {t("home.cta.viewWork")}
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 dark:hover:border-gray-700 transform hover:scale-105 transition-all duration-300"
+              <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA]">
+                {personalInfo.name}
+              </h1>
+              <p className="mt-4 text-2xl text-gray-700 dark:text-gray-300">
+                {personalInfo.title}
+              </p>
+              <div className="mt-2 flex items-center text-gray-600 dark:text-gray-400">
+                <MapPin className="w-4 h-4 mr-2" />
+                <span>{personalInfo.location}</span>
+              </div>
+              <p className="mt-6 text-gray-600 dark:text-gray-400 max-w-xl">
+                {personalInfo.bio?.length > 0
+                  ? personalInfo.bio.slice(0, 160)
+                  : t("home.defaultProfile.bio")}
+                {personalInfo.bio && personalInfo.bio.length > 160 ? "…" : ""}
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                <Link
+                  to="/projects"
+                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transform hover:scale-105 transition-all duration-300"
+                >
+                  {t("home.cta.viewWork")}
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 dark:hover:border-gray-700 transform hover:scale-105 transition-all duration-300"
+                >
+                  {t("home.cta.getInTouch")}
+                </Link>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {personalInfo.socialLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] border border-gray-200 dark:border-gray-800"
+                    aria-label={link.label}
+                  >
+                    <link.icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex justify-center"
             >
-              {t("home.cta.getInTouch")}
-            </Link>
+              <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-[#1B2333]/60 shadow-sm">
+                {personalInfo.profileImage ? (
+                  <img
+                    src={getImageUrl(personalInfo.profileImage)}
+                    alt={personalInfo.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] flex items-center justify-center">
+                    <User className="w-20 h-20 text-white/90" />
+                  </div>
+                )}
+                <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/40 dark:ring-black/30" />
+              </div>
+            </motion.div>
           </div>
-          <div className="flex justify-center gap-6">
-            {personalInfo.socialLinks.map((link) => (
-              <motion.a
-                key={link.label}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.1 }}
-                className="p-3 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 rounded-xl"
-                aria-label={link.label}
-              >
-                <link.icon className="h-6 w-6" />
-              </motion.a>
-            ))}
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <ChevronDown className="h-8 w-8 text-gray-400 dark:text-gray-500 animate-bounce" />
-        </motion.div>
+        </div>
       </section>
 
-      {/* Skills Section */}
+      {/* About Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
-              {t("home.skills.title")}
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              {t("home.skills.description")}
-            </p>
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[240px]">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600 dark:border-[#4F46E5]"></div>
+              <span className="ml-4 text-gray-600 dark:text-gray-400">
+                {t("about.loading")}
+              </span>
+            </div>
+          ) : (
+            <>
+              {/* Removed duplicated avatar and location from About header for a cleaner layout */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {getSkillsByCategory().map((group) => (
               <motion.div
-                key={group.category._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
               >
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-8 h-8">
-                    {(() => {
-                      const IconComponent = getIconComponent(group.category);
-                      return (
-                        <IconComponent className="w-8 h-8 text-blue-600 dark:text-[#4F46E5]" />
-                      );
-                    })()}
+                {stats.map((stat, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 text-center border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
+                  >
+                    <div className="text-blue-600 dark:text-[#4F46E5] mb-4 flex justify-center">
+                      {stat.icon}
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      {stat.value}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {stat.label}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {group.category.name}
+                ))}
+              </motion.div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mb-12"
+              >
+                <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                    {t("about.bio")}
                   </h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {personalInfo.bio}
+                  </p>
                 </div>
-                <div className="space-y-4">
-                  {group.skills.map((skill) => (
-                    <div
-                      key={skill._id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center">
-                        {skill.icon ? (
-                          <img
-                            src={getImageUrl(skill.icon)}
-                            alt={skill.name}
-                            className="w-6 h-6 mr-3"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              if (
-                                target.src !==
-                                `${window.location.origin}/placeholder-image.jpg`
-                              ) {
-                                target.src = "/placeholder-image.jpg";
+              </motion.div>
+
+              {personalInfo.values.length > 0 && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="mb-12"
+                >
+                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                      {t("about.coreValues")}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {personalInfo.values.map((value, index) => (
+                        <div
+                          key={index}
+                          className="group bg-white dark:bg-[#232B3B] rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300"
+                        >
+                          <div className="w-12 h-12 mx-auto mb-4 p-2.5 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 group-hover:border-gray-300 dark:group-hover:border-gray-700 transition-all duration-300">
+                            <img
+                              src={getImageUrl(value.icon)}
+                              alt={value.title}
+                              className="w-full h-full object-contain"
+                              loading="lazy"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
                                 target.style.display = "none";
                                 const parent = target.parentElement;
                                 if (parent) {
                                   const fallbackIcon =
                                     document.createElement("div");
                                   fallbackIcon.className =
-                                    "text-gray-500 dark:text-gray-400";
-                                  const icon = getIconComponent(skill.category);
-                                  if (React.isValidElement(icon)) {
-                                    parent.appendChild(fallbackIcon);
-                                    // Render the icon into the fallback div
-                                    const iconContainer =
-                                      document.createElement("div");
-                                    iconContainer.className = "w-6 h-6";
-                                    fallbackIcon.appendChild(iconContainer);
-                                  }
+                                    "w-full h-full text-blue-600 dark:text-[#4F46E5] flex items-center justify-center";
+                                  fallbackIcon.innerHTML =
+                                    '<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>';
+                                  parent.appendChild(fallbackIcon);
                                 }
-                              }
-                            }}
-                          />
-                        ) : (
-                          <Star className="w-6 h-6 text-yellow-400 mr-3" />
-                        )}
-                        <span className="text-gray-700 dark:text-gray-300">
-                          {skill.name}
-                        </span>
-                      </div>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        {getSkillLevel(skill.level, t)}
-                      </span>
+                              }}
+                            />
+                          </div>
+                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                            {value.title}
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
+                            {value.description}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link
-              to="/skills"
-              className="inline-flex items-center px-6 py-3 rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transition-all duration-300"
-            >
-              {t("home.skills.viewAll")}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#1B2333]">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
-              {t("home.values.sectionTitle")}
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              {t("home.values.sectionDescription")}
-            </p>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {personalInfo.values.map((value, index) => (
-              <motion.div
-                key={value.title}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-[#232B3B] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
-              >
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 p-2.5 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 mr-4">
-                    <img
-                      src={getImageUrl(value.icon)}
-                      alt={value.title}
-                      className="w-full h-full object-contain"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (
-                          target.src !==
-                          `${window.location.origin}/placeholder-image.jpg`
-                        ) {
-                          target.src = "/placeholder-image.jpg";
-                          target.style.display = "none";
-                          const parent = target.parentElement;
-                          if (parent) {
-                            const fallbackIcon = document.createElement("div");
-                            fallbackIcon.className =
-                              "w-full h-full text-blue-600 dark:text-[#4F46E5] flex items-center justify-center";
-                            fallbackIcon.innerHTML =
-                              '<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>';
-                            parent.appendChild(fallbackIcon);
-                          }
-                        }
-                      }}
-                    />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {value.title}
-                  </h3>
-                </div>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  {value.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              )}
+
+              {personalInfo.interests.length > 0 && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="mb-16"
+                >
+                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                      {t("about.expertise")}
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {personalInfo.interests.map((interest, index) => (
+                        <motion.span
+                          key={index}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3, delay: index * 0.1 }}
+                          className="px-4 py-2 bg-white dark:bg-[#232B3B] text-blue-600 dark:text-[#4F46E5] rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300"
+                        >
+                          {interest}
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {personalInfo.cvUrl && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="text-center"
+                >
+                  <a
+                    href={personalInfo.cvUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] text-white rounded-xl transition-all duration-300"
+                  >
+                    <Download className="w-5 h-5 mr-2" />
+                    {t("about.downloadCV")}
+                  </a>
+                </motion.div>
+              )}
+            </>
+          )}
         </div>
       </section>
 

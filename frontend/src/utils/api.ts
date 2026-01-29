@@ -44,7 +44,8 @@ const PUBLIC_ENDPOINTS = [
   '/categories',
   '/contact',
   '/auth/login',
-  '/auth/register'
+  '/auth/register',
+  '/home',
 ];
 
 const isPublicEndpoint = (endpoint: string) => {
@@ -52,7 +53,7 @@ const isPublicEndpoint = (endpoint: string) => {
 };
 
 const getHeaders = (endpoint: string) => {
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 

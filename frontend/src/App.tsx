@@ -5,12 +5,12 @@ import {
   Route,
   useLocation,
   Outlet,
+  Navigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -74,7 +74,10 @@ const App: React.FC = () => {
                   {/* Main layout routes */}
                   <Route element={<MainLayout />}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
+                    <Route
+                      path="/about"
+                      element={<Navigate to="/" replace />}
+                    />
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/experience" element={<Experience />} />
