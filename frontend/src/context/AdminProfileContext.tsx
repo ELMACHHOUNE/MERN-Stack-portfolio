@@ -30,23 +30,25 @@ interface AdminProfile {
   values: Value[];
   socialLinks?: SocialLinks;
   cvUrl?: string;
+  yearsOfExperience?: number;
+  happyClients?: number;
 }
 
 interface AdminProfileContextType {
   adminProfile: AdminProfile | null;
-  updateAdminProfile: (data: Partial<AdminProfile>) => Promise<AdminProfile>;
+  updateAdminProfile: (_data: Partial<AdminProfile>) => Promise<AdminProfile>;
   isLoading: boolean;
 }
 
 const AdminProfileContext = createContext<AdminProfileContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useAdminProfile = () => {
   const context = useContext(AdminProfileContext);
   if (!context) {
     throw new Error(
-      "useAdminProfile must be used within an AdminProfileProvider"
+      "useAdminProfile must be used within an AdminProfileProvider",
     );
   }
   return context;
@@ -59,10 +61,10 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchAdminProfile = async () => {
+  const fetchAdminProfile = React.useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      const headers: HeadersInit = {
+      const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
 
@@ -76,7 +78,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           `${import.meta.env.VITE_API_URL}/settings/admin-profile`,
           {
             headers,
-          }
+          },
         );
 
         if (!response.ok) {
@@ -96,6 +98,12 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           values: data.values || [],
           socialLinks: data.socialLinks || {},
           cvUrl: data.cvUrl || "",
+          yearsOfExperience:
+            typeof data.yearsOfExperience === "number"
+              ? data.yearsOfExperience
+              : 0,
+          happyClients:
+            typeof data.happyClients === "number" ? data.happyClients : 0,
         };
         setAdminProfile(profile);
         return profile;
@@ -106,7 +114,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           `${import.meta.env.VITE_API_URL}/settings/public-profile`,
           {
             headers,
-          }
+          },
         );
 
         if (!response.ok) {
@@ -114,7 +122,17 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         const data = await response.json();
-        setAdminProfile(data);
+        setAdminProfile({
+          ...data,
+          yearsOfExperience:
+            typeof (data as any).yearsOfExperience === "number"
+              ? (data as any).yearsOfExperience
+              : 0,
+          happyClients:
+            typeof (data as any).happyClients === "number"
+              ? (data as any).happyClients
+              : 0,
+        });
         return data;
       }
     } catch (error) {
@@ -123,72 +141,83 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchAdminProfile();
-  }, [user, token]);
+  }, [fetchAdminProfile]);
 
-  const updateAdminProfile = async (
-    data: Partial<AdminProfile>
-  ): Promise<AdminProfile> => {
-    if (!token) throw new Error("No authentication token");
+  const updateAdminProfile = React.useCallback(
+    async (data: Partial<AdminProfile>): Promise<AdminProfile> => {
+      if (!token) throw new Error("No authentication token");
 
-    try {
-      console.log("Updating profile with data:", data);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/settings/admin-profile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+      try {
+        console.log("Updating profile with data:", data);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/settings/admin-profile`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
           },
-          body: JSON.stringify(data),
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to update admin profile",
+          );
         }
-      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update admin profile");
+        const responseData = await response.json();
+        console.log("Received response:", responseData);
+
+        // Extract the user data from the response
+        const updatedProfile = responseData.user;
+        if (!updatedProfile) {
+          throw new Error("No user data in response");
+        }
+
+        // Update the state with a complete merge of existing and new data
+        setAdminProfile((prev) => {
+          if (!prev) return updatedProfile;
+
+          // Create a new object with all the data
+          const mergedProfile = {
+            ...prev,
+            ...updatedProfile,
+            // Ensure arrays are properly merged
+            interests: Array.isArray(updatedProfile.interests)
+              ? [...updatedProfile.interests]
+              : prev.interests || [],
+            values: Array.isArray(updatedProfile.values)
+              ? updatedProfile.values.map((value: Value) => ({ ...value }))
+              : prev.values || [],
+            yearsOfExperience:
+              typeof (updatedProfile as any).yearsOfExperience === "number"
+                ? (updatedProfile as any).yearsOfExperience
+                : prev.yearsOfExperience || 0,
+            happyClients:
+              typeof (updatedProfile as any).happyClients === "number"
+                ? (updatedProfile as any).happyClients
+                : prev.happyClients || 0,
+          };
+
+          console.log("Merged profile:", mergedProfile);
+          return mergedProfile;
+        });
+
+        return updatedProfile;
+      } catch (error) {
+        console.error("Error updating admin profile:", error);
+        throw error;
       }
-
-      const responseData = await response.json();
-      console.log("Received response:", responseData);
-
-      // Extract the user data from the response
-      const updatedProfile = responseData.user;
-      if (!updatedProfile) {
-        throw new Error("No user data in response");
-      }
-
-      // Update the state with a complete merge of existing and new data
-      setAdminProfile((prev) => {
-        if (!prev) return updatedProfile;
-
-        // Create a new object with all the data
-        const mergedProfile = {
-          ...prev,
-          ...updatedProfile,
-          // Ensure arrays are properly merged
-          interests: Array.isArray(updatedProfile.interests)
-            ? [...updatedProfile.interests]
-            : prev.interests || [],
-          values: Array.isArray(updatedProfile.values)
-            ? updatedProfile.values.map((value: Value) => ({ ...value }))
-            : prev.values || [],
-        };
-
-        console.log("Merged profile:", mergedProfile);
-        return mergedProfile;
-      });
-
-      return updatedProfile;
-    } catch (error) {
-      console.error("Error updating admin profile:", error);
-      throw error;
-    }
-  };
+    },
+    [token],
+  );
 
   const contextValue = React.useMemo(
     () => ({
@@ -196,7 +225,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
       updateAdminProfile,
       isLoading,
     }),
-    [adminProfile, isLoading]
+    [adminProfile, updateAdminProfile, isLoading],
   );
 
   return (

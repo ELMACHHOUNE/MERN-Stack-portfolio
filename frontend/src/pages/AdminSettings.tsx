@@ -52,10 +52,10 @@ const AdminSettings: React.FC = () => {
   const { token, setUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(
-    adminProfile?.profileImage || ""
+    adminProfile?.profileImage || "",
   );
   const [interests, setInterests] = useState<string[]>(
-    adminProfile?.interests || []
+    adminProfile?.interests || [],
   );
   const [newInterest, setNewInterest] = useState("");
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({
@@ -95,7 +95,7 @@ const AdminSettings: React.FC = () => {
         description:
           "Staying updated with the latest technologies and industry trends.",
       },
-    ]
+    ],
   );
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,14 +155,14 @@ const AdminSettings: React.FC = () => {
             profileImage: fullImageUrl,
             timestamp: Date.now(),
           },
-        })
+        }),
       );
 
       toast.success(t("settings.image.success"));
     } catch (error) {
       console.error("Image upload error:", error);
       toast.error(
-        error instanceof Error ? error.message : t("settings.image.error")
+        error instanceof Error ? error.message : t("settings.image.error"),
       );
     } finally {
       setIsUploading(false);
@@ -183,7 +183,7 @@ const AdminSettings: React.FC = () => {
   const handleValueChange = (
     index: number,
     field: keyof Value,
-    value: string
+    value: string,
   ) => {
     const newValues = [...values];
     newValues[index] = { ...newValues[index], [field]: value };
@@ -192,7 +192,7 @@ const AdminSettings: React.FC = () => {
 
   const handleSocialLinkChange = (
     platform: keyof SocialLinks,
-    value: string
+    value: string,
   ) => {
     setSocialLinks((prev) => ({
       ...prev,
@@ -228,6 +228,8 @@ const AdminSettings: React.FC = () => {
       values,
       socialLinks,
       profileImage,
+      yearsOfExperience: Number(formData.get("yearsOfExperience") || 0),
+      happyClients: Number(formData.get("happyClients") || 0),
     };
 
     try {
@@ -236,7 +238,7 @@ const AdminSettings: React.FC = () => {
     } catch (error) {
       console.error("Profile update error:", error);
       toast.error(
-        error instanceof Error ? error.message : t("settings.profile.error")
+        error instanceof Error ? error.message : t("settings.profile.error"),
       );
     }
   };
@@ -265,7 +267,7 @@ const AdminSettings: React.FC = () => {
                           <img
                             src={`${API_URL.replace(
                               "/api",
-                              ""
+                              "",
                             )}${profileImage}`}
                             alt={t("settings.profile.imageAlt")}
                             className="w-full h-full object-cover"
@@ -325,6 +327,26 @@ const AdminSettings: React.FC = () => {
                         type: "text",
                         placeholder: t("home.defaultProfile.location"),
                         value: adminProfile?.location || "",
+                      },
+                      {
+                        id: "yearsOfExperience",
+                        label: "Years of Experience",
+                        type: "number",
+                        placeholder: "0",
+                        value:
+                          typeof adminProfile?.yearsOfExperience === "number"
+                            ? adminProfile?.yearsOfExperience
+                            : 0,
+                      },
+                      {
+                        id: "happyClients",
+                        label: "Happy Clients",
+                        type: "number",
+                        placeholder: "0",
+                        value:
+                          typeof adminProfile?.happyClients === "number"
+                            ? adminProfile?.happyClients
+                            : 0,
                       },
                     ].map((field) => (
                       <div key={field.id}>
@@ -421,15 +443,15 @@ const AdminSettings: React.FC = () => {
                           onChange={(e) =>
                             handleSocialLinkChange(
                               platform.id as keyof SocialLinks,
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           placeholder={
                             platform.id === "gmail"
                               ? "mailto:your.email@gmail.com"
                               : platform.id === "whatsapp"
-                              ? "https://wa.me/1234567890"
-                              : `https://${platform.id}.com/yourusername`
+                                ? "https://wa.me/1234567890"
+                                : `https://${platform.id}.com/yourusername`
                           }
                           className="input"
                         />
@@ -506,7 +528,7 @@ const AdminSettings: React.FC = () => {
                                         handleValueChange(
                                           index,
                                           field.id as keyof Value,
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                       className="input"

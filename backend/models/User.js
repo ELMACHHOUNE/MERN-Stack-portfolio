@@ -56,6 +56,16 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    yearsOfExperience: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    happyClients: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     socialLinks: {
       github: {
         type: String,

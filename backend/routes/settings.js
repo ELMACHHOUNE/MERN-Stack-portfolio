@@ -152,6 +152,8 @@ router.put("/admin-profile", protect, admin, async (req, res) => {
       interests,
       values,
       socialLinks,
+      yearsOfExperience,
+      happyClients,
     } = req.body;
     const user = await User.findById(req.user._id);
 
@@ -176,6 +178,18 @@ router.put("/admin-profile", protect, admin, async (req, res) => {
     if (interests) user.interests = interests;
     if (values) user.values = values;
     if (socialLinks) user.socialLinks = socialLinks;
+    if (typeof yearsOfExperience !== "undefined") {
+      const num = Number(yearsOfExperience);
+      if (!Number.isNaN(num) && num >= 0) {
+        user.yearsOfExperience = num;
+      }
+    }
+    if (typeof happyClients !== "undefined") {
+      const num = Number(happyClients);
+      if (!Number.isNaN(num) && num >= 0) {
+        user.happyClients = num;
+      }
+    }
 
     await user.save();
     res.json({ message: "Profile updated successfully", user });
@@ -208,6 +222,12 @@ router.get("/public-profile", async (req, res) => {
       interests: adminUser.interests || [],
       values: adminUser.values || [],
       socialLinks: adminUser.socialLinks || {},
+      yearsOfExperience:
+        typeof adminUser.yearsOfExperience === "number"
+          ? adminUser.yearsOfExperience
+          : 0,
+      happyClients:
+        typeof adminUser.happyClients === "number" ? adminUser.happyClients : 0,
     };
 
     res.json(publicProfile);

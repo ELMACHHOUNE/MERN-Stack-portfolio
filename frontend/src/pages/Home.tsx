@@ -508,7 +508,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* Removed duplicated avatar and location from About header for a cleaner layout */}
+            
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

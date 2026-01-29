@@ -29,6 +29,14 @@ router.get("/", async (req, res) => {
           values: adminUser.values || [],
           socialLinks: adminUser.socialLinks || {},
           cvUrl: adminUser.cvUrl || "",
+          yearsOfExperience:
+            typeof adminUser.yearsOfExperience === "number"
+              ? adminUser.yearsOfExperience
+              : 0,
+          happyClients:
+            typeof adminUser.happyClients === "number"
+              ? adminUser.happyClients
+              : 0,
         }
       : null;
 
@@ -48,8 +56,12 @@ router.get("/", async (req, res) => {
       Experience.find({ isActive: true }).select("startDate current").lean(),
     ]);
 
-    let yearsOfExperience = 0;
-    if (experiences && experiences.length > 0) {
+    // Prefer admin-configured value; fallback to computed years
+    let yearsOfExperience =
+      profile && typeof profile.yearsOfExperience === "number"
+        ? profile.yearsOfExperience
+        : 0;
+    if (!yearsOfExperience && experiences && experiences.length > 0) {
       const earliestStart = experiences
         .map((e) => e.startDate)
         .filter(Boolean)
@@ -66,7 +78,12 @@ router.get("/", async (req, res) => {
     const stats = {
       yearsOfExperience,
       projectsCompleted: projectsCount,
-      happyClients: contactsCount,
+      happyClients:
+        profile &&
+        typeof profile.happyClients === "number" &&
+        profile.happyClients > 0
+          ? profile.happyClients
+          : contactsCount,
     };
 
     res.json({ profile, categories, skills, stats });
