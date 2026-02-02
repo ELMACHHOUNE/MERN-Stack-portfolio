@@ -383,7 +383,7 @@ const Home: React.FC = () => {
               animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA]">
+              <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent brand-gradient">
                 {personalInfo.name}
               </h1>
               <p className="mt-4 text-2xl text-gray-700 dark:text-gray-300">
@@ -402,7 +402,7 @@ const Home: React.FC = () => {
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/projects"
-                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] transform hover:scale-105 transition-all duration-300"
+                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white btn-brand transform hover:scale-105 transition-all duration-300"
                 >
                   {t("home.cta.viewWork")}
                   <ArrowRight className="h-5 w-5 ml-2" />
@@ -502,7 +502,7 @@ const Home: React.FC = () => {
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                     {t("about.bio")}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-body-var">
                     {personalInfo.bio}
                   </p>
                 </div>
@@ -685,7 +685,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-4xl font-bold text-heading-2 mb-6">
               {t("home.cta.readyToStart")}
             </h2>
             <p className="text-xl text-blue-100 mb-10">

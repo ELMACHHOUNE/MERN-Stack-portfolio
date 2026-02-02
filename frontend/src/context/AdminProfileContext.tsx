@@ -32,6 +32,26 @@ interface AdminProfile {
   cvUrl?: string;
   yearsOfExperience?: number;
   happyClients?: number;
+  theme?: {
+    primary: string;
+    secondary: string;
+    headingH1: string;
+    headingH2: string;
+    textBody: string;
+    primaryHover?: string;
+    accent?: string;
+    buttonBg?: string;
+    buttonText?: string;
+    buttonHoverBg?: string;
+    cardBg?: string;
+    cardBorder?: string;
+    sidebarBg?: string;
+    sidebarText?: string;
+    sidebarActiveBg?: string;
+    sidebarActiveText?: string;
+    sidebarHoverBg?: string;
+    sidebarHoverText?: string;
+  };
 }
 
 interface AdminProfileContextType {
@@ -44,6 +64,7 @@ const AdminProfileContext = createContext<AdminProfileContextType | undefined>(
   undefined,
 );
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdminProfile = () => {
   const context = useContext(AdminProfileContext);
   if (!context) {
@@ -104,6 +125,26 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
               : 0,
           happyClients:
             typeof data.happyClients === "number" ? data.happyClients : 0,
+          theme: data.theme || {
+            primary: "#4F46E5",
+            secondary: "#9333EA",
+            headingH1: "#111827",
+            headingH2: "#1F2937",
+            textBody: "#374151",
+            primaryHover: "#4338CA",
+            accent: "#10B981",
+            buttonBg: "#4F46E5",
+            buttonText: "#FFFFFF",
+            buttonHoverBg: "#4338CA",
+            cardBg: "#FFFFFF",
+            cardBorder: "#E5E7EB",
+            sidebarBg: "#FFFFFF",
+            sidebarText: "#374151",
+            sidebarActiveBg: "#E0E7FF",
+            sidebarActiveText: "#4F46E5",
+            sidebarHoverBg: "#F3F4F6",
+            sidebarHoverText: "#4F46E5",
+          },
         };
         setAdminProfile(profile);
         return profile;
@@ -132,6 +173,26 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
             typeof (data as any).happyClients === "number"
               ? (data as any).happyClients
               : 0,
+          theme: (data as any).theme || {
+            primary: "#4F46E5",
+            secondary: "#9333EA",
+            headingH1: "#111827",
+            headingH2: "#1F2937",
+            textBody: "#374151",
+            primaryHover: "#4338CA",
+            accent: "#10B981",
+            buttonBg: "#4F46E5",
+            buttonText: "#FFFFFF",
+            buttonHoverBg: "#4338CA",
+            cardBg: "#FFFFFF",
+            cardBorder: "#E5E7EB",
+            sidebarBg: "#FFFFFF",
+            sidebarText: "#374151",
+            sidebarActiveBg: "#E0E7FF",
+            sidebarActiveText: "#4F46E5",
+            sidebarHoverBg: "#F3F4F6",
+            sidebarHoverText: "#4F46E5",
+          },
         });
         return data;
       }
@@ -204,6 +265,14 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
               typeof (updatedProfile as any).happyClients === "number"
                 ? (updatedProfile as any).happyClients
                 : prev.happyClients || 0,
+            theme: (updatedProfile as any).theme ||
+              prev.theme || {
+                primary: "#4F46E5",
+                secondary: "#9333EA",
+                headingH1: "#111827",
+                headingH2: "#1F2937",
+                textBody: "#374151",
+              },
           };
 
           console.log("Merged profile:", mergedProfile);

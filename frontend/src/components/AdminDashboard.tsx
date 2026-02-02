@@ -14,6 +14,7 @@ import {
   Briefcase,
   FolderKanban,
   User as UserIcon,
+  Palette,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -23,6 +24,7 @@ import ContactManager from "./admin/ContactManager";
 import AnalyticsManager from "./admin/AnalyticsManager";
 import AdminSettings from "../pages/AdminSettings";
 import ClientsManager from "./admin/ClientsManager";
+import ThemeManager from "./admin/ThemeManager";
 import { toast } from "react-hot-toast";
 
 interface User {
@@ -162,6 +164,7 @@ const AdminDashboard: React.FC = () => {
     else if (path.includes("/settings")) setActiveTab("settings");
     else if (path.includes("/users")) setActiveTab("users");
     else if (path.includes("/clients")) setActiveTab("clients");
+    else if (path.includes("/theme")) setActiveTab("theme");
     else setActiveTab("");
   }, [location.pathname]);
 
@@ -329,7 +332,7 @@ const AdminDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div
-            className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)] ${
+            className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static sidebar-bg border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)] ${
               isSidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
           >
@@ -368,6 +371,11 @@ const AdminDashboard: React.FC = () => {
                     tab: "clients",
                   },
                   {
+                    label: t("admin.tabs.theme"),
+                    icon: <Palette className="w-5 h-5" />,
+                    tab: "theme",
+                  },
+                  {
                     label: t("admin.tabs.analytics"),
                     icon: <BarChart3 className="w-5 h-5" />,
                     tab: "analytics",
@@ -386,21 +394,11 @@ const AdminDashboard: React.FC = () => {
                   <button
                     key={tab}
                     onClick={() => handleTabClick(tab)}
-                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-                      activeTab === tab
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-blue-600 dark:hover:text-blue-400"
+                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 sidebar-text sidebar-hover ${
+                      activeTab === tab ? "sidebar-active" : ""
                     }`}
                   >
-                    <span
-                      className={`mr-3 ${
-                        activeTab === tab
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-                      }`}
-                    >
-                      {icon}
-                    </span>
+                    <span className={`mr-3`}>{icon}</span>
                     {label}
                   </button>
                 ))}
@@ -410,7 +408,7 @@ const AdminDashboard: React.FC = () => {
               <div className="p-4 border-t border-gray-200 dark:border-gray-800">
                 <button
                   onClick={handleLogout}
-                  className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
+                  className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 sidebar-hover"
                 >
                   <LogOut className="w-5 h-5 mr-3" />
                   {t("admin.logout")}
@@ -440,6 +438,7 @@ const AdminDashboard: React.FC = () => {
               {activeTab === "messages" && <ContactManager />}
               {activeTab === "settings" && <AdminSettings />}
               {activeTab === "clients" && <ClientsManager />}
+              {activeTab === "theme" && <ThemeManager />}
               {activeTab === "users" && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                   <div className="flex justify-between items-center mb-6">

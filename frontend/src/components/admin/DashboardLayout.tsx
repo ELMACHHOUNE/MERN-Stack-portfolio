@@ -39,6 +39,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       icon: "🤝",
     },
     {
+      path: "/admin/theme",
+      label: t("admin.tabs.theme"),
+      icon: "🎨",
+    },
+    {
       path: "/admin/about",
       label: t("dashboardLayout.menu.about"),
       icon: "👤",

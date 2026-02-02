@@ -16,6 +16,25 @@
     --color-primary-800: 7 89 133;
     --color-primary-900: 12 74 110;
     --color-primary-950: 8 47 73;
+    /* Theme custom properties */
+    --brand-primary: #4f46e5;
+    --brand-secondary: #9333ea;
+    --brand-primary-hover: #4338ca;
+    --brand-accent: #10b981;
+    --heading-h1: #111827;
+    --heading-h2: #1f2937;
+    --text-body: #374151;
+    --button-bg: #4f46e5;
+    --button-text: #ffffff;
+    --button-hover-bg: #4338ca;
+    --card-bg: #ffffff;
+    --card-border: #e5e7eb;
+    --bg-sidebar: #ffffff;
+    --sidebar-text: #374151;
+    --sidebar-active-bg: #e0e7ff;
+    --sidebar-active-text: #4f46e5;
+    --sidebar-hover-bg: #f3f4f6;
+    --sidebar-hover-text: #4f46e5;
   }
 
   .dark {
@@ -30,6 +49,25 @@
     --color-primary-800: 7 89 133;
     --color-primary-900: 12 74 110;
     --color-primary-950: 8 47 73;
+    /* Theme custom properties for dark mode (can be customized separately if desired) */
+    --brand-primary: #4f46e5;
+    --brand-secondary: #9333ea;
+    --brand-primary-hover: #4338ca;
+    --brand-accent: #10b981;
+    --heading-h1: #ffffff;
+    --heading-h2: #e5e7eb;
+    --text-body: #9ca3af;
+    --button-bg: #4f46e5;
+    --button-text: #ffffff;
+    --button-hover-bg: #4338ca;
+    --card-bg: #232b3b;
+    --card-border: #374151;
+    --bg-sidebar: #0b1121;
+    --sidebar-text: #e5e7eb;
+    --sidebar-active-bg: #1b2333;
+    --sidebar-active-text: #4f46e5;
+    --sidebar-hover-bg: #1b2333;
+    --sidebar-hover-text: #4f46e5;
   }
 }
 
@@ -92,6 +130,58 @@
 }
 
 @layer utilities {
+  /* Heading color utilities using theme variables */
+  .text-heading-1 {
+    color: var(--heading-h1);
+  }
+  .text-heading-2 {
+    color: var(--heading-h2);
+  }
+  .text-body-var {
+    color: var(--text-body);
+  }
+  /* Brand text utility */
+  .text-brand {
+    color: var(--brand-primary);
+  }
+  .hover-text-brand:hover {
+    color: var(--brand-primary);
+  }
+  /* Support group-hover for brand text */
+  .group:hover .group-hover\:text-brand {
+    color: var(--brand-primary);
+  }
+  /* Brand gradient utility */
+  .brand-gradient {
+    background-image: linear-gradient(
+      to right,
+      var(--brand-primary),
+      var(--brand-secondary)
+    );
+  }
+  /* Sidebar utilities */
+  .sidebar-bg {
+    background-color: var(--bg-sidebar);
+  }
+  .sidebar-text {
+    color: var(--sidebar-text);
+  }
+  .sidebar-active {
+    background-color: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+  }
+  .sidebar-hover:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-hover-text);
+  }
+  /* Button utility using theme variables */
+  .btn-brand {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+  }
+  .btn-brand:hover {
+    background-color: var(--button-hover-bg);
+  }
   .text-balance {
     text-wrap: balance;
   }

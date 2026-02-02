@@ -32,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [profileImageKey, setProfileImageKey] = useState(Date.now());
+  const [profileImageKey, setProfileImageKey] = useState<number>(0);
   const location = useLocation();
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -51,29 +51,24 @@ const Navbar: React.FC<NavbarProps> = ({
 
   // Listen for profile image updates
   useEffect(() => {
-    const handleProfileImageUpdate = (event: CustomEvent) => {
-      if (event.detail?.profileImage) {
-        setProfileImageKey(event.detail.timestamp || Date.now());
+    const handleProfileImageUpdate = (event: Event) => {
+      const custom = event as CustomEvent;
+      if ((custom.detail as any)?.profileImage) {
+        setProfileImageKey((custom.detail as any).timestamp || Date.now());
       }
     };
 
-    window.addEventListener(
-      "profileImageUpdated",
-      handleProfileImageUpdate as EventListener,
-    );
+    window.addEventListener("profileImageUpdated", handleProfileImageUpdate);
 
     return () => {
       window.removeEventListener(
         "profileImageUpdated",
-        handleProfileImageUpdate as EventListener,
+        handleProfileImageUpdate,
       );
     };
   }, []);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+  // Mobile menu is closed via nav item clicks; no global route-change effect needed
 
   const navItems = [
     { path: "/", label: t("navbar.menu.home"), icon: Home },
@@ -143,8 +138,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   to={item.path}
                   className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     isActive(item.path)
-                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary hover:text-blue-600 dark:hover:text-blue-400"
+                      ? "sidebar-active text-brand"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary hover-text-brand"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -155,7 +150,7 @@ const Navbar: React.FC<NavbarProps> = ({
             {user?.isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg text-light-text-secondary hover:bg-light-bg-tertiary hover:text-blue-600 transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary light:hover:text-blue-600"
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg text-light-text-secondary hover:bg-light-bg-tertiary transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary hover-text-brand"
               >
                 <LayoutDashboard className="h-5 w-5" />
                 <span>{t("navbar.menu.dashboard")}</span>
@@ -201,7 +196,7 @@ const Navbar: React.FC<NavbarProps> = ({
                         alt={user.name}
                       />
                     ) : (
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
+                      <div className="h-9 w-9 rounded-full brand-gradient flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
                         <User className="h-5 w-5 text-white" />
                       </div>
                     )}
@@ -229,7 +224,7 @@ const Navbar: React.FC<NavbarProps> = ({
                             className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200 group"
                             onClick={() => setIsProfileMenuOpen(false)}
                           >
-                            <Settings className="h-5 w-5 mr-3 text-gray-400 group-hover:text-blue-500 dark:text-gray-400 dark:group-hover:text-blue-400" />
+                            <Settings className="h-5 w-5 mr-3 text-gray-400 group-hover:text-brand dark:text-gray-400 group-hover:text-brand" />
                             <div>
                               <p className="font-medium">
                                 {t("navbar.profile.settings")}
@@ -265,7 +260,7 @@ const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <Link
                 to="/login"
-                className="text-sm font-medium text-light-text-secondary hover:text-blue-600 transition-all duration-200 dark:text-dark-text-secondary dark:hover:text-blue-600 light:text-light-text-secondary light:hover:text-blue-600"
+                className="text-sm font-medium text-light-text-secondary hover-text-brand transition-all duration-200 dark:text-dark-text-secondary"
               >
                 {t("navbar.auth.login")}
               </Link>
@@ -325,8 +320,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   to={item.path}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-colors ${
                     isActive(item.path)
-                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary hover:text-blue-600 dark:hover:text-blue-400"
+                      ? "sidebar-active text-brand"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary hover-text-brand"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -337,7 +332,7 @@ const Navbar: React.FC<NavbarProps> = ({
               {user?.isAdmin && (
                 <Link
                   to="/admin"
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary hover:text-blue-600 transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary light:hover:text-blue-600"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary hover-text-brand"
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="w-5 h-5" />
@@ -359,7 +354,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       setIsOpen(false);
                       handleLogout();
                     }}
-                    className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary hover:text-blue-600 transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary light:hover:text-blue-600"
+                    className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary hover-text-brand"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>{t("navbar.profile.signOut")}</span>
@@ -368,7 +363,7 @@ const Navbar: React.FC<NavbarProps> = ({
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary hover:text-blue-600 transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary light:hover:text-blue-600"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-light-text-secondary hover:bg-light-bg-tertiary transition-colors dark:text-dark-text-secondary dark:hover:bg-dark-bg-tertiary light:text-light-text-secondary light:hover:bg-light-bg-tertiary hover-text-brand"
                   onClick={() => setIsOpen(false)}
                 >
                   <span>{t("navbar.auth.login")}</span>
