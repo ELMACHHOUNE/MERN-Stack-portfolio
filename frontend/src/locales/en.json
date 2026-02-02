@@ -215,7 +215,8 @@
         "iconUrl": "Icon URL",
         "uploadIcon": "Upload Icon",
         "iconUrlPlaceholder": "Enter icon URL (e.g., https://example.com/icon.png)",
-        "iconPreview": "Icon Preview"
+        "iconPreview": "Icon Preview",
+        "clients": "Clients"
       }
     },
     "validation": {
@@ -509,6 +510,7 @@
         "beginner": "Beginner"
       }
     },
+    "clients": "Clients",
     "defaultProfile": {
       "name": "Your Name",
       "title": "Subtitle",

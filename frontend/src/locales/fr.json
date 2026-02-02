@@ -558,6 +558,7 @@
     "portfolio": "Portfolio"
   },
   "home": {
+    "clients": "Clients",
     "defaultProfile": {
       "name": "Votre Nom",
       "title": "Sous-titre",

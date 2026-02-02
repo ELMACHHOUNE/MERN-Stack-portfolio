@@ -617,7 +617,7 @@ const Home: React.FC = () => {
                 >
                   <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-                      Clients
+                      {t("home.clients")}
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-center">
                       {data.clients.map((client) => {
