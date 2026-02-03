@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Code,
@@ -76,7 +76,7 @@ const Skills: React.FC = () => {
     trackPageView("/skills");
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await api.get("/categories");
 
@@ -95,9 +95,9 @@ const Skills: React.FC = () => {
         err instanceof Error ? err.message : "Failed to fetch categories";
       toast.error(errorMessage);
     }
-  };
+  }, []);
 
-  const fetchSkills = async () => {
+  const fetchSkills = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -129,16 +129,16 @@ const Skills: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCategories();
     fetchSkills();
-  }, []);
+  }, [fetchCategories, fetchSkills]);
 
   const getSkillsByCategory = (categoryId: string) => {
     return skills.filter(
-      (skill) => skill.category && skill.category._id === categoryId
+      (skill) => skill.category && skill.category._id === categoryId,
     );
   };
 
@@ -171,35 +171,37 @@ const Skills: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0B1121] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 dark:border-blue-400"></div>
-        <span className="ml-4 text-gray-600 dark:text-gray-400">
-          {t("skills.loading")}
-        </span>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+          style={{
+            borderTopColor: "var(--brand-primary)",
+            borderBottomColor: "var(--brand-secondary)",
+          }}
+        ></div>
+        <span className="ml-4 text-body-var">{t("skills.loading")}</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0B1121] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 dark:text-red-400 mb-4">
-            {t("skills.error")}
-          </p>
+          <p className="text-red-600 mb-4">{t("skills.error")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0B1121] py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent brand-gradient mb-4">
             {t("skills.title")}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-body-var max-w-2xl mx-auto">
             {t("skills.description")}
           </p>
         </div>
@@ -220,9 +222,9 @@ const Skills: React.FC = () => {
                   transition={{ duration: 0.5 }}
                   className="group"
                 >
-                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-2xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                  <div className="card card-hover">
                     <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 rounded-xl border border-gray-200 dark:border-gray-800 group-hover:border-gray-300 dark:group-hover:border-gray-700 transition-colors">
+                      <div className="p-3 rounded-xl border border-gray-200 group-hover:border-gray-300 transition-colors">
                         {category.icon ? (
                           <img
                             src={getImageUrl(category.icon)}
@@ -236,32 +238,21 @@ const Skills: React.FC = () => {
                                 `${window.location.origin}/placeholder-image.jpg`
                               ) {
                                 target.src = "/placeholder-image.jpg";
-                                target.style.display = "none";
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  const fallbackIcon =
-                                    document.createElement("div");
-                                  fallbackIcon.className =
-                                    "w-8 h-8 text-blue-600 group-hover:text-purple-600 dark:text-[#4F46E5] dark:group-hover:text-[#9333EA] transition-colors";
-                                  const icon = getDefaultIcon(category.name);
-                                  if (React.isValidElement(icon)) {
-                                    parent.appendChild(fallbackIcon);
-                                  }
-                                }
+                                // Fallback to default icon style
                               }
                             }}
                           />
                         ) : (
-                          <div className="w-8 h-8 text-blue-600 group-hover:text-purple-600 dark:text-[#4F46E5] dark:group-hover:text-[#9333EA] transition-colors">
+                          <div className="w-8 h-8 text-brand transition-colors">
                             {getDefaultIcon(category.name)}
                           </div>
                         )}
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-[#4F46E5] transition-colors">
+                        <h3 className="text-2xl font-bold text-heading-1 group-hover:text-brand transition-colors">
                           {category.name}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                        <p className="text-body-var text-sm mt-1">
                           {category.description}
                         </p>
                       </div>
@@ -291,54 +282,36 @@ const Skills: React.FC = () => {
                                         `${window.location.origin}/placeholder-image.jpg`
                                       ) {
                                         target.src = "/placeholder-image.jpg";
-                                        target.style.display = "none";
-                                        const parent = target.parentElement;
-                                        if (parent) {
-                                          const fallbackIcon =
-                                            document.createElement("div");
-                                          fallbackIcon.className =
-                                            "w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400";
-                                          const categoryName =
-                                            skill.category?.name || "";
-                                          const icon =
-                                            getDefaultIcon(categoryName);
-                                          if (React.isValidElement(icon)) {
-                                            parent.appendChild(fallbackIcon);
-                                            // Render the icon into the fallback div
-                                            const iconContainer =
-                                              document.createElement("div");
-                                            iconContainer.className = "w-8 h-8";
-                                            fallbackIcon.appendChild(
-                                              iconContainer
-                                            );
-                                          }
-                                        }
+                                        // Fallback handled by placeholder image
                                       }
                                     }}
                                   />
                                 ) : (
-                                  <div className="text-gray-500 dark:text-gray-400">
+                                  <div className="text-body-var">
                                     {getDefaultIcon(skill.category?.name || "")}
                                   </div>
                                 )}
                               </div>
                               <div className="flex-grow">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                  <span className="text-sm font-medium text-body-var">
                                     {skill.name}
                                   </span>
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  <span className="text-xs text-body-var">
                                     {skill.level * 10}%
                                   </span>
                                 </div>
-                                <div className="mt-1 h-2 relative bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="mt-1 h-2 relative bg-gray-200 rounded-full overflow-hidden">
                                   <motion.div
-                                    className="absolute top-0 left-0 h-full bg-blue-500 dark:bg-blue-400"
+                                    className="absolute top-0 left-0 h-full"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${skill.level * 10}%` }}
                                     transition={{
                                       duration: 1,
                                       ease: "easeOut",
+                                    }}
+                                    style={{
+                                      background: "var(--brand-primary)",
                                     }}
                                   />
                                 </div>
@@ -354,9 +327,9 @@ const Skills: React.FC = () => {
         </div>
 
         {categories.filter((category) => category.isActive).length === 0 && (
-          <div className="text-center text-gray-600 dark:text-gray-400 mt-16">
-            <div className="mx-auto w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 flex items-center justify-center">
-              <Code className="w-10 h-10 text-blue-600 dark:text-[#4F46E5]" />
+          <div className="text-center text-body-var mt-16">
+            <div className="mx-auto w-20 h-20 mb-6 rounded-2xl border border-gray-200 flex items-center justify-center">
+              <Code className="w-10 h-10 text-brand" />
             </div>
             <p className="text-lg">{t("skills.noSkills")}</p>
           </div>

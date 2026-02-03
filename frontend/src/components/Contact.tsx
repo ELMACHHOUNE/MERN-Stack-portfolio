@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import debounce from "lodash/debounce";
 import { useLanguage } from "../context/LanguageContext";
 import { trackContactSubmission } from "../services/analytics";
+import { api } from "../utils/api";
 
 interface FormData {
   name: string;
@@ -56,18 +56,9 @@ const Contact: React.FC = () => {
     setStatus({ type: null, message: "" });
 
     try {
-      const response = await fetch("http://localhost:3000/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || t("contact.errors.sendFailed"));
+      const response = await api.post("/contact", formData);
+      if (response.error) {
+        throw new Error(response.error || t("contact.errors.sendFailed"));
       }
 
       // Track the contact submission
@@ -91,10 +82,7 @@ const Contact: React.FC = () => {
     }
   };
 
-  const debouncedSubmit = useCallback(debounce(handleSubmit, 300), [
-    formData,
-    t,
-  ]);
+  // Submit directly without debounce to avoid stale state and hook warnings
 
   return (
     <section id="contact" className="py-20 bg-white">
@@ -119,7 +107,7 @@ const Contact: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="max-w-xl mx-auto"
         >
-          <form onSubmit={debouncedSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="label">
                 {t("contact.name")}

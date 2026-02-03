@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLanguage } from "../context/LanguageContext";
@@ -58,7 +58,7 @@ const Projects: React.FC = () => {
     [],
   );
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -88,9 +88,9 @@ const Projects: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response =
         await api.get<{ _id: string; name: string }[]>("/categories");
@@ -110,13 +110,13 @@ const Projects: React.FC = () => {
       setError(errorMessage);
       toast.error(errorMessage);
     }
-  };
+  }, [t]);
 
   // Fetch projects on mount and when language changes
   useEffect(() => {
     fetchProjects();
     fetchCategories();
-  }, [language]);
+  }, [language, fetchProjects, fetchCategories]);
 
   // Reset filters when language changes
   useEffect(() => {
@@ -275,12 +275,16 @@ const Projects: React.FC = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-white dark:bg-[#0B1121]">
+      <section className="py-24 bg-white">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          <span className="ml-4 text-gray-600 dark:text-gray-400">
-            {t("projects.loading")}
-          </span>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+            style={{
+              borderTopColor: "var(--brand-primary)",
+              borderBottomColor: "var(--brand-secondary)",
+            }}
+          ></div>
+          <span className="ml-4 text-body-var">{t("projects.loading")}</span>
         </div>
       </section>
     );
@@ -288,8 +292,8 @@ const Projects: React.FC = () => {
 
   if (error) {
     return (
-      <section className="py-24 bg-white dark:bg-[#0B1121]">
-        <div className="text-center text-red-600 dark:text-red-400">
+      <section className="py-24 bg-white">
+        <div className="text-center text-red-600">
           <p>{t("projects.error")}</p>
         </div>
       </section>
@@ -300,7 +304,7 @@ const Projects: React.FC = () => {
     <section
       ref={sectionRef}
       id="projects"
-      className="min-h-screen bg-white dark:bg-[#0B1121] py-16 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-white py-16 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -333,7 +337,7 @@ const Projects: React.FC = () => {
                 showFilters: !prev.showFilters,
               }))
             }
-            className="flex items-center justify-center px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1B2333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 gap-2"
+            className="flex items-center justify-center px-4 py-3 rounded-xl bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 transition-all duration-300 gap-2"
           >
             <Filter className="w-5 h-5" />
             {t("projects.filter")}
@@ -342,14 +346,14 @@ const Projects: React.FC = () => {
 
         {/* Filter Panel */}
         {filters.showFilters && (
-          <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300">
+          <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200 hover:border-gray-300 transition-all duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-heading-1">
                 {t("projects.filter")}
               </h3>
               <button
                 onClick={resetFilters}
-                className="p-2 rounded-lg text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all duration-300"
+                className="p-2 rounded-lg text-body-var hover:text-heading-1 hover:bg-gray-100 transition-all duration-300"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -357,7 +361,7 @@ const Projects: React.FC = () => {
 
             {/* Categories */}
             <div>
-              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+              <h4 className="text-sm font-medium text-body-var mb-3">
                 {t("projects.categories.category")}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -367,7 +371,7 @@ const Projects: React.FC = () => {
 
             {/* Technologies */}
             <div>
-              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+              <h4 className="text-sm font-medium text-body-var mb-3">
                 {t("projects.technologies")}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -389,7 +393,7 @@ const Projects: React.FC = () => {
 
             {/* Sort Options */}
             <div>
-              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+              <h4 className="text-sm font-medium text-body-var mb-3">
                 {t("projects.sortBy")}
               </h4>
               <div className="flex gap-2">
@@ -407,8 +411,8 @@ const Projects: React.FC = () => {
                     }
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                       filters.sortBy === option.value
-                        ? "bg-gradient-to-r from-green-600 to-emerald-600 dark:from-[#059669] dark:to-[#047857] text-white"
-                        : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                        ? "brand-gradient text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     {option.label}
@@ -450,7 +454,7 @@ const Projects: React.FC = () => {
               </span>
             ))}
             {filters.searchTerm && (
-              <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-600 to-amber-600 dark:from-[#D97706] dark:to-[#B45309] text-white rounded-xl text-sm flex items-center gap-2">
+              <span className="px-3 py-1.5 brand-gradient text-white rounded-xl text-sm flex items-center gap-2">
                 {t("projects.searchResult")}: {filters.searchTerm}
                 <button
                   onClick={() =>
@@ -553,12 +557,10 @@ const Projects: React.FC = () => {
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-16">
-            <div className="mx-auto w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 flex items-center justify-center">
-              <Code2 className="w-10 h-10 text-blue-600 dark:text-[#4F46E5]" />
+            <div className="mx-auto w-20 h-20 mb-6 rounded-2xl border border-gray-200 flex items-center justify-center">
+              <Code2 className="w-10 h-10 text-brand" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              {t("projects.noProjects")}
-            </p>
+            <p className="text-body-var text-lg">{t("projects.noProjects")}</p>
           </div>
         )}
       </div>
