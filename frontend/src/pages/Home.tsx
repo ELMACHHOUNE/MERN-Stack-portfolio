@@ -371,7 +371,7 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-[#0B1121]">
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+      <section className="relative pt-16 min-h-[calc(100vh-0px)] flex items-center overflow-hidden">
         <motion.div
           style={{ opacity, y }}
           className="absolute inset-0 bg-gradient-to-br from-blue-50/60 to-purple-50/60 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10"
