@@ -20,12 +20,12 @@ import {
 
 interface NavbarProps {
   isAdmin?: boolean;
-  onSidebarToggle?: () => void;
+  onAdminMenuToggle?: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
   isAdmin = false,
-  onSidebarToggle,
+  onAdminMenuToggle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -106,15 +106,16 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="flex justify-between items-center h-16">
           {/* Left side */}
           <div className="flex items-center">
-            {isAdmin && (
+            {isAdmin ? (
+              // Mobile-only admin sidebar toggle button, top-left
               <button
-                onClick={onSidebarToggle}
-                className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                onClick={onAdminMenuToggle}
+                className="md:hidden inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-200 bg-white shadow-sm text-sm hover:bg-gray-50"
+                aria-label="Toggle admin sidebar"
               >
-                <LayoutDashboard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <Menu className="w-5 h-5" />
               </button>
-            )}
-            {!isAdmin && (
+            ) : (
               <Link
                 to="/"
                 className="flex items-center space-x-2 text-xl font-bold text-light-text-primary dark:text-dark-text-primary"

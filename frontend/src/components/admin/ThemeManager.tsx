@@ -52,7 +52,19 @@ const ThemeManager: React.FC = () => {
           Theme Settings
         </h2>
         {isLoading ? (
-          <p className="text-gray-600">Loading...</p>
+          <div className="card flex items-center gap-3 p-4">
+            <span
+              className="inline-block h-5 w-5 rounded-full animate-spin"
+              aria-hidden="true"
+              style={{
+                borderWidth: 2,
+                borderStyle: "solid",
+                borderColor: "var(--brand-primary)",
+                borderTopColor: "transparent",
+              }}
+            />
+            <span className="text-body-var">Loading theme…</span>
+          </div>
         ) : (
           <div>
             <label className="label">Theme Preset</label>

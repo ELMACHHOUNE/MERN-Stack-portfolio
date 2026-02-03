@@ -137,7 +137,8 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // mobile slide-in/out
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // desktop collapsed (icons-only)
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
     if (path.includes("/skills")) return "skills";
@@ -149,7 +150,8 @@ const AdminDashboard: React.FC = () => {
     if (path.includes("/settings")) return "settings";
     if (path.includes("/users")) return "users";
     if (path.includes("/clients")) return "clients";
-    return "";
+    // Default to skills on base /admin for immediate content on mobile
+    return "skills";
   });
 
   // Keep active tab synced with location changes
@@ -165,7 +167,7 @@ const AdminDashboard: React.FC = () => {
     else if (path.includes("/users")) setActiveTab("users");
     else if (path.includes("/clients")) setActiveTab("clients");
     else if (path.includes("/theme")) setActiveTab("theme");
-    else setActiveTab("");
+    else setActiveTab("skills");
   }, [location.pathname]);
 
   // Fetch users list (stable across renders)
@@ -283,13 +285,20 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    // On desktop, toggle collapsed (icons-only vs expanded). On mobile, toggle open/closed.
+    if (window.innerWidth >= 1024) {
+      setIsSidebarCollapsed((prev) => !prev);
+      // Ensure sidebar is shown on desktop even if previously closed
+      setIsSidebarOpen(true);
+    } else {
+      setIsSidebarOpen((prev) => !prev);
+    }
   };
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
-        // For large screens, always show sidebar
+        // For large screens, show sidebar (expanded/collapsed controlled separately)
         setIsSidebarOpen(true);
       } else {
         // For small screens, hide sidebar by default
@@ -317,10 +326,13 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0B1121]">
-      <Navbar isAdmin onSidebarToggle={handleSidebarToggle} />
+      <Navbar
+        isAdmin
+        onAdminMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
+      />
 
       <div className="flex pt-16">
-        {/* Sidebar with overlay on mobile */}
+        {/* Sidebar with overlay on mobile and collapse on desktop */}
         <>
           {/* Backdrop overlay for mobile - only shown when sidebar is open */}
           {isSidebarOpen && (
@@ -332,11 +344,31 @@ const AdminDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div
-            className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static sidebar-bg border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)] ${
-              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+            className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out sidebar-bg border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)]
+              ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+              lg:translate-x-0 lg:static
+              ${isSidebarCollapsed ? "lg:w-20" : "lg:w-64"}
+              w-64`}
           >
             <div className="flex flex-col h-full">
+              {/* Sidebar Header with internal toggle */}
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                {!isSidebarCollapsed && (
+                  <span className="font-semibold">Admin</span>
+                )}
+                <button
+                  onClick={handleSidebarToggle}
+                  className="p-2 rounded-lg hover:bg-light-bg-tertiary transition-colors"
+                  title={
+                    isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+                  }
+                >
+                  {/* Simple icon representation using text; could be replaced with chevrons */}
+                  <span className="w-5 h-5 inline-block">
+                    {isSidebarCollapsed ? "→" : "←"}
+                  </span>
+                </button>
+              </div>
               {/* Navigation Links */}
               <nav className="flex-1 px-4 py-4 space-y-1">
                 {[
@@ -398,8 +430,12 @@ const AdminDashboard: React.FC = () => {
                       activeTab === tab ? "sidebar-active" : ""
                     }`}
                   >
-                    <span className={`mr-3`}>{icon}</span>
-                    {label}
+                    <span className="mr-3 flex items-center justify-center w-5 h-5">
+                      {icon}
+                    </span>
+                    {!isSidebarCollapsed && (
+                      <span className="truncate">{label}</span>
+                    )}
                   </button>
                 ))}
               </nav>
@@ -411,7 +447,7 @@ const AdminDashboard: React.FC = () => {
                   className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 sidebar-hover"
                 >
                   <LogOut className="w-5 h-5 mr-3" />
-                  {t("admin.logout")}
+                  {!isSidebarCollapsed && t("admin.logout")}
                 </button>
               </div>
             </div>
@@ -420,8 +456,11 @@ const AdminDashboard: React.FC = () => {
 
         {/* Main Content with extra padding on mobile when sidebar is open */}
         <div
-          className={`flex-1 lg:ml-64 p-6 ${isSidebarOpen ? "md:ml-64" : ""}`}
+          className={`flex-1 p-6 ${isSidebarOpen ? "md:ml-64" : ""} ${
+            isSidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
+          }`}
         >
+          {/* Mobile header toggle moved into Navbar */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
