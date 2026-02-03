@@ -26,7 +26,7 @@ const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -97,7 +97,7 @@ const Contact: React.FC = () => {
   ]);
 
   return (
-    <section id="contact" className="py-20 bg-gray-900">
+    <section id="contact" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -105,10 +105,10 @@ const Contact: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-heading-1 mb-4">
             {t("contact.title")}
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-body-var max-w-2xl mx-auto">
             {t("contact.description")}
           </p>
         </motion.div>
@@ -121,10 +121,7 @@ const Contact: React.FC = () => {
         >
           <form onSubmit={debouncedSubmit} className="space-y-6">
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-300"
-              >
+              <label htmlFor="name" className="label">
                 {t("contact.name")}
               </label>
               <input
@@ -133,16 +130,13 @@ const Contact: React.FC = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="input"
                 placeholder={t("contact.namePlaceholder")}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-300"
-              >
+              <label htmlFor="email" className="label">
                 {t("contact.email")}
               </label>
               <input
@@ -151,16 +145,13 @@ const Contact: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="input"
                 placeholder={t("contact.emailPlaceholder")}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="subject"
-                className="block text-sm font-medium text-gray-300"
-              >
+              <label htmlFor="subject" className="label">
                 {t("contact.subject")}
               </label>
               <input
@@ -169,16 +160,13 @@ const Contact: React.FC = () => {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="input"
                 placeholder={t("contact.subjectPlaceholder")}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-medium text-gray-300"
-              >
+              <label htmlFor="message" className="label">
                 {t("contact.message")}
               </label>
               <textarea
@@ -187,7 +175,7 @@ const Contact: React.FC = () => {
                 value={formData.message}
                 onChange={handleChange}
                 rows={4}
-                className="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="input"
                 placeholder={t("contact.messagePlaceholder")}
               />
             </div>
@@ -197,7 +185,7 @@ const Contact: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+              className={`w-full flex justify-center py-3 px-4 rounded-md shadow-sm text-sm font-medium btn-brand ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -211,8 +199,8 @@ const Contact: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`mt-4 p-4 rounded-md ${
                 status.type === "success"
-                  ? "bg-green-900/50 text-green-300"
-                  : "bg-red-900/50 text-red-300"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
               }`}
             >
               {status.message}

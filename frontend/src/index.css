@@ -35,6 +35,11 @@
     --sidebar-active-text: #4f46e5;
     --sidebar-hover-bg: #f3f4f6;
     --sidebar-hover-text: #4f46e5;
+    /* Font family */
+    --font-sans:
+      "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+      Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji",
+      "Segoe UI Emoji";
   }
 
   .dark {
@@ -69,6 +74,12 @@
     --sidebar-hover-bg: #1b2333;
     --sidebar-hover-text: #4f46e5;
   }
+}
+
+/* Global font family */
+html,
+body {
+  font-family: var(--font-sans);
 }
 
 @layer components {

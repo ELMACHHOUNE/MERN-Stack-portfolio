@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { API_URL } from "../utils/api";
 import {
@@ -15,8 +14,6 @@ import {
   Mail,
   LayoutDashboard,
   LogOut,
-  Sun,
-  Moon,
   Settings,
   Globe,
 } from "lucide-react";
@@ -35,7 +32,6 @@ const Navbar: React.FC<NavbarProps> = ({
   const [profileImageKey, setProfileImageKey] = useState<number>(0);
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
   const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -165,17 +161,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 {language.toUpperCase()}
               </span>
             </button>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary text-light-text-secondary dark:text-dark-text-secondary transition-colors"
-              aria-label={t("navbar.theme.toggle")}
-            >
-              {isDarkMode ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </button>
+            {/* Theme toggle removed for light-only mode */}
             {user ? (
               <div className="flex items-center">
                 <div className="relative">
@@ -278,16 +264,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 {language.toUpperCase()}
               </span>
             </button>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary text-light-text-secondary dark:text-dark-text-secondary transition-colors"
-            >
-              {isDarkMode ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </button>
+            {/* Theme toggle removed for light-only mode (mobile) */}
             {/* Navigation toggle button */}
             <button
               onClick={() => setIsOpen(!isOpen)}

@@ -1,11 +1,9 @@
 import React from "react";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useAdminProfile } from "../context/AdminProfileContext";
 import { Github, Linkedin, Twitter } from "lucide-react";
 
 const Footer: React.FC = () => {
-  const { isDarkMode } = useTheme();
   const { t } = useLanguage();
   const { adminProfile } = useAdminProfile();
 
@@ -28,11 +26,11 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className={`py-8 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+    <footer className="py-8 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-center md:text-left mb-4 md:mb-0">
-            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+            <p className="text-gray-600">
               &copy; {new Date().getFullYear()}{" "}
               {adminProfile?.name || "Your Name"}. {t("footer.copyright")}
             </p>
@@ -45,16 +43,12 @@ const Footer: React.FC = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-white"
-                      : "text-gray-600 hover:text-gray-900"
-                  } transition-colors duration-300`}
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-300"
                   aria-label={link.label}
                 >
                   {link.icon}
                 </a>
-              ) : null
+              ) : null,
             )}
           </div>
         </div>

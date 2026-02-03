@@ -192,35 +192,12 @@ router.put("/admin-profile", protect, admin, async (req, res) => {
       }
     }
     if (theme && typeof theme === "object") {
-      const sanitizeHex = (val) =>
-        typeof val === "string" && /^#([0-9A-Fa-f]{3}){1,2}$/.test(val)
-          ? val
-          : undefined;
-      const defaults = {
-        primary: "#4F46E5",
-        secondary: "#9333EA",
-        headingH1: "#111827",
-        headingH2: "#1F2937",
-        textBody: "#374151",
-        primaryHover: "#4338CA",
-        accent: "#10B981",
-        buttonBg: "#4F46E5",
-        buttonText: "#FFFFFF",
-        buttonHoverBg: "#4338CA",
-        cardBg: "#FFFFFF",
-        cardBorder: "#E5E7EB",
-        sidebarBg: "#FFFFFF",
-        sidebarText: "#374151",
-        sidebarActiveBg: "#E0E7FF",
-        sidebarActiveText: "#4F46E5",
-        sidebarHoverBg: "#F3F4F6",
-        sidebarHoverText: "#4F46E5",
-      };
+      const allowedPresets = ["girls", "boys", "professional", "custom"];
       const nextTheme = { ...(user.theme || {}) };
-      for (const key of Object.keys(defaults)) {
-        const val = sanitizeHex(theme[key]);
-        nextTheme[key] = val ?? nextTheme[key] ?? defaults[key];
-      }
+      const p = theme.preset;
+      nextTheme.preset = allowedPresets.includes(p)
+        ? p
+        : nextTheme.preset || "professional";
       user.theme = nextTheme;
     }
 
@@ -262,6 +239,7 @@ router.get("/public-profile", async (req, res) => {
       happyClients:
         typeof adminUser.happyClients === "number" ? adminUser.happyClients : 0,
       theme: adminUser.theme || {
+        preset: "custom",
         primary: "#4F46E5",
         secondary: "#9333EA",
         headingH1: "#111827",

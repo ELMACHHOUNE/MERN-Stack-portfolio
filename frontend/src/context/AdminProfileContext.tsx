@@ -33,6 +33,7 @@ interface AdminProfile {
   yearsOfExperience?: number;
   happyClients?: number;
   theme?: {
+    preset?: "girls" | "boys" | "professional" | "custom";
     primary: string;
     secondary: string;
     headingH1: string;
@@ -56,7 +57,11 @@ interface AdminProfile {
 
 interface AdminProfileContextType {
   adminProfile: AdminProfile | null;
-  updateAdminProfile: (_data: Partial<AdminProfile>) => Promise<AdminProfile>;
+  updateAdminProfile: (
+    _data: Omit<Partial<AdminProfile>, "theme"> & {
+      theme?: Partial<AdminProfile["theme"]>;
+    },
+  ) => Promise<AdminProfile>;
   isLoading: boolean;
 }
 
@@ -126,6 +131,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           happyClients:
             typeof data.happyClients === "number" ? data.happyClients : 0,
           theme: data.theme || {
+            preset: "custom",
             primary: "#4F46E5",
             secondary: "#9333EA",
             headingH1: "#111827",
@@ -174,6 +180,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
               ? (data as any).happyClients
               : 0,
           theme: (data as any).theme || {
+            preset: "custom",
             primary: "#4F46E5",
             secondary: "#9333EA",
             headingH1: "#111827",
@@ -209,7 +216,11 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [fetchAdminProfile]);
 
   const updateAdminProfile = React.useCallback(
-    async (data: Partial<AdminProfile>): Promise<AdminProfile> => {
+    async (
+      data: Omit<Partial<AdminProfile>, "theme"> & {
+        theme?: Partial<AdminProfile["theme"]>;
+      },
+    ): Promise<AdminProfile> => {
       if (!token) throw new Error("No authentication token");
 
       try {
@@ -267,6 +278,7 @@ export const AdminProfileProvider: React.FC<{ children: React.ReactNode }> = ({
                 : prev.happyClients || 0,
             theme: (updatedProfile as any).theme ||
               prev.theme || {
+                preset: "custom",
                 primary: "#4F46E5",
                 secondary: "#9333EA",
                 headingH1: "#111827",

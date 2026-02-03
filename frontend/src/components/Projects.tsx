@@ -55,7 +55,7 @@ const Projects: React.FC = () => {
     showFilters: false,
   });
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>(
-    []
+    [],
   );
 
   const fetchProjects = async () => {
@@ -75,7 +75,7 @@ const Projects: React.FC = () => {
 
       if (!Array.isArray(response.data)) {
         throw new Error(
-          "Invalid response format: expected an array of projects"
+          "Invalid response format: expected an array of projects",
         );
       }
 
@@ -92,9 +92,8 @@ const Projects: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get<{ _id: string; name: string }[]>(
-        "/categories"
-      );
+      const response =
+        await api.get<{ _id: string; name: string }[]>("/categories");
       if (response.error) {
         throw new Error(response.error);
       }
@@ -133,7 +132,7 @@ const Projects: React.FC = () => {
   const filterProjects = (projects: Project[]) => {
     const filtered = projects.filter((project) => {
       const categoryName = categories.find(
-        (c) => c._id === project.category
+        (c) => c._id === project.category,
       )?.name;
       const matchesCategory =
         filters.selectedCategory === t("projects.all") ||
@@ -142,7 +141,7 @@ const Projects: React.FC = () => {
       const matchesTechnologies =
         filters.selectedTechnologies.length === 0 ||
         filters.selectedTechnologies.every((tech) =>
-          project.technologies.includes(tech)
+          project.technologies.includes(tech),
         );
 
       const matchesSearch =
@@ -181,7 +180,7 @@ const Projects: React.FC = () => {
 
   // Get unique technologies from all projects
   const allTechnologies = Array.from(
-    new Set(projects.flatMap((project) => project.technologies))
+    new Set(projects.flatMap((project) => project.technologies)),
   ).sort();
 
   const toggleTechnology = (tech: string) => {
@@ -227,7 +226,7 @@ const Projects: React.FC = () => {
           start: "top 80%",
           toggleActions: "play none none reverse",
         },
-      }
+      },
     );
 
     cardsRef.current.forEach((card, index) => {
@@ -246,7 +245,7 @@ const Projects: React.FC = () => {
             start: "top 85%",
             toggleActions: "play none none reverse",
           },
-        }
+        },
       );
     });
 
@@ -264,13 +263,13 @@ const Projects: React.FC = () => {
           onClick={() => handleCategoryChange(category)}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
             filters.selectedCategory === category
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white"
-              : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+              ? "brand-gradient text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 hover:border-gray-300"
           }`}
         >
           {category}
         </button>
-      )
+      ),
     );
   };
 
@@ -305,10 +304,10 @@ const Projects: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] mb-4">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent brand-gradient mb-4">
             {t("projects.title")}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-body-var max-w-2xl mx-auto">
             {t("projects.description")}
           </p>
         </div>
@@ -324,7 +323,7 @@ const Projects: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
               }
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1B2333] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4F46E5] focus:border-transparent transition-all duration-300"
+              className="input pl-10"
             />
           </div>
           <button
@@ -378,8 +377,8 @@ const Projects: React.FC = () => {
                     onClick={() => toggleTechnology(tech)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                       filters.selectedTechnologies.includes(tech)
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white"
-                        : "bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A3341] border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+                        ? "brand-gradient text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     {tech}
@@ -426,7 +425,7 @@ const Projects: React.FC = () => {
           filters.searchTerm) && (
           <div className="flex flex-wrap gap-2 mb-8">
             {filters.selectedCategory !== t("projects.all") && (
-              <span className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] text-white rounded-xl text-sm flex items-center gap-2">
+              <span className="px-3 py-1.5 brand-gradient text-white rounded-xl text-sm flex items-center gap-2">
                 {filters.selectedCategory}
                 <button
                   onClick={() => handleCategoryChange(t("projects.all"))}
@@ -439,7 +438,7 @@ const Projects: React.FC = () => {
             {filters.selectedTechnologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 dark:from-[#9333EA] dark:to-[#4F46E5] text-white rounded-xl text-sm flex items-center gap-2"
+                className="px-3 py-1.5 brand-gradient text-white rounded-xl text-sm flex items-center gap-2"
               >
                 {tech}
                 <button
@@ -474,7 +473,7 @@ const Projects: React.FC = () => {
               ref={(el) => {
                 if (el) cardsRef.current[index] = el;
               }}
-              className="group bg-gray-50 dark:bg-[#1B2333] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
+              className="group card card-hover overflow-hidden"
             >
               <div className="relative h-48 overflow-hidden">
                 <img
@@ -499,24 +498,24 @@ const Projects: React.FC = () => {
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-[#4F46E5] transition-colors">
+                <h3 className="text-xl font-semibold text-heading-1 mb-3 group-hover:text-brand transition-colors">
                   {project.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                <p className="text-body-var mb-4 line-clamp-2">
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {project.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="px-2.5 py-1 rounded-lg text-sm bg-gray-100 dark:bg-[#232B3B] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800"
+                      className="px-2.5 py-1 rounded-lg text-sm bg-gray-100 text-gray-700 border border-gray-200"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1.5 text-body-var">
                     <FolderGit2 className="w-4 h-4" />
                     <span className="text-sm">
                       {new Date(project.startDate).toLocaleDateString()}
@@ -528,7 +527,7 @@ const Projects: React.FC = () => {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] transition-colors"
+                        className="text-body-var hover-text-brand transition-colors"
                         title={t("projects.viewCode")}
                       >
                         <Github className="w-5 h-5" />
@@ -539,7 +538,7 @@ const Projects: React.FC = () => {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
+                        className="text-body-var hover:text-green-600 transition-colors"
                         title={t("projects.viewProject")}
                       >
                         <ExternalLink className="w-5 h-5" />

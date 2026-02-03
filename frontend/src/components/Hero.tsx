@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
@@ -39,12 +40,13 @@ const Hero: React.FC = () => {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-gray-900 to-blue-900"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-white"
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"
+          className="absolute w-96 h-96 rounded-full mix-blend-multiply filter blur-xl opacity-20"
+          style={{ backgroundColor: "var(--brand-primary)" }}
           animate={{
             x: [0, 100, 0],
             y: [0, 50, 0],
@@ -56,7 +58,8 @@ const Hero: React.FC = () => {
           }}
         />
         <motion.div
-          className="absolute w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"
+          className="absolute w-96 h-96 rounded-full mix-blend-multiply filter blur-xl opacity-20"
+          style={{ backgroundColor: "var(--brand-secondary)" }}
           animate={{
             x: [0, -100, 0],
             y: [0, -50, 0],
@@ -76,10 +79,10 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="max-w-3xl mx-auto"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-heading-1 mb-6">
             {adminProfile?.name || t("home.hero.title")}
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-300 mb-8">
+          <p className="text-xl sm:text-2xl text-body-var mb-8">
             {adminProfile?.title || t("home.hero.subtitle")}
           </p>
         </motion.div>
@@ -98,14 +101,14 @@ const Hero: React.FC = () => {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-body-var hover-text-brand transition-colors duration-300"
                   whileHover={{ scale: 1.1, y: -5 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={link.label}
                 >
                   {link.icon}
                 </motion.a>
-              )
+              ),
           )}
         </motion.div>
         <motion.div
@@ -116,7 +119,7 @@ const Hero: React.FC = () => {
         >
           <motion.a
             href="#about"
-            className="inline-flex items-center text-gray-300 hover:text-white transition-colors duration-300"
+            className="inline-flex items-center text-body-var hover-text-brand transition-colors duration-300"
             whileHover={{ y: 5 }}
             whileTap={{ scale: 0.95 }}
           >

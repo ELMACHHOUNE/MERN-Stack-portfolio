@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema(
       min: 0,
     },
     theme: {
+      preset: {
+        type: String,
+        enum: ["girls", "boys", "professional", "custom"],
+        default: "custom",
+      },
       primary: { type: String, default: "#4F46E5" },
       secondary: { type: String, default: "#9333EA" },
       headingH1: { type: String, default: "#111827" },
