@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { api } from "../utils/api";
 import { toast } from "react-hot-toast";
+import { useTheme } from "../context/ThemeContext";
 
 interface SocialLink {
   icon: LucideIcon;
@@ -139,6 +140,20 @@ const Home: React.FC = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
   const [isVisible, setIsVisible] = useState(false);
+  const { preset } = useTheme();
+
+  const heroBackground = (() => {
+    switch (preset) {
+      case "girls":
+        return "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, #ec4899 100%)";
+      case "boys":
+        return "radial-gradient(125% 125% at 50% 10%, #fff 40%, #6366f1 100%)";
+      case "professional":
+        return "radial-gradient(125% 125% at 50% 90%, #000000 40%, #0d1a36 100%)";
+      default:
+        return "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, var(--brand-primary) 100%)";
+    }
+  })();
 
   useEffect(() => {
     setIsVisible(true);
@@ -373,8 +388,8 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-16 min-h-[calc(100vh-0px)] flex items-center overflow-hidden">
         <motion.div
-          style={{ opacity, y }}
-          className="absolute inset-0 bg-gradient-to-br from-blue-50/60 to-purple-50/60 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10"
+          style={{ opacity, y, background: heroBackground }}
+          className="absolute inset-0 z-0"
         />
         <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -421,7 +436,7 @@ const Home: React.FC = () => {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-[#4F46E5] border border-gray-200 dark:border-gray-800"
+                    className="p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] text-gray-600 hover-text-brand dark:text-gray-400 border border-gray-200 dark:border-gray-800"
                     aria-label={link.label}
                   >
                     <link.icon className="h-5 w-5" />
@@ -445,7 +460,7 @@ const Home: React.FC = () => {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] flex items-center justify-center">
+                  <div className="w-full h-full brand-gradient flex items-center justify-center">
                     <User className="w-20 h-20 text-white/90" />
                   </div>
                 )}
@@ -475,19 +490,14 @@ const Home: React.FC = () => {
                 className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
               >
                 {stats.map((stat, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-6 text-center border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none"
-                  >
-                    <div className="text-blue-600 dark:text-[#4F46E5] mb-4 flex justify-center">
+                  <div key={index} className="card card-hover text-center p-6">
+                    <div className="mx-auto mb-4 w-12 h-12 rounded-xl brand-gradient text-white flex justify-center items-center shadow-sm">
                       {stat.icon}
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold text-heading-1 mb-2">
                       {stat.value}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {stat.label}
-                    </p>
+                    <p className="text-body-var">{stat.label}</p>
                   </div>
                 ))}
               </motion.div>
@@ -498,11 +508,11 @@ const Home: React.FC = () => {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mb-12"
               >
-                <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                <div className="card card-hover p-8">
+                  <h3 className="text-2xl font-bold text-heading-1 mb-6">
                     {t("about.bio")}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-body-var">
+                  <p className="leading-relaxed text-body-var">
                     {personalInfo.bio}
                   </p>
                 </div>
@@ -515,17 +525,14 @@ const Home: React.FC = () => {
                   transition={{ duration: 0.5, delay: 0.4 }}
                   className="mb-12"
                 >
-                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                  <div className="card card-hover p-8">
+                    <h3 className="text-2xl font-bold text-heading-1 mb-8">
                       {t("about.coreValues")}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {personalInfo.values.map((value, index) => (
-                        <div
-                          key={index}
-                          className="group bg-white dark:bg-[#232B3B] rounded-xl p-6 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300"
-                        >
-                          <div className="w-12 h-12 mx-auto mb-4 p-2.5 rounded-xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 dark:from-[#4F46E5]/10 dark:to-[#9333EA]/10 border border-gray-200 dark:border-gray-800 group-hover:border-gray-300 dark:group-hover:border-gray-700 transition-all duration-300">
+                        <div key={index} className="group card card-hover p-6">
+                          <div className="w-12 h-12 mx-auto mb-4 p-2.5 rounded-xl brand-gradient text-white shadow-sm">
                             <img
                               src={getImageUrl(value.icon)}
                               alt={value.title}
@@ -539,7 +546,7 @@ const Home: React.FC = () => {
                                   const fallbackIcon =
                                     document.createElement("div");
                                   fallbackIcon.className =
-                                    "w-full h-full text-blue-600 dark:text-[#4F46E5] flex items-center justify-center";
+                                    "w-full h-full text-white flex items-center justify-center";
                                   fallbackIcon.innerHTML =
                                     '<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>';
                                   parent.appendChild(fallbackIcon);
@@ -547,10 +554,10 @@ const Home: React.FC = () => {
                               }}
                             />
                           </div>
-                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                          <h4 className="text-lg font-semibold text-heading-1 mb-2 text-center">
                             {value.title}
                           </h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
+                          <p className="text-body-var text-center text-sm">
                             {value.description}
                           </p>
                         </div>
@@ -567,8 +574,8 @@ const Home: React.FC = () => {
                   transition={{ duration: 0.5, delay: 0.5 }}
                   className="mb-16"
                 >
-                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                  <div className="card card-hover p-8">
+                    <h3 className="text-2xl font-bold text-heading-1 mb-8">
                       {t("about.expertise")}
                     </h3>
                     <div className="flex flex-wrap gap-3">
@@ -578,7 +585,7 @@ const Home: React.FC = () => {
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3, delay: index * 0.1 }}
-                          className="px-4 py-2 bg-white dark:bg-[#232B3B] text-blue-600 dark:text-[#4F46E5] rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300"
+                          className="px-4 py-2 bg-white dark:bg-[#232B3B] text-brand rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 hover:scale-105"
                         >
                           {interest}
                         </motion.span>
@@ -599,7 +606,7 @@ const Home: React.FC = () => {
                     href={personalInfo.cvUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA] hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#4338CA] dark:hover:to-[#7E22CE] text-white rounded-xl transition-all duration-300"
+                    className="inline-flex items-center px-6 py-3 text-white btn-brand rounded-xl transition-all duration-300"
                   >
                     <Download className="w-5 h-5 mr-2" />
                     {t("about.downloadCV")}
@@ -615,7 +622,7 @@ const Home: React.FC = () => {
                   transition={{ duration: 0.5, delay: 0.6 }}
                   className="mt-16"
                 >
-                  <div className="bg-gray-50 dark:bg-[#1B2333] rounded-xl p-8 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 shadow-sm dark:shadow-none">
+                  <div className="card card-hover p-8">
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
                       {t("home.clients")}
                     </h3>
@@ -623,12 +630,12 @@ const Home: React.FC = () => {
                       {data.clients.map((client) => {
                         const logoUrl = getImageUrl(client.logo);
                         const content = (
-                          <div className="flex items-center justify-center bg-white dark:bg-[#232B3B] rounded-xl p-4 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+                          <div className="group card card-hover p-4 flex items-center justify-center transition-transform">
                             {logoUrl ? (
                               <img
                                 src={logoUrl}
                                 alt={client.name}
-                                className="h-16 object-contain"
+                                className="h-16 object-contain transition-transform group-hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -637,15 +644,14 @@ const Home: React.FC = () => {
                                   if (parent) {
                                     const fallback =
                                       document.createElement("div");
-                                    fallback.className =
-                                      "text-gray-600 dark:text-gray-400";
+                                    fallback.className = "text-body-var";
                                     fallback.textContent = client.name;
                                     parent.appendChild(fallback);
                                   }
                                 }}
                               />
                             ) : (
-                              <span className="text-gray-600 dark:text-gray-400 text-sm">
+                              <span className="text-body-var text-sm">
                                 {client.name}
                               </span>
                             )}
@@ -677,7 +683,19 @@ const Home: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#4F46E5] dark:to-[#9333EA]">
+      <section
+        className="py-20 px-4 sm:px-6 lg:px-8"
+        style={{
+          background:
+            preset === "girls"
+              ? "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, #ec4899 100%)"
+              : preset === "boys"
+                ? "radial-gradient(125% 125% at 50% 10%, #fff 40%, #6366f1 100%)"
+                : preset === "professional"
+                  ? "radial-gradient(125% 125% at 50% 90%, #000000 40%, #0d1a36 100%)"
+                  : "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, var(--brand-primary) 100%)",
+        }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

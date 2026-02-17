@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { useTheme } from "../context/ThemeContext";
 import { API_URL } from "../utils/api";
 import {
   Menu,
@@ -35,6 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { preset } = useTheme();
 
   // Handle scroll effect
   useEffect(() => {
@@ -94,13 +96,19 @@ const Navbar: React.FC<NavbarProps> = ({
     setLanguage(language === "en" ? "fr" : "en");
   };
 
+  const scrolledClasses =
+    preset === "professional"
+      ? "bg-dark-bg-secondary/80 backdrop-blur-lg shadow-lg border-b border-dark-border-primary"
+      : "bg-white/95 dark:bg-dark-bg-secondary/95 backdrop-blur-lg shadow-lg border-b border-light-border-primary dark:border-dark-border-primary";
+
+  const unscrolledClasses =
+    preset === "professional"
+      ? "bg-transparent"
+      : "bg-white dark:bg-dark-bg-secondary";
+
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/95 dark:bg-dark-bg-secondary/95 backdrop-blur-lg shadow-lg border-b border-light-border-primary dark:border-dark-border-primary"
-          : "bg-white dark:bg-dark-bg-secondary"
-      }`}
+      className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? scrolledClasses : unscrolledClasses}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">

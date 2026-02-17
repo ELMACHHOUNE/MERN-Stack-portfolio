@@ -149,12 +149,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
           secondary,
           primaryHover,
           accent,
+          headingH1: "#FFFFFF",
+          headingH2: "#E5E7EB",
+          textBody: "#CBD5E1",
+          sidebarBg: "#0d1a36",
+          sidebarText: "#E5E7EB",
           buttonBg: "#111827",
           buttonText: "#FFFFFF",
           buttonHoverBg: "#0F172A",
-          sidebarActiveBg: "#F1F5F9",
-          sidebarActiveText: "#0F172A",
-          sidebarHoverBg: "#E5E7EB",
+          cardBg: "#0d1a36",
+          cardBorder: "#112240",
+          sidebarActiveBg: "#0F172A",
+          sidebarActiveText: "#FFFFFF",
+          sidebarHoverBg: "#1F2937",
           sidebarHoverText: primary,
         };
       }
@@ -181,6 +188,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     setPreset(p);
     localStorage.setItem("themePreset", p);
     const settings = getPresetTheme(p);
+    // Toggle Tailwind dark class for professional preset to support dark-styled components
+    const rootEl = document.documentElement;
+    if (p === "professional") {
+      rootEl.classList.add("dark");
+    } else {
+      rootEl.classList.remove("dark");
+    }
     applyTheme(settings);
   };
 
@@ -197,6 +211,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         const p: ThemePreset = t.preset || "custom";
         setPreset(p);
         localStorage.setItem("themePreset", p);
+        // Apply dark class for professional preset
+        const rootEl = document.documentElement;
+        if (p === "professional") {
+          rootEl.classList.add("dark");
+        } else {
+          rootEl.classList.remove("dark");
+        }
         if (p !== "custom") {
           const settings = getPresetTheme(p);
           applyTheme(settings);
@@ -233,6 +254,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (preset !== "custom") {
       const s = getPresetTheme(preset);
+      // Update dark class when preset changes
+      const rootEl = document.documentElement;
+      if (preset === "professional") {
+        rootEl.classList.add("dark");
+      } else {
+        rootEl.classList.remove("dark");
+      }
       applyTheme(s);
     }
   }, [preset]);

@@ -47,8 +47,8 @@ const ThemeManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      <div className="card card-hover p-6">
+        <h2 className="text-2xl font-bold text-heading-1 mb-4">
           Theme Settings
         </h2>
         {isLoading ? (
@@ -86,7 +86,7 @@ const ThemeManager: React.FC = () => {
         <div className="mt-6">
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-brand"
             disabled={saving}
             onClick={saveTheme}
           >

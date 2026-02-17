@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Folder, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -24,11 +24,7 @@ const CategoryManager: React.FC = () => {
     icon: "",
   });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -37,18 +33,22 @@ const CategoryManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok)
         throw new Error(t("categories.management.errors.fetchFailed"));
       const data = await response.json();
       setCategories(data);
-    } catch (error) {
+    } catch {
       toast.error(t("categories.management.errors.fetchFailed"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,11 +79,11 @@ const CategoryManager: React.FC = () => {
       toast.success(
         isEditing
           ? t("categories.management.actions.updateSuccess")
-          : t("categories.management.actions.addSuccess")
+          : t("categories.management.actions.addSuccess"),
       );
       resetForm();
       fetchCategories();
-    } catch (error) {
+    } catch {
       toast.error(t("categories.management.errors.saveFailed"));
     }
   };
@@ -101,7 +101,7 @@ const CategoryManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok)
@@ -109,7 +109,7 @@ const CategoryManager: React.FC = () => {
 
       toast.success(t("categories.management.actions.deleteSuccess"));
       fetchCategories();
-    } catch (error) {
+    } catch {
       toast.error(t("categories.management.errors.deleteFailed"));
     }
   };
@@ -151,10 +151,10 @@ const CategoryManager: React.FC = () => {
             <Folder className="w-6 h-6 text-blue-500 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-2xl font-bold text-heading-1">
               {t("categories.management.title")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-body-var">
               {t("categories.management.categoryList", {
                 count: categories.length,
               })}
@@ -163,7 +163,7 @@ const CategoryManager: React.FC = () => {
         </div>
         <button
           onClick={() => setIsEditing(false)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-sm hover:shadow"
+          className="btn btn-brand flex items-center gap-2 shadow-sm hover:shadow"
         >
           <Plus className="w-5 h-5" />
           {t("categories.management.addCategory")}
@@ -171,12 +171,12 @@ const CategoryManager: React.FC = () => {
       </div>
 
       {/* Form Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+      <div className="card card-hover p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="label">
                 {t("categories.management.form.title")}
               </label>
               <input
@@ -185,7 +185,7 @@ const CategoryManager: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="input"
                 placeholder={t("categories.management.form.namePlaceholder")}
                 required
               />
@@ -193,7 +193,7 @@ const CategoryManager: React.FC = () => {
 
             {/* Icon */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="label">
                 {t("categories.management.form.iconUrl")}
               </label>
               <input
@@ -202,7 +202,7 @@ const CategoryManager: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, icon: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="input"
                 placeholder={t("categories.management.form.iconUrlPlaceholder")}
                 required
               />
@@ -211,7 +211,7 @@ const CategoryManager: React.FC = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="label">
               {t("categories.management.form.description")}
             </label>
             <textarea
@@ -220,9 +220,9 @@ const CategoryManager: React.FC = () => {
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={3}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+              className="input resize-none"
               placeholder={t(
-                "categories.management.form.descriptionPlaceholder"
+                "categories.management.form.descriptionPlaceholder",
               )}
               required
             />
@@ -234,7 +234,7 @@ const CategoryManager: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                className="btn btn-outline flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {t("common.cancel")}
@@ -242,7 +242,7 @@ const CategoryManager: React.FC = () => {
             )}
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+              className="btn btn-brand flex items-center gap-2"
             >
               {isEditing ? (
                 <>
@@ -267,17 +267,14 @@ const CategoryManager: React.FC = () => {
             <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <Folder className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-body-var">
               {t("categories.management.noCategories")}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
-              <div
-                key={category._id}
-                className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200"
-              >
+              <div key={category._id} className="group card card-hover p-6">
                 <div className="flex items-start gap-4">
                   <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                     {category.icon ? (
@@ -293,27 +290,27 @@ const CategoryManager: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                      <h4 className="text-lg font-semibold text-heading-1 truncate">
                         {category.name}
                       </h4>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEdit(category)}
-                          className="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                          className="p-1 text-body-var hover-text-brand rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                           title={t("common.edit")}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(category._id)}
-                          className="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                          className="p-1 text-body-var hover:text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                           title={t("common.delete")}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                    <p className="mt-2 text-sm text-body-var line-clamp-2">
                       {category.description}
                     </p>
                   </div>

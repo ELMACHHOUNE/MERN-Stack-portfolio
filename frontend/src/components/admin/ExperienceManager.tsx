@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Briefcase, Calendar, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -20,7 +20,7 @@ const ExperienceManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentExperience, setCurrentExperience] = useState<Experience | null>(
-    null
+    null,
   );
   const [formData, setFormData] = useState({
     company: "",
@@ -32,11 +32,7 @@ const ExperienceManager: React.FC = () => {
     technologies: "",
   });
 
-  useEffect(() => {
-    fetchExperiences();
-  }, []);
-
-  const fetchExperiences = async () => {
+  const fetchExperiences = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -50,12 +46,12 @@ const ExperienceManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || t("experience.management.errors.fetchFailed")
+          errorData.message || t("experience.management.errors.fetchFailed"),
         );
       }
       const data = await response.json();
@@ -65,13 +61,17 @@ const ExperienceManager: React.FC = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : t("experience.management.errors.fetchFailed")
+          : t("experience.management.errors.fetchFailed"),
       );
       setExperiences([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchExperiences();
+  }, [fetchExperiences]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,9 +92,7 @@ const ExperienceManager: React.FC = () => {
       };
 
       const url = isEditing
-        ? `${import.meta.env.VITE_API_URL}/experience/${
-            currentExperience?._id
-          }`
+        ? `${import.meta.env.VITE_API_URL}/experience/${currentExperience?._id}`
         : `${import.meta.env.VITE_API_URL}/experience`;
       const method = isEditing ? "PUT" : "POST";
 
@@ -110,14 +108,14 @@ const ExperienceManager: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || t("experience.management.errors.saveFailed")
+          errorData.message || t("experience.management.errors.saveFailed"),
         );
       }
 
       toast.success(
         isEditing
           ? t("experience.management.actions.updateSuccess")
-          : t("experience.management.actions.addSuccess")
+          : t("experience.management.actions.addSuccess"),
       );
       resetForm();
       fetchExperiences();
@@ -126,7 +124,7 @@ const ExperienceManager: React.FC = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : t("experience.management.errors.saveFailed")
+          : t("experience.management.errors.saveFailed"),
       );
     }
   };
@@ -149,13 +147,13 @@ const ExperienceManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || t("experience.management.errors.deleteFailed")
+          errorData.message || t("experience.management.errors.deleteFailed"),
         );
       }
 
@@ -166,7 +164,7 @@ const ExperienceManager: React.FC = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : t("experience.management.errors.deleteFailed")
+          : t("experience.management.errors.deleteFailed"),
       );
     }
   };
@@ -211,12 +209,12 @@ const ExperienceManager: React.FC = () => {
     <div className="space-y-8 p-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+        <h2 className="text-2xl font-bold text-heading-1">
           {t("experience.management.title")}
         </h2>
         <button
           onClick={resetForm}
-          className="px-4 py-2 rounded-lg transition-colors bg-blue-500 text-white hover:bg-blue-600 shadow-md hover:shadow-lg flex items-center gap-2"
+          className="btn btn-brand shadow-sm hover:shadow flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           {t("experience.management.addExperience")}
@@ -224,14 +222,11 @@ const ExperienceManager: React.FC = () => {
       </div>
 
       {/* Form Section */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-6 border border-gray-200 dark:border-gray-700"
-      >
+      <form onSubmit={handleSubmit} className="card card-hover p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Company Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="label">
               {t("experience.management.form.company")}
             </label>
             <input
@@ -240,14 +235,14 @@ const ExperienceManager: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, company: e.target.value })
               }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="input"
               required
             />
           </div>
 
           {/* Position */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="label">
               {t("experience.management.form.position")}
             </label>
             <input
@@ -256,14 +251,14 @@ const ExperienceManager: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, position: e.target.value })
               }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="input"
               required
             />
           </div>
 
           {/* Start Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="label">
               {t("experience.management.form.startDate")}
             </label>
             <input
@@ -272,14 +267,14 @@ const ExperienceManager: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, startDate: e.target.value })
               }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="input"
               required
             />
           </div>
 
           {/* End Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="label">
               {t("experience.management.form.endDate")}
             </label>
             <input
@@ -288,7 +283,7 @@ const ExperienceManager: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, endDate: e.target.value })
               }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="input"
               disabled={formData.current}
               required={!formData.current}
             />
@@ -316,7 +311,7 @@ const ExperienceManager: React.FC = () => {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="label">
             {t("experience.management.form.description")}
           </label>
           <textarea
@@ -325,14 +320,14 @@ const ExperienceManager: React.FC = () => {
               setFormData({ ...formData, description: e.target.value })
             }
             rows={4}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+            className="input resize-none"
             required
           />
         </div>
 
         {/* Technologies */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="label">
             {t("experience.management.form.technologies")}
           </label>
           <input
@@ -341,9 +336,9 @@ const ExperienceManager: React.FC = () => {
             onChange={(e) =>
               setFormData({ ...formData, technologies: e.target.value })
             }
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className="input"
             placeholder={t(
-              "experience.management.form.technologiesPlaceholder"
+              "experience.management.form.technologiesPlaceholder",
             )}
             required
           />
@@ -355,7 +350,7 @@ const ExperienceManager: React.FC = () => {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              className="btn btn-outline flex items-center gap-2"
             >
               <X className="w-4 h-4" />
               {t("common.cancel")}
@@ -363,7 +358,7 @@ const ExperienceManager: React.FC = () => {
           )}
           <button
             type="submit"
-            className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+            className="btn btn-brand flex items-center gap-2"
           >
             {isEditing ? (
               <>
@@ -381,8 +376,8 @@ const ExperienceManager: React.FC = () => {
       </form>
 
       {/* Experience List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">
+      <div className="card card-hover p-6">
+        <h3 className="text-lg font-semibold text-heading-1 mb-6">
           {t("experience.management.experienceList")}
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -395,14 +390,14 @@ const ExperienceManager: React.FC = () => {
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                   <button
                     onClick={() => handleEdit(experience)}
-                    className="p-1 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
+                    className="p-1 text-body-var hover-text-brand"
                     title={t("common.edit")}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(experience._id)}
-                    className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                    className="p-1 text-body-var hover:text-red-600"
                     title={t("common.delete")}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -416,13 +411,13 @@ const ExperienceManager: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                    <h4 className="text-lg font-semibold text-heading-1 truncate">
                       {experience.position}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    <p className="text-sm text-body-var mb-1">
                       {experience.company}
                     </p>
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <div className="flex items-center text-sm text-body-var mb-2">
                       <Calendar className="w-4 h-4 mr-1" />
                       <span>
                         {new Date(experience.startDate).toLocaleDateString()} -{" "}
@@ -431,7 +426,7 @@ const ExperienceManager: React.FC = () => {
                           : new Date(experience.endDate).toLocaleDateString()}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                    <p className="text-sm text-body-var mb-3 line-clamp-2">
                       {experience.description}
                     </p>
                     <div className="flex flex-wrap gap-1">
@@ -453,7 +448,7 @@ const ExperienceManager: React.FC = () => {
               <div className="mx-auto w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
                 <Briefcase className="w-6 h-6 text-gray-400 dark:text-gray-500" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-body-var">
                 {t("experience.management.noExperiences")}
               </p>
             </div>

@@ -15,6 +15,8 @@ import {
   FolderKanban,
   User as UserIcon,
   Palette,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import SkillsManager from "./admin/SkillsManager";
 import ExperienceManager from "./admin/ExperienceManager";
@@ -26,6 +28,8 @@ import AdminSettings from "../pages/AdminSettings";
 import ClientsManager from "./admin/ClientsManager";
 import ThemeManager from "./admin/ThemeManager";
 import { toast } from "react-hot-toast";
+import { useTheme } from "../context/ThemeContext";
+import Loading from "./Loading";
 
 interface User {
   _id: string;
@@ -133,6 +137,7 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { preset } = useTheme();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -317,15 +322,23 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1121]">
+    <div
+      className={`${preset === "professional" ? "dark" : ""} min-h-screen`}
+      style={{
+        background:
+          preset === "girls"
+            ? "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, #ec4899 100%)"
+            : preset === "boys"
+              ? "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, #3b82f6 100%)"
+              : preset === "professional"
+                ? "radial-gradient(125% 125% at 50% 90%, #000000 40%, #0d1a36 100%)"
+                : "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, var(--brand-primary) 100%)",
+      }}
+    >
       <Navbar
         isAdmin
         onAdminMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
@@ -344,33 +357,40 @@ const AdminDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div
-            className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out sidebar-bg border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-64px)]
+            className={`fixed top-16 bottom-0 left-0 z-50 transform transition-transform duration-300 ease-in-out sidebar-bg border-r border-gray-200 dark:border-gray-800
               ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-              lg:translate-x-0 lg:static
+              lg:translate-x-0
               ${isSidebarCollapsed ? "lg:w-20" : "lg:w-64"}
               w-64`}
           >
             <div className="flex flex-col h-full">
               {/* Sidebar Header with internal toggle */}
-              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+              <div
+                className={`sticky top-0 z-10 p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between sidebar-bg`}
+              >
                 {!isSidebarCollapsed && (
-                  <span className="font-semibold">Admin</span>
+                  <span className="font-semibold sidebar-text">Admin</span>
                 )}
                 <button
                   onClick={handleSidebarToggle}
-                  className="p-2 rounded-lg hover:bg-light-bg-tertiary transition-colors"
+                  className={`p-2 rounded-lg sidebar-hover transition-colors sidebar-text`}
                   title={
                     isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
                   }
+                  aria-label={
+                    isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+                  }
+                  aria-expanded={!isSidebarCollapsed}
                 >
-                  {/* Simple icon representation using text; could be replaced with chevrons */}
-                  <span className="w-5 h-5 inline-block">
-                    {isSidebarCollapsed ? "→" : "←"}
-                  </span>
+                  {isSidebarCollapsed ? (
+                    <ChevronRight className="w-5 h-5" />
+                  ) : (
+                    <ChevronLeft className="w-5 h-5" />
+                  )}
                 </button>
               </div>
               {/* Navigation Links */}
-              <nav className="flex-1 px-4 py-4 space-y-1">
+              <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto overflow-x-hidden pr-2">
                 {[
                   {
                     label: t("admin.tabs.skills"),
@@ -426,11 +446,18 @@ const AdminDashboard: React.FC = () => {
                   <button
                     key={tab}
                     onClick={() => handleTabClick(tab)}
-                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 sidebar-text sidebar-hover ${
-                      activeTab === tab ? "sidebar-active" : ""
-                    }`}
+                    className={`flex w-full rounded-xl transition-all duration-200 sidebar-text sidebar-hover ${
+                      isSidebarCollapsed
+                        ? "justify-center px-3 py-3"
+                        : "items-center justify-start px-4 py-3"
+                    } ${activeTab === tab ? "sidebar-active" : ""}`}
+                    aria-current={activeTab === tab ? "page" : undefined}
                   >
-                    <span className="mr-3 flex items-center justify-center w-5 h-5">
+                    <span
+                      className={`${
+                        isSidebarCollapsed ? "w-6 h-6" : "w-5 h-5 mr-3"
+                      } flex items-center justify-center`}
+                    >
                       {icon}
                     </span>
                     {!isSidebarCollapsed && (
@@ -441,12 +468,20 @@ const AdminDashboard: React.FC = () => {
               </nav>
 
               {/* Sidebar Footer */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+              <div
+                className={`mt-auto p-4 border-t border-gray-200 dark:border-gray-800 sidebar-bg`}
+              >
                 <button
                   onClick={handleLogout}
-                  className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 sidebar-hover"
+                  className={`flex w-full rounded-xl transition-all duration-200 sidebar-hover sidebar-text ${
+                    isSidebarCollapsed
+                      ? "justify-center px-3 py-3"
+                      : "items-center justify-start px-4 py-3"
+                  }`}
                 >
-                  <LogOut className="w-5 h-5 mr-3" />
+                  <LogOut
+                    className={`${isSidebarCollapsed ? "w-6 h-6" : "w-5 h-5 mr-3"}`}
+                  />
                   {!isSidebarCollapsed && t("admin.logout")}
                 </button>
               </div>
@@ -479,66 +514,66 @@ const AdminDashboard: React.FC = () => {
               {activeTab === "clients" && <ClientsManager />}
               {activeTab === "theme" && <ThemeManager />}
               {activeTab === "users" && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <div className="card card-hover p-6">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-2xl font-bold text-heading-1">
                       {t("admin.users.title")}
                     </h2>
                   </div>
                   {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <div className="h-64 flex items-center justify-center">
+                      <Loading />
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-700">
+                      <table className="min-w-full divide-y">
+                        <thead>
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-body-var uppercase tracking-wider">
                               {t("admin.users.name")}
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-body-var uppercase tracking-wider">
                               {t("admin.users.email")}
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-body-var uppercase tracking-wider">
                               {t("admin.users.role")}
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-body-var uppercase tracking-wider">
                               {t("admin.users.lastLogin")}
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-right text-xs font-medium text-body-var uppercase tracking-wider">
                               {t("admin.users.actions")}
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="divide-y">
                           {users.length > 0 ? (
                             users.map((user) => (
                               <tr key={user._id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-heading-1">
                                   {user.name}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-body-var">
                                   {user.email}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-body-var">
                                   {user.isAdmin
                                     ? t("admin.users.admin")
                                     : t("admin.users.user")}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-body-var">
                                   {new Date(user.lastLogin).toLocaleString()}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                   <button
                                     onClick={() => handleEditUser(user)}
-                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                                    className="text-brand hover-text-brand mr-3"
                                   >
                                     {t("admin.users.edit")}
                                   </button>
                                   <button
                                     onClick={() => handleDeleteUser(user._id)}
-                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                    className="text-red-600 hover:text-red-700"
                                   >
                                     {t("admin.users.delete")}
                                   </button>
@@ -549,7 +584,7 @@ const AdminDashboard: React.FC = () => {
                             <tr>
                               <td
                                 colSpan={5}
-                                className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                                className="px-6 py-4 text-center text-sm text-body-var"
                               >
                                 {t("admin.users.noUsers")}
                               </td>

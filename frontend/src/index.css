@@ -100,7 +100,10 @@ body {
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-soft dark:shadow-soft-dark p-6 transition-all duration-200;
+    /* Use theme variables for card background and border to match presets */
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    @apply rounded-lg shadow-soft dark:shadow-soft-dark p-6 transition-all duration-200;
   }
 
   .card-hover {

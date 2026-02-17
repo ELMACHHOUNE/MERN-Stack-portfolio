@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { Plus, Trash2, Edit, Wrench, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -50,12 +50,7 @@ const SkillsManager: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [imageSource, setImageSource] = useState<"url" | "file">("url");
 
-  useEffect(() => {
-    fetchSkills();
-    fetchCategories();
-  }, []);
-
-  const fetchSkills = async () => {
+  const fetchSkills = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -64,7 +59,7 @@ const SkillsManager: React.FC = () => {
       }
       console.log(
         "Fetching skills with token:",
-        token.substring(0, 10) + "..."
+        token.substring(0, 10) + "...",
       );
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/skills/admin`,
@@ -72,7 +67,7 @@ const SkillsManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok) {
         const errorData = await response.json();
@@ -88,9 +83,8 @@ const SkillsManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchCategories = async () => {
+  }, [t]);
+  const fetchCategories = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -99,7 +93,7 @@ const SkillsManager: React.FC = () => {
       }
       console.log(
         "Fetching categories with token:",
-        token.substring(0, 10) + "..."
+        token.substring(0, 10) + "...",
       );
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/categories/admin`,
@@ -107,7 +101,7 @@ const SkillsManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok) {
         const errorData = await response.json();
@@ -123,7 +117,12 @@ const SkillsManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchSkills();
+    fetchCategories();
+  }, [fetchSkills, fetchCategories]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -214,7 +213,7 @@ const SkillsManager: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || t("skills.management.errors.saveFailed")
+          errorData.message || t("skills.management.errors.saveFailed"),
         );
       }
 
@@ -223,7 +222,7 @@ const SkillsManager: React.FC = () => {
       toast.success(
         isEditing
           ? t("skills.management.actions.updateSuccess")
-          : t("skills.management.actions.addSuccess")
+          : t("skills.management.actions.addSuccess"),
       );
 
       // Update the form data with the saved skill's icon path
@@ -258,14 +257,14 @@ const SkillsManager: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) throw new Error(t("common.error"));
 
       toast.success(t("skills.management.deleteSuccess"));
       fetchSkills();
-    } catch (error) {
+    } catch {
       toast.error(t("common.error"));
     }
   };
@@ -309,7 +308,7 @@ const SkillsManager: React.FC = () => {
     if (iconPath.startsWith("/uploads/")) {
       return `${import.meta.env.VITE_API_URL.replace(
         /\/?api\/?$/,
-        ""
+        "",
       )}${iconPath}`;
     }
     return iconPath;
@@ -332,10 +331,10 @@ const SkillsManager: React.FC = () => {
             <Wrench className="w-6 h-6 text-blue-500 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-2xl font-bold text-heading-1">
               {t("skills.management.title")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-body-var">
               {t("skills.management.subtitle", { count: skills.length })}
             </p>
           </div>
@@ -350,7 +349,7 @@ const SkillsManager: React.FC = () => {
       </div>
 
       {/* Form Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+      <div className="card card-hover p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Name */}
@@ -364,22 +363,20 @@ const SkillsManager: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="input"
                 required
               />
             </div>
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("skills.management.category")}
-              </label>
+              <label className="label">{t("skills.management.category")}</label>
               <select
                 value={formData.category}
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="input"
                 required
               >
                 <option value="">
@@ -395,7 +392,7 @@ const SkillsManager: React.FC = () => {
 
             {/* Level */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="label">
                 {t("skills.management.level")} (1-10)
               </label>
               <input
@@ -406,26 +403,22 @@ const SkillsManager: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, level: parseInt(e.target.value) })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="input"
                 required
               />
             </div>
 
             {/* Icon */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("skills.management.icon")}
-              </label>
+              <label className="label">{t("skills.management.icon")}</label>
 
               {/* Image Source Toggle */}
               <div className="flex gap-4 mb-4">
                 <button
                   type="button"
                   onClick={() => handleImageSourceChange("url")}
-                  className={`px-4 py-2 rounded-lg ${
-                    imageSource === "url"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className={`btn ${
+                    imageSource === "url" ? "btn-brand" : "btn-outline"
                   }`}
                 >
                   {t("skills.management.form.iconUrl")}
@@ -433,10 +426,8 @@ const SkillsManager: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleImageSourceChange("file")}
-                  className={`px-4 py-2 rounded-lg ${
-                    imageSource === "file"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className={`btn ${
+                    imageSource === "file" ? "btn-brand" : "btn-outline"
                   }`}
                 >
                   {t("skills.management.form.uploadIcon")}
@@ -451,21 +442,21 @@ const SkillsManager: React.FC = () => {
                     value={formData.icon}
                     onChange={handleIconUrlChange}
                     placeholder={t("skills.management.form.iconUrlPlaceholder")}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="input"
                   />
                 ) : (
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="input"
                   />
                 )}
 
                 {/* Icon Preview */}
                 {(previewUrl || formData.icon) && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <h4 className="text-sm font-medium text-body-var mb-2">
                       {t("skills.management.form.iconPreview")}
                     </h4>
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -492,7 +483,7 @@ const SkillsManager: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                className="btn btn-outline flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {t("common.cancel")}
@@ -500,7 +491,7 @@ const SkillsManager: React.FC = () => {
             )}
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+              className="btn btn-brand flex items-center gap-2"
             >
               {isEditing ? (
                 <>
@@ -531,10 +522,7 @@ const SkillsManager: React.FC = () => {
           if (categorySkills.length === 0) return null;
 
           return (
-            <div
-              key={category._id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
-            >
+            <div key={category._id} className="card card-hover p-6">
               <div className="flex items-center gap-3 mb-6">
                 {category.icon && (
                   <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
@@ -550,7 +538,7 @@ const SkillsManager: React.FC = () => {
                     />
                   </div>
                 )}
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                <h3 className="text-lg font-semibold text-heading-1">
                   {category.name}
                 </h3>
               </div>
@@ -576,20 +564,20 @@ const SkillsManager: React.FC = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <h4 className="text-sm font-medium text-heading-1 truncate">
                             {skill.name}
                           </h4>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => handleEdit(skill)}
-                              className="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                              className="p-1 text-body-var hover-text-brand rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                               title={t("common.edit")}
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(skill._id)}
-                              className="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                              className="p-1 text-body-var hover:text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                               title={t("common.delete")}
                             >
                               <Trash2 className="w-4 h-4" />
@@ -606,7 +594,7 @@ const SkillsManager: React.FC = () => {
                                 }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 min-w-[2rem] text-right">
+                            <span className="text-xs font-medium text-body-var min-w-[2rem] text-right">
                               {skill.level}/10
                             </span>
                           </div>
@@ -625,9 +613,7 @@ const SkillsManager: React.FC = () => {
             <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <Wrench className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
-            <p className="text-gray-500 dark:text-gray-400">
-              {t("skills.management.noSkills")}
-            </p>
+            <p className="text-body-var">{t("skills.management.noSkills")}</p>
           </div>
         )}
       </div>

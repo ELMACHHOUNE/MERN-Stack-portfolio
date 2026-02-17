@@ -244,11 +244,11 @@ const AdminSettings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+            <CardTitle className="text-heading-1">
               {t("settings.profile.title")}
             </CardTitle>
           </CardHeader>
@@ -257,9 +257,11 @@ const AdminSettings: React.FC = () => {
               {/* Profile Image Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("settings.profile.title")}</CardTitle>
+                  <CardTitle className="text-heading-1">
+                    {t("settings.profile.title")}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-body-var">
                   <div className="flex flex-col items-center space-y-4">
                     <div className="relative">
                       <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700 shadow-xl">
@@ -293,7 +295,7 @@ const AdminSettings: React.FC = () => {
                         className="hidden"
                       />
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-body-var">
                       {t("settings.profile.description")}
                     </p>
                   </div>
@@ -384,9 +386,11 @@ const AdminSettings: React.FC = () => {
               {/* Social Links Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("about.socialLinks.title")}</CardTitle>
+                  <CardTitle className="text-heading-1">
+                    {t("about.socialLinks.title")}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-body-var">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[
                       {
@@ -466,8 +470,10 @@ const AdminSettings: React.FC = () => {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <div>
-                      <CardTitle>{t("about.coreValues")}</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <CardTitle className="text-heading-1">
+                        {t("about.coreValues")}
+                      </CardTitle>
+                      <p className="text-sm text-body-var mt-1">
                         {t("about.coreValues")}
                       </p>
                     </div>
@@ -480,11 +486,11 @@ const AdminSettings: React.FC = () => {
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-body-var">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {values.map((value, index) => (
                       <Card key={index} hover>
-                        <CardContent>
+                        <CardContent className="text-body-var">
                           <div className="flex items-start space-x-4">
                             <div className="flex-shrink-0">
                               <div className="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
@@ -559,8 +565,10 @@ const AdminSettings: React.FC = () => {
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                      <CardTitle>{t("about.interests")}</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <CardTitle className="text-heading-1">
+                        {t("about.interests")}
+                      </CardTitle>
+                      <p className="text-sm text-body-var mt-1">
                         {t("about.interests")}
                       </p>
                     </div>
@@ -582,7 +590,7 @@ const AdminSettings: React.FC = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-body-var">
                   <div className="flex flex-wrap gap-2">
                     {interests.map((interest, index) => (
                       <div

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import {
   Plus,
@@ -10,6 +10,7 @@ import {
   ToggleLeft,
   ToggleRight,
 } from "lucide-react";
+
 
 interface ClientItem {
   _id?: string;
@@ -54,11 +55,7 @@ const ClientsManager: React.FC = () => {
     file: null,
   });
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -77,7 +74,11 @@ const ClientsManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   const resetForm = () => {
     setIsEditing(false);
@@ -200,73 +201,65 @@ const ClientsManager: React.FC = () => {
             <Globe className="w-6 h-6 text-blue-500 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-              Clients
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <h2 className="text-2xl font-bold text-heading-1">Clients</h2>
+            <p className="text-sm text-body-var">
               Manage client logos displayed on Home
             </p>
           </div>
         </div>
         <button
           onClick={() => resetForm()}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-sm hover:shadow"
+          className="btn btn-brand flex items-center gap-2 shadow-sm hover:shadow"
         >
           <Plus className="w-5 h-5" /> Add Client
         </button>
       </div>
 
       {/* Form */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+      <div className="card card-hover p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Client Name
-              </label>
+              <label className="label">Client Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="input"
                 placeholder="e.g. Acme Corp"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Website
-              </label>
+              <label className="label">Website</label>
               <input
                 type="url"
                 value={formData.website}
                 onChange={(e) =>
                   setFormData({ ...formData, website: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="input"
                 placeholder="https://example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Logo Source
-            </label>
+            <label className="label">Logo Source</label>
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={() => setLogoSource("url")}
-                className={`px-3 py-1 rounded-md border ${logoSource === "url" ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500" : "bg-gray-50 dark:bg-gray-700 border-gray-300"}`}
+                className={`btn ${logoSource === "url" ? "btn-brand" : "btn-outline"}`}
               >
                 <LinkIcon className="w-4 h-4 inline mr-1" /> URL
               </button>
               <button
                 type="button"
                 onClick={() => setLogoSource("file")}
-                className={`px-3 py-1 rounded-md border ${logoSource === "file" ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500" : "bg-gray-50 dark:bg-gray-700 border-gray-300"}`}
+                className={`btn ${logoSource === "file" ? "btn-brand" : "btn-outline"}`}
               >
                 <Image className="w-4 h-4 inline mr-1" /> Upload
               </button>
@@ -275,24 +268,20 @@ const ClientsManager: React.FC = () => {
 
           {logoSource === "url" ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Logo URL
-              </label>
+              <label className="label">Logo URL</label>
               <input
                 type="url"
                 value={formData.logo}
                 onChange={(e) =>
                   setFormData({ ...formData, logo: e.target.value })
                 }
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="input"
                 placeholder="https://example.com/logo.png"
               />
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Upload Logo
-              </label>
+              <label className="label">Upload Logo</label>
               <input
                 type="file"
                 accept="image/*"
@@ -312,15 +301,12 @@ const ClientsManager: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                className="btn btn-outline"
               >
                 Cancel
               </button>
             )}
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
-            >
+            <button type="submit" className="btn btn-brand">
               {isEditing ? (
                 <>
                   <Edit className="w-4 h-4 inline mr-1" /> Save
@@ -339,15 +325,12 @@ const ClientsManager: React.FC = () => {
       <div className="space-y-6">
         {clients.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No clients found</p>
+            <p className="text-body-var">No clients found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {clients.map((client) => (
-              <div
-                key={client._id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
-              >
+              <div key={client._id} className="card card-hover p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {client.logo ? (
@@ -363,19 +346,19 @@ const ClientsManager: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                      <h4 className="text-lg font-semibold text-heading-1 truncate">
                         {client.name}
                       </h4>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEdit(client)}
-                          className="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400"
+                          className="p-1 text-body-var hover-text-brand"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(String(client._id))}
-                          className="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
+                          className="p-1 text-body-var hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -386,7 +369,7 @@ const ClientsManager: React.FC = () => {
                         href={client.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 dark:text-blue-400"
+                        className="text-sm text-brand"
                       >
                         {client.website}
                       </a>
@@ -394,7 +377,7 @@ const ClientsManager: React.FC = () => {
                     <div className="mt-3">
                       <button
                         onClick={() => toggleActive(client)}
-                        className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300"
+                        className="flex items-center gap-1 text-sm text-body-var"
                       >
                         {client.isActive ? (
                           <>

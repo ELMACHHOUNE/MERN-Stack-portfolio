@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import Loading from "../Loading";
 import { useLanguage } from "../../context/LanguageContext";
 
 interface Contact {
@@ -30,11 +31,7 @@ const ContactManager: React.FC = () => {
   const { token } = useAuth();
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
 
-  useEffect(() => {
-    fetchContacts();
-  }, [token]);
-
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/contact/admin`,
@@ -44,7 +41,7 @@ const ContactManager: React.FC = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -54,11 +51,16 @@ const ContactManager: React.FC = () => {
       const data = await response.json();
       setContacts(data);
     } catch (err) {
+      console.error(err);
       toast.error(t("contact.management.messages.error"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, t]);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -71,7 +73,7 @@ const ContactManager: React.FC = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -80,11 +82,12 @@ const ContactManager: React.FC = () => {
 
       setContacts(
         contacts.map((contact) =>
-          contact._id === id ? { ...contact, isRead: true } : contact
-        )
+          contact._id === id ? { ...contact, isRead: true } : contact,
+        ),
       );
       toast.success(t("contact.management.messages.markReadSuccess"));
     } catch (err) {
+      console.error(err);
       toast.error(t("contact.management.messages.markReadError"));
     }
   };
@@ -102,7 +105,7 @@ const ContactManager: React.FC = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -112,6 +115,7 @@ const ContactManager: React.FC = () => {
       setContacts(contacts.filter((contact) => contact._id !== id));
       toast.success(t("contact.management.messages.deleteSuccess"));
     } catch (err) {
+      console.error(err);
       toast.error(t("contact.management.messages.deleteError"));
     }
   };
@@ -125,11 +129,7 @@ const ContactManager: React.FC = () => {
   const unreadCount = contacts.filter((contact) => !contact.isRead).length;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -141,10 +141,10 @@ const ContactManager: React.FC = () => {
             <MessageSquare className="w-6 h-6 text-blue-500 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-2xl font-bold text-heading-1">
               {t("contact.management.title")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-body-var">
               {t("contact.management.messages.messageCount", {
                 count: contacts.length,
               })}
@@ -164,7 +164,7 @@ const ContactManager: React.FC = () => {
             onChange={(e) =>
               setFilter(e.target.value as "all" | "unread" | "read")
             }
-            className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input w-40 text-sm"
           >
             <option value="all">{t("contact.management.filter.all")}</option>
             <option value="unread">
@@ -182,7 +182,7 @@ const ContactManager: React.FC = () => {
             key={contact._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border ${
+            className={`card card-hover p-6 border ${
               !contact.isRead
                 ? "border-blue-500 dark:border-blue-400"
                 : "border-gray-200 dark:border-gray-700"
@@ -204,7 +204,7 @@ const ContactManager: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                      <h3 className="text-lg font-semibold text-heading-1 truncate">
                         {contact.name}
                       </h3>
                       {!contact.isRead && (
@@ -215,21 +215,21 @@ const ContactManager: React.FC = () => {
                     </div>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      className="text-sm text-body-var hover:text-brand transition-colors"
                     >
                       {contact.email}
                     </a>
-                    <h4 className="text-base font-medium text-gray-800 dark:text-gray-200 mt-2">
+                    <h4 className="text-base font-medium text-heading-1 mt-2">
                       {contact.subject}
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-300 mt-2 whitespace-pre-wrap">
+                    <p className="text-body-var mt-2 whitespace-pre-wrap">
                       {contact.message}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="flex sm:flex-col items-center gap-3 sm:gap-2">
-                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center text-sm text-body-var">
                   <Calendar className="w-4 h-4 mr-1.5" />
                   {new Date(contact.createdAt).toLocaleDateString()}
                 </div>
@@ -237,14 +237,14 @@ const ContactManager: React.FC = () => {
                   {!contact.isRead ? (
                     <button
                       onClick={() => handleMarkAsRead(contact._id)}
-                      className="p-1.5 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                      className="btn btn-outline p-1.5 text-brand hover:text-brand rounded-lg transition-colors"
                       title={t("contact.management.actions.markAsRead")}
                     >
                       <Eye className="w-5 h-5" />
                     </button>
                   ) : (
                     <span
-                      className="p-1.5 text-gray-400 dark:text-gray-500"
+                      className="p-1.5 text-body-var"
                       title={t("contact.management.status.read")}
                     >
                       <EyeOff className="w-5 h-5" />
@@ -252,7 +252,7 @@ const ContactManager: React.FC = () => {
                   )}
                   <button
                     onClick={() => handleDelete(contact._id)}
-                    className="p-1.5 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                    className="btn btn-outline p-1.5 text-red-600 hover:text-red-700 rounded-lg transition-colors"
                     title={t("contact.management.actions.delete")}
                   >
                     <Trash2 className="w-5 h-5" />
@@ -266,14 +266,14 @@ const ContactManager: React.FC = () => {
         {filteredContacts.length === 0 && (
           <div className="text-center py-12">
             <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <MessageSquare className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              <MessageSquare className="w-8 h-8 text-body-var" />
             </div>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-body-var">
               {filter === "all"
                 ? t("contact.management.messages.noMessages")
                 : filter === "unread"
-                ? t("contact.management.messages.noUnreadMessages")
-                : t("contact.management.messages.noReadMessages")}
+                  ? t("contact.management.messages.noUnreadMessages")
+                  : t("contact.management.messages.noReadMessages")}
             </p>
           </div>
         )}
