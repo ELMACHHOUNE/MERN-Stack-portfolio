@@ -209,6 +209,56 @@ body {
     display: none;
   }
 
+  /* Themed scrollbar utility for containers like the admin sidebar */
+  .scrollbar-themed {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-scroll-thumb) var(--sidebar-scroll-track);
+  }
+  .scrollbar-themed::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-themed::-webkit-scrollbar-track {
+    background-color: var(--sidebar-scroll-track);
+    border-radius: 8px;
+  }
+  .scrollbar-themed::-webkit-scrollbar-thumb {
+    background-color: var(--sidebar-scroll-thumb);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .scrollbar-themed::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sidebar-scroll-thumb-hover);
+  }
+
+  /* Global themed scrollbars across the project */
+  html,
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-scroll-thumb) var(--sidebar-scroll-track);
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background-color: var(--sidebar-scroll-track);
+  }
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background-color: var(--sidebar-scroll-thumb);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sidebar-scroll-thumb-hover);
+  }
+
   .animate-fade-in {
     @apply opacity-0 transition-opacity duration-300;
   }

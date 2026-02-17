@@ -32,6 +32,9 @@ interface ThemeSettings {
   sidebarActiveText?: string;
   sidebarHoverBg?: string;
   sidebarHoverText?: string;
+  sidebarScrollTrack?: string;
+  sidebarScrollThumb?: string;
+  sidebarScrollThumbHover?: string;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -76,6 +79,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       "--sidebar-hover-text",
       t.sidebarHoverText || t.primary || "#4F46E5",
     );
+    root.style.setProperty(
+      "--sidebar-scroll-track",
+      t.sidebarScrollTrack || "#F3F4F6",
+    );
+    root.style.setProperty(
+      "--sidebar-scroll-thumb",
+      t.sidebarScrollThumb || "#D1D5DB",
+    );
+    root.style.setProperty(
+      "--sidebar-scroll-thumb-hover",
+      t.sidebarScrollThumbHover || "#9CA3AF",
+    );
   };
 
   const [preset, setPreset] = useState<ThemePreset>(() => {
@@ -94,6 +109,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       cardBorder: "#E5E7EB",
       sidebarBg: "#FFFFFF",
       sidebarText: "#374151",
+      sidebarScrollTrack: "#F3F4F6",
+      sidebarScrollThumb: "#D1D5DB",
+      sidebarScrollThumbHover: "#9CA3AF",
     };
     const base = baseLight;
 
@@ -116,6 +134,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
           sidebarActiveText: primary,
           sidebarHoverBg: "#F9A8D4",
           sidebarHoverText: primary,
+          sidebarScrollTrack: "#FCE7F3",
+          sidebarScrollThumb: "#F9A8D4",
+          sidebarScrollThumbHover: "#F472B6",
         };
       }
       case "boys": {
@@ -136,6 +157,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
           sidebarActiveText: primary,
           sidebarHoverBg: "#BFDBFE",
           sidebarHoverText: primary,
+          sidebarScrollTrack: "#DBEAFE",
+          sidebarScrollThumb: "#BFDBFE",
+          sidebarScrollThumbHover: "#93C5FD",
         };
       }
       case "professional": {
@@ -163,6 +187,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
           sidebarActiveText: "#FFFFFF",
           sidebarHoverBg: "#1F2937",
           sidebarHoverText: primary,
+          sidebarScrollTrack: "#0b1121",
+          sidebarScrollThumb: "#1b2333",
+          sidebarScrollThumbHover: "#334155",
         };
       }
       default: {
@@ -179,6 +206,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
           sidebarActiveText: "#4F46E5",
           sidebarHoverBg: "#F3F4F6",
           sidebarHoverText: "#4F46E5",
+          sidebarScrollTrack: "#F3F4F6",
+          sidebarScrollThumb: "#D1D5DB",
+          sidebarScrollThumbHover: "#9CA3AF",
         };
       }
     }

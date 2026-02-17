@@ -390,7 +390,7 @@ const AdminDashboard: React.FC = () => {
                 </button>
               </div>
               {/* Navigation Links */}
-              <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto overflow-x-hidden pr-2">
+              <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-themed">
                 {[
                   {
                     label: t("admin.tabs.skills"),
