@@ -527,9 +527,7 @@
         "markAsRead": "Marquer comme lu",
         "markAsUnread": "Marquer comme non lu",
         "reply": "Répondre",
-        "export": "Exporter",
-        "markAsRead": "Marquer comme lu",
-        "delete": "Supprimer"
+        "export": "Exporter"
       },
       "table": {
         "name": "Nom",
@@ -572,7 +570,7 @@
       "viewWork": "Voir Mes Projets",
       "getInTouch": "Me Contacter",
       "readyToStart": "Prêt à Démarrer Votre Prochain Projet ?",
-      "collaborateMessage": "Collaborons ensemble pour créer quelque chose d'extraordinaire",
+      "collaborateMessage": "Collaborons et construisons quelque chose de rapide, propre et agréable à utiliser.",
       "letsTalk": "Discutons"
     },
     "values": {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAdminProfile } from "../context/AdminProfileContext";
@@ -26,6 +26,7 @@ import { toast } from "react-hot-toast";
 import { useTheme } from "../context/ThemeContext";
 import { ProgressiveBlur } from "../components/ui/ProgressiveBlur";
 import { AnimatedBeam } from "../components/ui/animated-beam";
+import TypewriterEffectSmoothDemo from "../components/typewriter-effect-demo-1";
 
 type CoreValue = {
   icon: string;
@@ -941,18 +942,24 @@ const Home: React.FC = () => {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-heading-2 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-heading-2 mb-4">
               {t("home.cta.readyToStart")}
             </h2>
-            <p className="text-xl text-body-var mb-10">
+
+            <p className="mx-auto max-w-xl text-base text-muted mb-8">
               {t("home.cta.collaborateMessage")}
             </p>
+
+            <div className="mb-10">
+              <TypewriterEffectSmoothDemo />
+            </div>
+
             <Link
               to="/contact"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl btn-brand transition-colors duration-300"
+              className="inline-flex items-center justify-center gap-2 px-10 py-4 text-lg font-semibold rounded-2xl btn-brand shadow-sm hover:shadow-lg transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
             >
               {t("home.cta.letsTalk")}
-              <ArrowRight className="h-5 w-5 ml-2" />
+              <ArrowRight className="h-5 w-5" />
             </Link>
           </motion.div>
         </div>
