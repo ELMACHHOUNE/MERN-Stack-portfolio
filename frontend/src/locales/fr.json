@@ -559,6 +559,8 @@
     "portfolio": "Portfolio"
   },
   "home": {
+    "coreValuesSubtitle": "Ma façon de travailler, de construire et de collaborer",
+    "coreValuesHint": "Faites défiler la liste pour découvrir chaque valeur",
     "clients": "Clients",
     "defaultProfile": {
       "name": "Votre Nom",

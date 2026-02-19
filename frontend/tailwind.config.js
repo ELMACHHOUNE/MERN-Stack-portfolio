@@ -1,167 +1,249 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  darkMode: "class",
+  darkMode: ["class", "class"],
   theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: "rgb(var(--color-primary-50) / <alpha-value>)",
-          100: "rgb(var(--color-primary-100) / <alpha-value>)",
-          200: "rgb(var(--color-primary-200) / <alpha-value>)",
-          300: "rgb(var(--color-primary-300) / <alpha-value>)",
-          400: "rgb(var(--color-primary-400) / <alpha-value>)",
-          500: "rgb(var(--color-primary-500) / <alpha-value>)",
-          600: "rgb(var(--color-primary-600) / <alpha-value>)",
-          700: "rgb(var(--color-primary-700) / <alpha-value>)",
-          800: "rgb(var(--color-primary-800) / <alpha-value>)",
-          900: "rgb(var(--color-primary-900) / <alpha-value>)",
-          950: "rgb(var(--color-primary-950) / <alpha-value>)",
-        },
-        secondary: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
-          950: "#2e1065",
-        },
-        success: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          200: "#bbf7d0",
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22c55e",
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
-          950: "#052e16",
-        },
-        warning: {
-          50: "#fffbeb",
-          100: "#fef3c7",
-          200: "#fde68a",
-          300: "#fcd34d",
-          400: "#fbbf24",
-          500: "#f59e0b",
-          600: "#d97706",
-          700: "#b45309",
-          800: "#92400e",
-          900: "#78350f",
-          950: "#451a03",
-        },
-        error: {
-          50: "#fef2f2",
-          100: "#fee2e2",
-          200: "#fecaca",
-          300: "#fca5a5",
-          400: "#f87171",
-          500: "#ef4444",
-          600: "#dc2626",
-          700: "#b91c1c",
-          800: "#991b1b",
-          900: "#7f1d1d",
-          950: "#450a0a",
-        },
-        light: {
-          bg: {
-            primary: "#ffffff",
-            secondary: "#f3f4f6",
-            tertiary: "#e5e7eb",
-          },
-          text: {
-            primary: "#111827",
-            secondary: "#374151",
-            tertiary: "#6b7280",
-          },
-          border: {
-            primary: "#e5e7eb",
-            secondary: "#d1d5db",
-          },
-        },
-        dark: {
-          bg: {
-            primary: "#0B1121",
-            secondary: "#1B2333",
-            tertiary: "#1f2937",
-          },
-          text: {
-            primary: "#ffffff",
-            secondary: "#e5e7eb",
-            tertiary: "#9ca3af",
-          },
-          border: {
-            primary: "#374151",
-            secondary: "#4b5563",
-          },
-        },
-      },
-      spacing: {
-        18: "4.5rem",
-        22: "5.5rem",
-        26: "6.5rem",
-        30: "7.5rem",
-        34: "8.5rem",
-        38: "9.5rem",
-        42: "10.5rem",
-        46: "11.5rem",
-        50: "12.5rem",
-      },
-      borderRadius: {
-        "4xl": "2rem",
-        "5xl": "2.5rem",
-        "6xl": "3rem",
-      },
-      fontFamily: {
-        sans: ["Inter var", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
-      },
-      fontSize: {
-        "2xs": ["0.625rem", { lineHeight: "0.75rem" }],
-        "3xs": ["0.5rem", { lineHeight: "0.625rem" }],
-      },
-      boxShadow: {
-        soft: "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
-        "soft-dark":
-          "0 2px 15px -3px rgba(0, 0, 0, 0.2), 0 10px 20px -2px rgba(0, 0, 0, 0.15)",
-      },
-      animation: {
-        "fade-in": "fadeIn 0.5s ease-in-out",
-        "slide-up": "slideUp 0.5s ease-out",
-        "slide-down": "slideDown 0.5s ease-out",
-        "slide-left": "slideLeft 0.5s ease-out",
-        "slide-right": "slideRight 0.5s ease-out",
-      },
-      keyframes: {
-        fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        slideUp: {
-          "0%": { transform: "translateY(20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
-        },
-        slideDown: {
-          "0%": { transform: "translateY(-20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
-        },
-        slideLeft: {
-          "0%": { transform: "translateX(20px)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" },
-        },
-        slideRight: {
-          "0%": { transform: "translateX(-20px)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" },
-        },
-      },
-    },
+  	extend: {
+  		colors: {
+  			primary: {
+  				'50': 'rgb(var(--color-primary-50) / <alpha-value>)',
+  				'100': 'rgb(var(--color-primary-100) / <alpha-value>)',
+  				'200': 'rgb(var(--color-primary-200) / <alpha-value>)',
+  				'300': 'rgb(var(--color-primary-300) / <alpha-value>)',
+  				'400': 'rgb(var(--color-primary-400) / <alpha-value>)',
+  				'500': 'rgb(var(--color-primary-500) / <alpha-value>)',
+  				'600': 'rgb(var(--color-primary-600) / <alpha-value>)',
+  				'700': 'rgb(var(--color-primary-700) / <alpha-value>)',
+  				'800': 'rgb(var(--color-primary-800) / <alpha-value>)',
+  				'900': 'rgb(var(--color-primary-900) / <alpha-value>)',
+  				'950': 'rgb(var(--color-primary-950) / <alpha-value>)',
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primary-foreground))'
+  			},
+  			secondary: {
+  				'50': '#f5f3ff',
+  				'100': '#ede9fe',
+  				'200': '#ddd6fe',
+  				'300': '#c4b5fd',
+  				'400': '#a78bfa',
+  				'500': '#8b5cf6',
+  				'600': '#7c3aed',
+  				'700': '#6d28d9',
+  				'800': '#5b21b6',
+  				'900': '#4c1d95',
+  				'950': '#2e1065',
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondary-foreground))'
+  			},
+  			success: {
+  				'50': '#f0fdf4',
+  				'100': '#dcfce7',
+  				'200': '#bbf7d0',
+  				'300': '#86efac',
+  				'400': '#4ade80',
+  				'500': '#22c55e',
+  				'600': '#16a34a',
+  				'700': '#15803d',
+  				'800': '#166534',
+  				'900': '#14532d',
+  				'950': '#052e16'
+  			},
+  			warning: {
+  				'50': '#fffbeb',
+  				'100': '#fef3c7',
+  				'200': '#fde68a',
+  				'300': '#fcd34d',
+  				'400': '#fbbf24',
+  				'500': '#f59e0b',
+  				'600': '#d97706',
+  				'700': '#b45309',
+  				'800': '#92400e',
+  				'900': '#78350f',
+  				'950': '#451a03'
+  			},
+  			error: {
+  				'50': '#fef2f2',
+  				'100': '#fee2e2',
+  				'200': '#fecaca',
+  				'300': '#fca5a5',
+  				'400': '#f87171',
+  				'500': '#ef4444',
+  				'600': '#dc2626',
+  				'700': '#b91c1c',
+  				'800': '#991b1b',
+  				'900': '#7f1d1d',
+  				'950': '#450a0a'
+  			},
+  			light: {
+  				bg: {
+  					primary: '#ffffff',
+  					secondary: '#f3f4f6',
+  					tertiary: '#e5e7eb'
+  				},
+  				text: {
+  					primary: '#111827',
+  					secondary: '#374151',
+  					tertiary: '#6b7280'
+  				},
+  				border: {
+  					primary: '#e5e7eb',
+  					secondary: '#d1d5db'
+  				}
+  			},
+  			dark: {
+  				bg: {
+  					primary: '#0B1121',
+  					secondary: '#1B2333',
+  					tertiary: '#1f2937'
+  				},
+  				text: {
+  					primary: '#ffffff',
+  					secondary: '#e5e7eb',
+  					tertiary: '#9ca3af'
+  				},
+  				border: {
+  					primary: '#374151',
+  					secondary: '#4b5563'
+  				}
+  			},
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))',
+  			card: {
+  				DEFAULT: 'hsl(var(--card))',
+  				foreground: 'hsl(var(--card-foreground))'
+  			},
+  			popover: {
+  				DEFAULT: 'hsl(var(--popover))',
+  				foreground: 'hsl(var(--popover-foreground))'
+  			},
+  			muted: {
+  				DEFAULT: 'hsl(var(--muted))',
+  				foreground: 'hsl(var(--muted-foreground))'
+  			},
+  			accent: {
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accent-foreground))'
+  			},
+  			destructive: {
+  				DEFAULT: 'hsl(var(--destructive))',
+  				foreground: 'hsl(var(--destructive-foreground))'
+  			},
+  			border: 'hsl(var(--border))',
+  			input: 'hsl(var(--input))',
+  			ring: 'hsl(var(--ring))',
+  			chart: {
+  				'1': 'hsl(var(--chart-1))',
+  				'2': 'hsl(var(--chart-2))',
+  				'3': 'hsl(var(--chart-3))',
+  				'4': 'hsl(var(--chart-4))',
+  				'5': 'hsl(var(--chart-5))'
+  			}
+  		},
+  		spacing: {
+  			'18': '4.5rem',
+  			'22': '5.5rem',
+  			'26': '6.5rem',
+  			'30': '7.5rem',
+  			'34': '8.5rem',
+  			'38': '9.5rem',
+  			'42': '10.5rem',
+  			'46': '11.5rem',
+  			'50': '12.5rem'
+  		},
+  		borderRadius: {
+  			'4xl': '2rem',
+  			'5xl': '2.5rem',
+  			'6xl': '3rem',
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		fontFamily: {
+  			sans: [
+  				'Inter var',
+  				'sans-serif'
+  			],
+  			mono: [
+  				'JetBrains Mono',
+  				'monospace'
+  			]
+  		},
+  		fontSize: {
+  			'2xs': [
+  				'0.625rem',
+  				{
+  					lineHeight: '0.75rem'
+  				}
+  			],
+  			'3xs': [
+  				'0.5rem',
+  				{
+  					lineHeight: '0.625rem'
+  				}
+  			]
+  		},
+  		boxShadow: {
+  			soft: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+  			'soft-dark': '0 2px 15px -3px rgba(0, 0, 0, 0.2), 0 10px 20px -2px rgba(0, 0, 0, 0.15)'
+  		},
+  		animation: {
+  			'fade-in': 'fadeIn 0.5s ease-in-out',
+  			'slide-up': 'slideUp 0.5s ease-out',
+  			'slide-down': 'slideDown 0.5s ease-out',
+  			'slide-left': 'slideLeft 0.5s ease-out',
+  			'slide-right': 'slideRight 0.5s ease-out'
+  		},
+  		keyframes: {
+  			fadeIn: {
+  				'0%': {
+  					opacity: '0'
+  				},
+  				'100%': {
+  					opacity: '1'
+  				}
+  			},
+  			slideUp: {
+  				'0%': {
+  					transform: 'translateY(20px)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'translateY(0)',
+  					opacity: '1'
+  				}
+  			},
+  			slideDown: {
+  				'0%': {
+  					transform: 'translateY(-20px)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'translateY(0)',
+  					opacity: '1'
+  				}
+  			},
+  			slideLeft: {
+  				'0%': {
+  					transform: 'translateX(20px)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'translateX(0)',
+  					opacity: '1'
+  				}
+  			},
+  			slideRight: {
+  				'0%': {
+  					transform: 'translateX(-20px)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'translateX(0)',
+  					opacity: '1'
+  				}
+  			}
+  		}
+  	}
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };

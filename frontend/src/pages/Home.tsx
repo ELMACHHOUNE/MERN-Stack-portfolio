@@ -24,6 +24,188 @@ import {
 import { api } from "../utils/api";
 import { toast } from "react-hot-toast";
 import { useTheme } from "../context/ThemeContext";
+import { ProgressiveBlur } from "../components/ui/ProgressiveBlur";
+import { AnimatedBeam } from "../components/ui/animated-beam";
+
+type CoreValue = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+const CoreValuesCircle = React.forwardRef<
+  HTMLDivElement,
+  { className?: string; children?: React.ReactNode; title?: string }
+>(({ className = "", children, title }, ref) => (
+  <div
+    ref={ref}
+    title={title}
+    className={[
+      "z-10 flex size-12 items-center justify-center rounded-full",
+      "border border-card bg-card",
+      "shadow-[0_0_20px_-12px_rgba(0,0,0,0.35)]",
+      "transition-transform duration-300 hover:scale-105",
+      className,
+    ].join(" ")}
+  >
+    {children}
+  </div>
+));
+CoreValuesCircle.displayName = "CoreValuesCircle";
+
+const CoreValuesBeamDiagram: React.FC<{
+  values: CoreValue[];
+  getImageUrl: (_url: string) => string | undefined;
+}> = ({ values, getImageUrl }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const centerRef = React.useRef<HTMLDivElement>(null);
+  const div1Ref = React.useRef<HTMLDivElement>(null);
+  const div2Ref = React.useRef<HTMLDivElement>(null);
+  const div3Ref = React.useRef<HTMLDivElement>(null);
+  const div5Ref = React.useRef<HTMLDivElement>(null);
+  const div6Ref = React.useRef<HTMLDivElement>(null);
+
+  const nodes = values.slice(0, 6);
+  const topRow = nodes.slice(0, 2);
+  const midRow = nodes.slice(2, 5);
+  const bottomRow = nodes.slice(5, 6);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-2xl border border-card bg-card/60"
+    >
+      <div className="flex size-full max-h-[230px] max-w-lg flex-col items-stretch justify-between gap-10 px-8">
+        <div className="flex flex-row items-center justify-between">
+          {topRow[0] ? (
+            <CoreValuesCircle ref={div1Ref} title={topRow[0].title}>
+              <img
+                src={getImageUrl(topRow[0].icon)}
+                alt={topRow[0].title}
+                className="h-6 w-6 object-contain"
+                loading="lazy"
+              />
+            </CoreValuesCircle>
+          ) : (
+            <div />
+          )}
+
+          {topRow[1] ? (
+            <CoreValuesCircle ref={div5Ref} title={topRow[1].title}>
+              <img
+                src={getImageUrl(topRow[1].icon)}
+                alt={topRow[1].title}
+                className="h-6 w-6 object-contain"
+                loading="lazy"
+              />
+            </CoreValuesCircle>
+          ) : (
+            <div />
+          )}
+        </div>
+
+        <div className="flex flex-row items-center justify-between">
+          {midRow[0] ? (
+            <CoreValuesCircle ref={div2Ref} title={midRow[0].title}>
+              <img
+                src={getImageUrl(midRow[0].icon)}
+                alt={midRow[0].title}
+                className="h-6 w-6 object-contain"
+                loading="lazy"
+              />
+            </CoreValuesCircle>
+          ) : (
+            <div />
+          )}
+
+          <CoreValuesCircle
+            ref={centerRef}
+            className="size-16 bg-card"
+            title="Core Values"
+          >
+            <span className="text-xs font-semibold tracking-wide text-heading-1">
+              CORE
+            </span>
+          </CoreValuesCircle>
+
+          {midRow[1] ? (
+            <CoreValuesCircle ref={div6Ref} title={midRow[1].title}>
+              <img
+                src={getImageUrl(midRow[1].icon)}
+                alt={midRow[1].title}
+                className="h-6 w-6 object-contain"
+                loading="lazy"
+              />
+            </CoreValuesCircle>
+          ) : (
+            <div />
+          )}
+        </div>
+
+        <div className="flex flex-row items-center justify-between">
+          {bottomRow[0] ? (
+            <CoreValuesCircle ref={div3Ref} title={bottomRow[0].title}>
+              <img
+                src={getImageUrl(bottomRow[0].icon)}
+                alt={bottomRow[0].title}
+                className="h-6 w-6 object-contain"
+                loading="lazy"
+              />
+            </CoreValuesCircle>
+          ) : (
+            <div />
+          )}
+          <div />
+        </div>
+      </div>
+
+      {/* Beams */}
+      {nodes[0] && (
+        <AnimatedBeam
+          containerRef={containerRef}
+          fromRef={div1Ref}
+          toRef={centerRef}
+          curvature={75}
+          endYOffset={-10}
+        />
+      )}
+      {nodes[1] && (
+        <AnimatedBeam
+          containerRef={containerRef}
+          fromRef={div5Ref}
+          toRef={centerRef}
+          curvature={-75}
+          endYOffset={-10}
+          reverse
+        />
+      )}
+      {nodes[2] && (
+        <AnimatedBeam
+          containerRef={containerRef}
+          fromRef={div2Ref}
+          toRef={centerRef}
+        />
+      )}
+      {nodes[3] && (
+        <AnimatedBeam
+          containerRef={containerRef}
+          fromRef={div6Ref}
+          toRef={centerRef}
+          reverse
+        />
+      )}
+      {nodes[5] && (
+        <AnimatedBeam
+          containerRef={containerRef}
+          fromRef={div3Ref}
+          toRef={centerRef}
+          curvature={-75}
+          endYOffset={10}
+        />
+      )}
+    </div>
+  );
+};
 
 interface SocialLink {
   icon: LucideIcon;
@@ -319,6 +501,9 @@ const Home: React.FC = () => {
     cvUrl: adminProfile?.cvUrl || "",
   };
 
+  const valuesCount = personalInfo.values.length;
+  const isSparseValues = valuesCount <= 2;
+
   const stats = [
     {
       icon: <Briefcase className="w-6 h-6" />,
@@ -518,55 +703,6 @@ const Home: React.FC = () => {
                 </div>
               </motion.div>
 
-              {personalInfo.values.length > 0 && (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  className="mb-12"
-                >
-                  <div className="card card-hover p-8">
-                    <h3 className="text-2xl font-bold text-heading-1 mb-8">
-                      {t("about.coreValues")}
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      {personalInfo.values.map((value, index) => (
-                        <div key={index} className="group card card-hover p-6">
-                          <div className="w-12 h-12 mx-auto mb-4 p-2.5 rounded-xl brand-gradient text-white shadow-sm">
-                            <img
-                              src={getImageUrl(value.icon)}
-                              alt={value.title}
-                              className="w-full h-full object-contain"
-                              loading="lazy"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = "none";
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  const fallbackIcon =
-                                    document.createElement("div");
-                                  fallbackIcon.className =
-                                    "w-full h-full text-white flex items-center justify-center";
-                                  fallbackIcon.innerHTML =
-                                    '<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>';
-                                  parent.appendChild(fallbackIcon);
-                                }
-                              }}
-                            />
-                          </div>
-                          <h4 className="text-lg font-semibold text-heading-1 mb-2 text-center">
-                            {value.title}
-                          </h4>
-                          <p className="text-body-var text-center text-sm">
-                            {value.description}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
               {personalInfo.interests.length > 0 && (
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
@@ -681,6 +817,108 @@ const Home: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* Core Values Section (separated) */}
+      {personalInfo.values.length > 0 && (
+        <section
+          className="relative min-h-screen w-full flex items-center overflow-hidden"
+          style={{
+            background:
+              preset === "professional"
+                ? "radial-gradient(120% 100% at 50% 115%, rgba(13,26,54,0.95) 0%, rgba(13,26,54,0.55) 26%, rgba(0,0,0,1) 62%)"
+                : preset === "girls"
+                  ? "radial-gradient(120% 100% at 50% 115%, rgba(236,72,153,0.65) 0%, rgba(236,72,153,0.12) 28%, rgba(255,255,255,1) 62%)"
+                  : preset === "boys"
+                    ? "radial-gradient(120% 100% at 50% 115%, rgba(99,102,241,0.65) 0%, rgba(99,102,241,0.12) 28%, rgba(255,255,255,1) 62%)"
+                    : "radial-gradient(120% 100% at 50% 115%, rgba(79,70,229,0.65) 0%, rgba(79,70,229,0.10) 28%, rgba(255,255,255,1) 62%)",
+          }}
+        >
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-20">
+            <div className="max-w-7xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55 }}
+                viewport={{ once: true }}
+                className="mb-10"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold text-heading-1">
+                  {t("about.coreValues")}
+                </h2>
+                <p className="mt-3 text-lg text-body-var max-w-2xl">
+                  {t("home.coreValuesSubtitle") ||
+                    t("home.cta.collaborateMessage")}
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.05 }}
+                viewport={{ once: true }}
+                className="relative w-full rounded-2xl border border-card bg-card"
+              >
+                <div className="p-6 md:p-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                    <div className="order-2 lg:order-1">
+                      <div
+                        className={
+                          isSparseValues
+                            ? "space-y-4"
+                            : "space-y-4 max-h-[360px] overflow-auto scrollbar-themed pr-1"
+                        }
+                      >
+                        {personalInfo.values.map((value, index) => (
+                          <div
+                            key={index}
+                            className="group card card-hover p-5"
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="shrink-0 w-11 h-11 p-2.5 rounded-xl brand-gradient text-white shadow-sm flex items-center justify-center">
+                                <img
+                                  src={getImageUrl(value.icon)}
+                                  alt={value.title}
+                                  className="w-full h-full object-contain"
+                                  loading="lazy"
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <h3 className="text-base font-semibold text-heading-1">
+                                  {value.title}
+                                </h3>
+                                <p className="mt-1 text-body-var text-sm leading-relaxed">
+                                  {value.description}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {!isSparseValues && (
+                        <div className="relative mt-0">
+                          <ProgressiveBlur position="bottom" height="35%" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="order-1 lg:order-2">
+                      <CoreValuesBeamDiagram
+                        values={personalInfo.values}
+                        getImageUrl={getImageUrl}
+                      />
+                      <p className="mt-4 text-sm text-muted">
+                        {t("home.coreValuesHint") ||
+                          "Each value connects back to how I work."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section

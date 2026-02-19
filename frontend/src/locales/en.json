@@ -477,6 +477,8 @@
     "portfolio": "Portfolio"
   },
   "home": {
+    "coreValuesSubtitle": "How I show up, build, and collaborate",
+    "coreValuesHint": "Scroll the list to explore each value",
     "values": {
       "sectionTitle": "My Values",
       "sectionDescription": "Principles that guide my work",
