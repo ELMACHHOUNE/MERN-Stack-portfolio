@@ -408,7 +408,7 @@ const Home: React.FC = () => {
                 <MapPin className="w-4 h-4 mr-2" />
                 <span>{personalInfo.location}</span>
               </div>
-              <p className="mt-6 text-gray-600 dark:text-gray-400 max-w-xl">
+              <p className="mt-6 text-body-var max-w-xl">
                 {personalInfo.bio?.length > 0
                   ? personalInfo.bio.slice(0, 160)
                   : t("home.defaultProfile.bio")}
@@ -424,7 +424,7 @@ const Home: React.FC = () => {
                 </Link>
                 <Link
                   to="/contact"
-                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] border border-gray-200 dark:border-gray-800 dark:hover:border-gray-700 transform hover:scale-105 transition-all duration-300"
+                  className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-body-var bg-card border border-card hover:border-[var(--brand-primary)] transform hover:scale-105 transition-all duration-300"
                 >
                   {t("home.cta.getInTouch")}
                 </Link>
@@ -436,7 +436,7 @@ const Home: React.FC = () => {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-[#1B2333] dark:hover:bg-[#232B3B] text-gray-600 hover-text-brand dark:text-gray-400 border border-gray-200 dark:border-gray-800"
+                    className="p-2.5 rounded-lg bg-card text-body-var hover-text-brand border border-card hover:border-[var(--brand-primary)] transition-all duration-300"
                     aria-label={link.label}
                   >
                     <link.icon className="h-5 w-5" />
@@ -585,7 +585,7 @@ const Home: React.FC = () => {
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3, delay: index * 0.1 }}
-                          className="px-4 py-2 bg-white dark:bg-[#232B3B] text-brand rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 hover:scale-105"
+                          className="px-4 py-2 bg-card text-brand rounded-lg text-sm font-medium border border-card hover:border-[var(--brand-primary)] transition-all duration-300 hover:scale-105"
                         >
                           {interest}
                         </motion.span>
@@ -623,7 +623,7 @@ const Home: React.FC = () => {
                   className="mt-16"
                 >
                   <div className="card card-hover p-8">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                    <h3 className="text-2xl font-bold text-heading-1 mb-8">
                       {t("home.clients")}
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-center">
@@ -688,12 +688,12 @@ const Home: React.FC = () => {
         style={{
           background:
             preset === "girls"
-              ? "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, #ec4899 100%)"
+              ? "radial-gradient(120% 100% at 50% 115%, rgba(236,72,153,0.75) 0%, rgba(236,72,153,0.20) 28%, rgba(255,255,255,1) 62%)"
               : preset === "boys"
-                ? "radial-gradient(125% 125% at 50% 10%, #fff 40%, #6366f1 100%)"
+                ? "radial-gradient(120% 100% at 50% 115%, rgba(99,102,241,0.75) 0%, rgba(99,102,241,0.20) 28%, rgba(255,255,255,1) 62%)"
                 : preset === "professional"
-                  ? "radial-gradient(125% 125% at 50% 90%, #000000 40%, #0d1a36 100%)"
-                  : "radial-gradient(125% 125% at 50% 10%, #ffffff 40%, var(--brand-primary) 100%)",
+                  ? "radial-gradient(120% 100% at 50% 115%, rgba(13,26,54,0.95) 0%, rgba(13,26,54,0.55) 26%, rgba(0,0,0,1) 62%)"
+                  : "radial-gradient(120% 100% at 50% 115%, rgba(79,70,229,0.75) 0%, rgba(79,70,229,0.18) 28%, rgba(255,255,255,1) 62%)",
         }}
       >
         <div className="max-w-4xl mx-auto text-center">
@@ -706,12 +706,12 @@ const Home: React.FC = () => {
             <h2 className="text-4xl font-bold text-heading-2 mb-6">
               {t("home.cta.readyToStart")}
             </h2>
-            <p className="text-xl text-blue-100 mb-10">
+            <p className="text-xl text-body-var mb-10">
               {t("home.cta.collaborateMessage")}
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transform hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl btn-brand transition-colors duration-300"
             >
               {t("home.cta.letsTalk")}
               <ArrowRight className="h-5 w-5 ml-2" />
