@@ -24,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const baseClasses = "btn inline-flex items-center justify-center gap-2";
   const variantClasses = {
-    primary: "btn-primary",
+    primary: "btn-brand",
     secondary: "btn-secondary",
     outline: "btn-outline",
   };

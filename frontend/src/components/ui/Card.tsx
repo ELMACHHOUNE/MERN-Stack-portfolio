@@ -61,7 +61,7 @@ const CardTitle: React.FC<CardTitleProps> = ({
 }) => {
   return (
     <h3
-      className={`text-xl font-semibold text-gray-900 dark:text-white ${className}`}
+      className={`text-xl font-semibold text-heading-1 ${className}`}
       {...props}
     >
       {children}
@@ -79,7 +79,7 @@ const CardContent: React.FC<CardContentProps> = ({
   ...props
 }) => {
   return (
-    <div className={`text-gray-600 dark:text-gray-300 ${className}`} {...props}>
+    <div className={`text-body-var ${className}`} {...props}>
       {children}
     </div>
   );

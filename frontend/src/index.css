@@ -180,6 +180,13 @@ body {
   .sidebar-text {
     color: var(--sidebar-text);
   }
+  /* Card background helper */
+  .bg-card {
+    background-color: var(--card-bg) !important;
+  }
+  .border-card {
+    border-color: var(--card-border) !important;
+  }
   .sidebar-active {
     background-color: var(--sidebar-active-bg);
     color: var(--sidebar-active-text);

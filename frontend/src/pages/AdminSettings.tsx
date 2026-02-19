@@ -256,11 +256,6 @@ const AdminSettings: React.FC = () => {
             <form onSubmit={handleProfileUpdate} className="space-y-8">
               {/* Profile Image Section */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-heading-1">
-                    {t("settings.profile.title")}
-                  </CardTitle>
-                </CardHeader>
                 <CardContent className="text-body-var">
                   <div className="flex flex-col items-center space-y-4">
                     <div className="relative">
